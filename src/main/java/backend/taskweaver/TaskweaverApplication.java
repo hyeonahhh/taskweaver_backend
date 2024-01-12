@@ -15,6 +15,6 @@ public class TaskweaverApplication {
 
 	@GetMapping(value = "/")
 	public String helloWorld() {
-		return "PLEASE";
+		return "CI/CD";
 	}
 }
