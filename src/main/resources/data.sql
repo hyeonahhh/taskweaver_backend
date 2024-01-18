@@ -1,0 +1,1 @@
+insert into member (email, password, nickname, login_type) values ('amy4021@naver.com', '1234', 'amy', 'loginType.DEFAULT');
