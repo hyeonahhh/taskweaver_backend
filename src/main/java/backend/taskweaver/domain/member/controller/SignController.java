@@ -18,7 +18,7 @@ public class SignController {
 
     @PostMapping("/sign-up")
     public ApiResponse signUp(@RequestBody SignUpRequest request) {
-        return ApiResponse.success(signService.registMember(request));
+        return ApiResponse.success(signService.registerMember(request));
     }
 
     @PostMapping("/sign-in")

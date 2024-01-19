@@ -1,5 +1,6 @@
 package backend.taskweaver.global.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,20 +30,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = parseBearerToken(request); //  HTTP 요청의 헤더에서 Authorization값을 찾아서 Bearer로 시작하는지 확인하고 접두어를 제외한 토큰값으로 파싱한다. 헤더에 Authorization이 존재하지 않거나 접두어가 Bearer가 아니면 null을 반환한다.
-        User user = parseUserSpecification(token); //토큰값을 토대로 토큰에 담긴 회원ID와 회원타입을 토대로 스프링 시큐리티에서 사용할 User 객체를 반환한다. 이 때 파싱된 토큰이 null이 아니면서 길이가 너무 짧지 않을 때만 토큰을 복호화하고, 그 외에는 별도로 익명임을 뜻하는 User 객체를 생성한다. 비밀번호는 로그인 API를 호출할 때 이미 확인을 했기 때문에, User 객체를 생성할 때는 사용하지 않으므로 빈 문자열을 넘긴다.
-
-        //HTTP 요청 헤더의 토큰을 기반으로 생성한 User 객체를 토대로 스프링 시큐리티에서 사용할 UsernamePasswordAuthenticationToken 객체를 생성한다.
-        // 이후 스프링 시큐리티 컨텍스트의 인증 정보를 새로 생성한 인증 토큰으로 설정하고 다음 필터로 넘어간다.
-        AbstractAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(user, token, user.getAuthorities());
-        authenticated.setDetails(new WebAuthenticationDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticated);
+        try {
+            String accessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION);	// parseBearerToken() 변경에 따른 수정
+            User user = parseUserSpecification(accessToken);
+            AbstractAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(user, accessToken, user.getAuthorities());
+            authenticated.setDetails(new WebAuthenticationDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticated);
+        } catch (ExpiredJwtException e) {	// 변경
+            reissueAccessToken(request, response, e);
+        } catch (Exception e) {
+            request.setAttribute("exception", e);
+        }
 
         filterChain.doFilter(request, response);
     }
 
-    private String parseBearerToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+    private String parseBearerToken(HttpServletRequest request, String headerName) {
+        return Optional.ofNullable(request.getHeader(headerName))
                 .filter(token -> token.substring(0, 7).equalsIgnoreCase("Bearer "))
                 .map(token -> token.substring(7))
                 .orElse(null);
@@ -56,5 +60,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .split(":");
 
         return new User(split[0], "", List.of(new SimpleGrantedAuthority(split[1])));
+    }
+
+    private void reissueAccessToken(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+        try {
+            String refreshToken = parseBearerToken(request, "Refresh-Token");
+            if (refreshToken == null) {
+                throw exception;
+            }
+            String oldAccessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION);
+            tokenProvider.validateRefreshToken(refreshToken, oldAccessToken);
+            String newAccessToken = tokenProvider.recreateAccessToken(oldAccessToken);
+            User user = parseUserSpecification(newAccessToken);
+            AbstractAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(user, newAccessToken, user.getAuthorities());
+            authenticated.setDetails(new WebAuthenticationDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticated);
+
+            response.setHeader("New-Access-Token", newAccessToken);
+        } catch (Exception e) {
+            request.setAttribute("exception", e);
+        }
     }
 }
