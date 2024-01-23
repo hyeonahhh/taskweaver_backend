@@ -23,7 +23,7 @@ public class SignController {
     private final SignService signService;
 
     @Operation(summary = "회원 가입")
-    @PostMapping("/sign-up")
+    @PostMapping("/v1/auth/sign-up")
     public ResponseEntity<ApiResponse> signUp(@RequestBody SignUpRequest request) {
         ApiResponse ar = ApiResponse.builder()
                 .result(signService.registMember(request))
@@ -34,7 +34,7 @@ public class SignController {
     }
 
     @Operation(summary = "로그인")
-    @PostMapping("/sign-in")
+    @PostMapping("/v1/auth/sign-in")
     public ResponseEntity<ApiResponse> signIn(@RequestBody SignInRequest request) {
         ApiResponse ar = ApiResponse.builder()
                 .result(signService.signIn(request))
