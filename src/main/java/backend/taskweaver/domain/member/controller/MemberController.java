@@ -14,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "회원 관련 컨트롤러")
 @RequiredArgsConstructor
@@ -26,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
 
-    @Operation(summary = "회원 정보 조회")
-    @PostMapping("/get-member-info")
+    @Operation(summary = "마이페이지(회원 정보 조회)")
+    @GetMapping("/v1/user")
     public ResponseEntity<ApiResponse> getMemberInfo(@AuthenticationPrincipal User user) {
         ApiResponse ar = ApiResponse.builder()
                 .result(memberService.getMemberInfo(Long.parseLong(user.getUsername())))
