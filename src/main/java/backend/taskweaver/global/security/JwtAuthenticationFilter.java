@@ -32,13 +32,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String accessToken = parseBearerToken(request, HttpHeaders.AUTHORIZATION);	// parseBearerToken() 변경에 따른 수정
+            System.out.println("doFilterInternal accessToken : " + accessToken);
             User user = parseUserSpecification(accessToken);
             AbstractAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(user, accessToken, user.getAuthorities());
             authenticated.setDetails(new WebAuthenticationDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticated);
         } catch (ExpiredJwtException e) {	// 변경
+            e.printStackTrace();
             reissueAccessToken(request, response, e);
         } catch (Exception e) {
+            e.printStackTrace();
             request.setAttribute("exception", e);
         }
 
@@ -58,6 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .map(tokenProvider::validateTokenAndGetSubject)
                 .orElse("anonymous:anonymous")
                 .split(":");
+        System.out.println(split[0]);
+        System.out.println(split[1]);
 
         return new User(split[0], "", List.of(new SimpleGrantedAuthority(split[1])));
     }

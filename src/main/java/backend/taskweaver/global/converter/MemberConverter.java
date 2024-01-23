@@ -1,5 +1,6 @@
 package backend.taskweaver.global.converter;
 
+import backend.taskweaver.domain.member.dto.MemberInfoResponse;
 import backend.taskweaver.domain.member.dto.SignInResponse;
 import backend.taskweaver.domain.member.dto.SignUpRequest;
 import backend.taskweaver.domain.member.dto.SignUpResponse;
@@ -33,6 +34,15 @@ public class MemberConverter {
                 member.getLoginType(),
                 accessToken,
                 refreshToken
+        );
+    }
+    public static MemberInfoResponse toMemberInfoResponse(Member member) {
+        return new MemberInfoResponse(
+                member.getId(),
+                member.getEmail(),
+                member.getNickname(),
+                member.getLoginType(),
+                member.getImageUrl()
         );
     }
 }
