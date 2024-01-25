@@ -22,7 +22,8 @@ public class TeamConverter {
             team.getName(),
             team.getDescription(),
             team.getInviteLink(),
-            team.getTeamLeader()
+            team.getTeamLeader(),
+            team.getCreatedAt()
         );
     }
     public static String generateInviteLink() {

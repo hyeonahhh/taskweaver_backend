@@ -1,7 +1,7 @@
 package backend.taskweaver.domain.team.entity;
 
 
-import backend.taskweaver.domain.member.entity.BaseEntity;
+import backend.taskweaver.domain.team.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
