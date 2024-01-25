@@ -13,6 +13,7 @@ public class TeamResponse {
         String name;
         String description;
         String inviteLink;
+        Long teamLeader;
     }
 
 }

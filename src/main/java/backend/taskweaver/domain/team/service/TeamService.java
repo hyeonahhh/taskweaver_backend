@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 public class TeamService {
     @Autowired
     private final TeamRepository teamRepository;
-    public TeamResponse.teamCreateResult createTeam(TeamRequest.teamCreate request) {
+    // 우선 팀 생성자 필드로만 추가
+    public TeamResponse.teamCreateResult createTeam(TeamRequest.teamCreate request, Long user) {
         Team team =  teamRepository.save(TeamConverter.toTeam(request));
+        team.setTeamLeader(user);
         return TeamConverter.toCreateResponse(team);
 
     }

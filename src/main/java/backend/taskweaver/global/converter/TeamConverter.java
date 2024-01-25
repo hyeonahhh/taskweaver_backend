@@ -21,7 +21,8 @@ public class TeamConverter {
             team.getId(),
             team.getName(),
             team.getDescription(),
-            team.getInviteLink()
+            team.getInviteLink(),
+            team.getTeamLeader()
         );
     }
     public static String generateInviteLink() {
@@ -29,7 +30,5 @@ public class TeamConverter {
         // 도메인 결정 후
         return "https://localhost:" + "8081" + "/invite/" + uuid.toString();
     }
-
-
 
 }

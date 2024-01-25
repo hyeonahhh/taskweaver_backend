@@ -10,6 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
+@Setter
 @Builder
 
 @DynamicUpdate
@@ -30,4 +31,6 @@ public class Team extends BaseEntity {
     private String description;
 
     private String inviteLink;
+
+    private Long teamLeader;
 }
