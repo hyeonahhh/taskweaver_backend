@@ -2,7 +2,6 @@ package backend.taskweaver.domain.team.entity;
 
 
 import backend.taskweaver.domain.member.entity.Member;
-import backend.taskweaver.domain.member.entity.enums.LoginType;
 import backend.taskweaver.domain.team.entity.enums.TeamRole;
 import jakarta.persistence.*;
 import lombok.*;
