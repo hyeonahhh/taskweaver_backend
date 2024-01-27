@@ -11,7 +11,6 @@ public class TeamConverter {
     public static Team toTeam(TeamRequest.teamCreate request) {
         return Team.builder()
                 .name(request.getName())
-                .description(request.getDescription())
                 .inviteLink(generateInviteLink())
                 .build();
     }
@@ -20,7 +19,6 @@ public class TeamConverter {
         return new TeamResponse.teamCreateResult(
             team.getId(),
             team.getName(),
-            team.getDescription(),
             team.getInviteLink(),
             team.getTeamLeader(),
             team.getCreatedAt()

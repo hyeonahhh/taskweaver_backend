@@ -15,8 +15,5 @@ public class TeamRequest {
     public static class teamCreate {
         @Schema(description = "팀 이름", example = "Team Name")
         String name;
-
-        @Schema(description = "팀 설명", example = "Team Description")
-        String description;
     }
 }

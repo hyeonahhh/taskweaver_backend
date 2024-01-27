@@ -14,7 +14,6 @@ public class TeamResponse {
     public static class teamCreateResult {
         Long id;
         String name;
-        String description;
         String inviteLink;
         Long teamLeader;
         LocalDateTime createdAt;

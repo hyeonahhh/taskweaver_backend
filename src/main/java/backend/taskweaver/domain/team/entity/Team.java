@@ -1,7 +1,6 @@
 package backend.taskweaver.domain.team.entity;
 
 
-import backend.taskweaver.domain.team.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -27,8 +26,10 @@ public class Team extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
+    /*
     @Column(nullable = false, length = 100)
     private String description;
+     */
 
     private String inviteLink;
 
