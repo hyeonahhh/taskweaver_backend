@@ -1,5 +1,6 @@
 package backend.taskweaver.domain.project.entity;
 
+import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;
