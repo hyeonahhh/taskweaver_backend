@@ -1,4 +1,4 @@
-package backend.taskweaver.domain.project.entity;
+package backend.taskweaver.domain;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
