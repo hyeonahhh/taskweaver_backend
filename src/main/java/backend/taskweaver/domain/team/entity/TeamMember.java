@@ -1,6 +1,7 @@
 package backend.taskweaver.domain.team.entity;
 
 
+import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.team.entity.enums.TeamRole;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class TeamMember {
+public class TeamMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
