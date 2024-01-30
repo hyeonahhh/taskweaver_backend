@@ -5,8 +5,6 @@ import backend.taskweaver.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "project")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,15 +19,16 @@ public class Project extends BaseEntity {
     private Long id;
 
     @Column(name = "project_name", nullable = false)
-    private String projectName;
+    private String name;
 
     @Column(name = "poject_description", nullable = false)
-    private String projectDescription;
-
-    @Column(name = "finished_at", nullable = false)
-    private LocalDateTime finishedAt;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_state_id")
+    private ProjectState projectState;
 }

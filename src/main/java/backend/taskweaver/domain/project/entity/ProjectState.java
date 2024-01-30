@@ -1,6 +1,7 @@
 package backend.taskweaver.domain.project.entity;
 
 
+import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-public class ProjectState {
+public class ProjectState extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_state_id")
@@ -19,9 +20,5 @@ public class ProjectState {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "project_state_name", nullable = false)
-    private ProjectStateName projectStateName;
-
-    @OneToOne
-    @JoinColumn(name = "project_state_mapping_id")
-    private ProjectStateMapping projectStateMapping;
+    private ProjectStateName stateName;
 }
