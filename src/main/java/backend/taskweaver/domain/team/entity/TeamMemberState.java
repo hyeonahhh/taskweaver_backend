@@ -4,8 +4,6 @@ package backend.taskweaver.domain.team.entity;
 import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.team.entity.enums.InviteState;
-import backend.taskweaver.domain.team.entity.enums.TeamRole;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
