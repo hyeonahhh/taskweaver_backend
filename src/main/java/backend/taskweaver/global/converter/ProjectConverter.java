@@ -37,9 +37,9 @@ public class ProjectConverter {
         );
     }
 
-    public static ProjectMember toProjectMember(Project project, TeamMember teamMember) {
+    public static ProjectMember toProjectMember(Project project, TeamMember teamMember, ProjectRole role) {
         return ProjectMember.builder()
-                .role(ProjectRole.NON_MANAGER)
+                .role(role)
                 .member(teamMember.getMember())
                 .project(project)
                 .build();

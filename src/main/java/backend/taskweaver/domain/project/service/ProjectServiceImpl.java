@@ -5,6 +5,7 @@ import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.entity.ProjectState;
+import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
 import backend.taskweaver.domain.project.repository.ProjectStateRepository;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
@@ -59,14 +59,20 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     @Transactional
     public void createProjectMember(Project project, Long managerId) {
+        // 팀 member를 가져와 project member로 저장시키기
         Team team = project.getTeam();
-        List<TeamMember> teamMembers = teamMemberRepository.findAlByTeam(team);
+        List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
 
-        teamMembers.stream()
-                .map(teamMember -> ProjectConverter.toProjectMember(project, teamMember))
-                .forEach(projectMemberRepository::save);
+        teamMembers.forEach(teamMember -> {
+            Long teamMemberId = teamMember.getId();
+            if (teamMemberId.equals(managerId)) {
+                ProjectMember projectMember = ProjectConverter.toProjectMember(project, teamMember, ProjectRole.MANAGER);
+                projectMemberRepository.save(projectMember);
+            } else {
+                ProjectMember projectMember = ProjectConverter.toProjectMember(project, teamMember, ProjectRole.NON_MANAGER);
+                projectMemberRepository.save(projectMember);
 
-        ProjectMember member = projectMemberRepository.findById(managerId).get();
-        member.changeToManager();
+            }
+        });
     }
 }
