@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class TeamConverter {
 
-    public static Team toTeam(TeamRequest.teamCreate request) {
+    public static Team toTeam(TeamRequest.teamCreateRequest request) {
         return Team.builder()
                 .name(request.getName())
                 .inviteLink(generateInviteLink())

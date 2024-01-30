@@ -1,5 +1,6 @@
 package backend.taskweaver.domain.team.controller;
 
+import backend.taskweaver.domain.team.dto.TeamInviteRequest;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.service.TeamService;
 import backend.taskweaver.global.code.ApiResponse;
@@ -28,7 +29,7 @@ public class TeamController {
 
     @Operation(summary = "팀 생성")
     @PostMapping("/teams")
-    public ResponseEntity<ApiResponse> createTeam(@RequestBody TeamRequest.teamCreate request, @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse> createTeam(@RequestBody TeamRequest.teamCreateRequest request, @AuthenticationPrincipal User user) {
         try {
             ApiResponse ar = ApiResponse.builder()
                     .result(teamService.createTeam(request, Long.parseLong(user.getUsername())))
@@ -40,5 +41,17 @@ public class TeamController {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    @Operation(summary = "팀원 초대 - 이메일로 초대")
+    @PostMapping("/team/invitation/email")
+    public ResponseEntity<ApiResponse> inviteEmail(@RequestBody TeamInviteRequest.EmailInviteRequest request) {
+        ApiResponse ar = ApiResponse.builder()
+                .result(teamService.inviteEmail(request))
+                .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
     }
 }
