@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +60,10 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     @Transactional
     public void createProjectMember(Project project, Long managerId) {
+
+        // 예외 처리
+        checkIfManagerIdExist(managerId); // managerId가 아예 존재하지 않을 경우
+
         // 팀 member를 가져와 project member로 저장시키기
         Team team = project.getTeam();
         List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
@@ -71,8 +76,13 @@ public class ProjectServiceImpl implements ProjectService{
             } else {
                 ProjectMember projectMember = ProjectConverter.toProjectMember(project, teamMember, ProjectRole.NON_MANAGER);
                 projectMemberRepository.save(projectMember);
-
             }
         });
+    }
+
+    @Override
+    public void checkIfManagerIdExist(Long managerId) {
+        teamMemberRepository.findById(managerId)
+                .orElseThrow(NoSuchElementException::new);
     }
 }

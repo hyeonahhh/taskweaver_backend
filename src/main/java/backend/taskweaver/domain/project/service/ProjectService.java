@@ -9,4 +9,5 @@ public interface ProjectService{
     ProjectState createProjectStateOnProgress();
     ProjectResponse createProject(ProjectRequest request, Long teamId);
     void createProjectMember(Project project, Long managerId);
+    void checkIfManagerIdExist(Long managerId);
 }

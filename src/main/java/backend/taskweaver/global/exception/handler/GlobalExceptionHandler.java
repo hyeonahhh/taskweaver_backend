@@ -10,17 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestControllerAdvice
@@ -117,6 +116,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HTTP_STATUS_OK);
     }
 
+    /**
+     * [Exception]  Java 컬렉션에서 요소를 찾지 못한 경우
+     *
+     * @param e NoSuchElementException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(NoSuchElementException.class)
+    protected ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException e) {
+        log.error("NoSuchElementException", e);
+        log.error("Element not found: {}", e.getMessage());
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.NOT_FOUND_ERROR, e.getMessage());
+        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+    }
 
     /**
      * [Exception] NULL 값이 발생한 경우
