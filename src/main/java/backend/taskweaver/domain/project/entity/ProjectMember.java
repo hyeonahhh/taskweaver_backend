@@ -30,5 +30,7 @@ public class ProjectMember extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-
+    public void changeToManager() {
+        this.role = ProjectRole.MANAGER;
+    }
 }
