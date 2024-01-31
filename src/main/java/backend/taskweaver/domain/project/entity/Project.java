@@ -9,8 +9,8 @@ import lombok.*;
 @Table(name = "project")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 @Getter
+@Builder
 public class Project extends BaseEntity {
 
     @Id
@@ -31,4 +31,11 @@ public class Project extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_state_id")
     private ProjectState projectState;
+
+    @Column(name = "manager_id")
+    private Long managerId;
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
+    }
 }
