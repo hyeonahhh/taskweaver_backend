@@ -13,7 +13,9 @@ import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
+import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.ProjectConverter;
+import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,16 +44,18 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     @Transactional
     public ProjectResponse createProject(ProjectRequest request, Long teamId) {
-        // project state 저장
+         /* project state 저장 */
         ProjectState state = createProjectStateOnProgress();
 
-        // project 저장
+         /* project 저장 */
         Team team = teamRepository.findById(teamId).get();
         Project project = ProjectConverter.toProject(request, team, state);
         projectRepository.save(project);
 
-        // project member 저장
+         /* project member 저장 */
         Long managerId = request.managerId();
+        checkIfManagerIdExist(managerId); // 예외처리: managerId가 존재하는지 확인
+        checkIfTeamIdIsSame(managerId, teamId); // 예외처리: 프론트에서 보내온 manager Id가 속해있는 team이 프론트에서 보내온 teamId의 team과 동일한지 확인
         createProjectMember(project, managerId);
 
         return ProjectConverter.toProjectResponse(project, state, managerId);
@@ -60,11 +64,6 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     @Transactional
     public void createProjectMember(Project project, Long managerId) {
-
-        // 예외 처리
-        checkIfManagerIdExist(managerId); // managerId가 아예 존재하지 않을 경우
-
-        // 팀 member를 가져와 project member로 저장시키기
         Team team = project.getTeam();
         List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
 
@@ -84,5 +83,14 @@ public class ProjectServiceImpl implements ProjectService{
     public void checkIfManagerIdExist(Long managerId) {
         teamMemberRepository.findById(managerId)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    @Override
+    public void checkIfTeamIdIsSame(Long managerId, Long teamId) {
+        TeamMember teamMember = teamMemberRepository.findById(managerId).get();
+        Long teamIdFromManagerId = teamMember.getTeam().getId();
+        if(!teamIdFromManagerId.equals(teamId)) {
+            throw new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR);
+        }
     }
 }

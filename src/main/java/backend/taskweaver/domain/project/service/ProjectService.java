@@ -10,4 +10,5 @@ public interface ProjectService{
     ProjectResponse createProject(ProjectRequest request, Long teamId);
     void createProjectMember(Project project, Long managerId);
     void checkIfManagerIdExist(Long managerId);
+    void checkIfTeamIdIsSame(Long managerId, Long teamId);
 }
