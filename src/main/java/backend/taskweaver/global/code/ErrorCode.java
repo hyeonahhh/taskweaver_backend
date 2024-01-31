@@ -76,6 +76,9 @@ public enum ErrorCode {
     // Transaction Delete Error
     DELETE_ERROR(200, "9999", "Delete Transaction Error Exception"),
 
+    // PROJECT
+    BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team");
+
     ; // End
 
     /**
