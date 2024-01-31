@@ -198,4 +198,19 @@ public class GlobalExceptionHandler {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR, ex.getMessage());
         return new ResponseEntity<>(response, HTTP_STATUS_OK);
     }
+
+    // ==================================================================================================================
+
+    /**
+     * BusinessException 발생
+     *
+     */
+
+    @ExceptionHandler(BusinessExceptionHandler.class)
+    protected ResponseEntity<ErrorResponse> handleBusinessException(BusinessExceptionHandler ex) {
+        log.error("BusinessExceptionHandler", ex);
+        ErrorCode errorCode = ex.getErrorCode();
+        final ErrorResponse response = ErrorResponse.of(errorCode, ex.getMessage());
+        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+    }
 }
