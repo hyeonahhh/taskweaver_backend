@@ -25,7 +25,6 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ProjectServiceImpl implements ProjectService{
 
     private final TeamRepository teamRepository;
