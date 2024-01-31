@@ -54,8 +54,8 @@ public class ProjectServiceImpl implements ProjectService{
 
          /* project member 저장 */
         Long managerId = request.managerId();
-        checkIfManagerIdExist(managerId); // 예외처리: managerId가 존재하는지 확인
-        checkIfTeamIdIsSame(managerId, teamId); // 예외처리: 프론트에서 보내온 manager Id가 속해있는 team이 프론트에서 보내온 teamId의 team과 동일한지 확인
+        TeamMember manager = checkIfManagerIdExist(managerId);// 예외처리: managerId가 존재하는지 확인
+        checkIfTeamIdIsSame(manager, teamId); // 예외처리: 프론트에서 보내온 manager Id가 속해있는 team이 프론트에서 보내온 teamId의 team과 동일한지 확인
         createProjectMember(project, managerId);
 
         return ProjectConverter.toProjectResponse(project, state, managerId);
@@ -86,16 +86,15 @@ public class ProjectServiceImpl implements ProjectService{
     }
 
     @Override
-    public void checkIfManagerIdExist(Long managerId) {
-        teamMemberRepository.findById(managerId)
+    public TeamMember checkIfManagerIdExist(Long managerId) {
+        return teamMemberRepository.findById(managerId)
                 .orElseThrow(NoSuchElementException::new);
     }
 
     @Override
-    public void checkIfTeamIdIsSame(Long managerId, Long teamId) {
-        TeamMember teamMember = teamMemberRepository.findById(managerId).get();
-        Long teamIdFromManagerId = teamMember.getTeam().getId();
-        if(!teamIdFromManagerId.equals(teamId)) {
+    public void checkIfTeamIdIsSame(TeamMember manager, Long teamId) {
+        Long teamIdFromManager = manager.getTeam().getId();
+        if(!teamIdFromManager.equals(teamId)) {
             throw new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR);
         }
     }
