@@ -27,12 +27,12 @@ public class ProjectConverter {
                 .build();
     }
 
-    public static ProjectResponse toProjectResponse(Project project, ProjectState state, Long managerId) {
+    public static ProjectResponse toProjectResponse(Project project, ProjectState state) {
         return new ProjectResponse(
                 project.getId(),
                 project.getName(),
                 project.getDescription(),
-                managerId,
+                project.getManagerId(),
                 state.getStateName()
         );
     }

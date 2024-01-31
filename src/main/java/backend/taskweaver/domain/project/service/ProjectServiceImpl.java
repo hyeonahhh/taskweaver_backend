@@ -57,7 +57,7 @@ public class ProjectServiceImpl implements ProjectService{
         checkIfTeamIdIsSame(manager, teamId); // 예외처리: 프론트에서 보내온 manager Id가 속해있는 team이 프론트에서 보내온 teamId의 team과 동일한지 확인
         createProjectMember(project, managerId);
 
-        return ProjectConverter.toProjectResponse(project, state, managerId);
+        return ProjectConverter.toProjectResponse(project, state);
     }
 
     @Override
@@ -71,6 +71,7 @@ public class ProjectServiceImpl implements ProjectService{
             if (teamMemberId.equals(managerId)) {
                 ProjectMember projectMember = ProjectConverter.toProjectMember(project, teamMember, ProjectRole.MANAGER);
                 projectMemberRepository.save(projectMember);
+                project.setManagerId(teamMemberId);
             } else {
                 ProjectMember projectMember = ProjectConverter.toProjectMember(project, teamMember, ProjectRole.NON_MANAGER);
                 projectMemberRepository.save(projectMember);
