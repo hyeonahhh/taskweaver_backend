@@ -39,7 +39,7 @@ jobs:
 
     ## create application-prod.yml
     - name: make application.yml
-      if: contains(github.ref, 'main')
+      if: contains(github.ref, 'develop')
       run: |
           cd ./src/main/resources
           touch ./application.yml
@@ -81,7 +81,7 @@ jobs:
     - name: Deploy to prod
       uses: appleboy/ssh-action@master
       id: deploy-prod
-      if: contains(github.ref, 'main')
+      if: contains(github.ref, 'develop')
       with:
           host: ${{ secrets.HOST_PROD }}
           username: ubuntu
