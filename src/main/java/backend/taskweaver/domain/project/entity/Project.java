@@ -8,9 +8,7 @@ import lombok.*;
 @Entity
 @Table(name = "project")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
-@Builder
 public class Project extends BaseEntity {
 
     @Id
@@ -34,6 +32,14 @@ public class Project extends BaseEntity {
 
     @Column(name = "manager_id")
     private Long managerId;
+
+    @Builder
+    public Project(String name, String description, Team team, ProjectState projectState) {
+        this.name = name;
+        this.description = description;
+        this.team = team;
+        this.projectState = projectState;
+    }
 
     public void setManagerId(Long managerId) {
         this.managerId = managerId;
