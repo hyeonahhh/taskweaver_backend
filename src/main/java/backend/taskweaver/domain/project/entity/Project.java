@@ -26,7 +26,7 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "project_state_id")
     private ProjectState projectState;
 

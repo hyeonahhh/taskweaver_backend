@@ -8,7 +8,6 @@ import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
 
 public interface ProjectService{
-    ProjectState createProjectStateOnProgress();
     ProjectResponse createProject(ProjectRequest request, Long teamId);
     void createProjectMember(Project project, Long managerId);
     void checkIfTeamIdIsSame(TeamMember manager, Long teamId);

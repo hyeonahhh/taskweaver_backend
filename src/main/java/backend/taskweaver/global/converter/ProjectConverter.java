@@ -21,9 +21,9 @@ public class ProjectConverter {
                 .build();
     }
 
-    public static ProjectState toProjectState() {
+    public static ProjectState toProjectState(ProjectStateName projectState) {
         return  ProjectState.builder()
-                .stateName(ProjectStateName.ON_PROGRESS)
+                .stateName(projectState)
                 .build();
     }
 

@@ -6,9 +6,9 @@ import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.entity.ProjectState;
 import backend.taskweaver.domain.project.entity.enums.ProjectRole;
+import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
-import backend.taskweaver.domain.project.repository.ProjectStateRepository;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
@@ -21,37 +21,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-public class ProjectServiceImpl implements ProjectService{
+public class ProjectServiceImpl implements ProjectService {
 
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final ProjectRepository projectRepository;
-    private final ProjectStateRepository projectStateRepository;
     private final ProjectMemberRepository projectMemberRepository;
 
     @Override
     @Transactional
-    public ProjectState createProjectStateOnProgress() {
-        ProjectState state = ProjectConverter.toProjectState();
-        return projectStateRepository.save(state);
-    }
-
-    @Override
-    @Transactional
     public ProjectResponse createProject(ProjectRequest request, Long teamId) {
-         /* project state 저장 */
-        ProjectState state = createProjectStateOnProgress();
+        /* project state 저장 */
+        ProjectState state = ProjectConverter.toProjectState(ProjectStateName.ON_PROGRESS);
 
-         /* project 저장 */
+        /* project 저장 */
         Team team = teamRepository.findById(teamId).get();
         Project project = ProjectConverter.toProject(request, team, state);
         projectRepository.save(project);
 
-         /* project member 저장 */
+        /* project member 저장 */
         Long managerId = request.managerId();
         TeamMember manager = teamMemberRepository.findById(managerId).get();
         checkIfTeamIdIsSame(manager, teamId); // 예외처리: 프론트에서 보내온 manager Id가 속해있는 team이 프론트에서 보내온 teamId의 team과 동일한지 확인
@@ -82,7 +73,7 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     public void checkIfTeamIdIsSame(TeamMember manager, Long teamId) {
         Long teamIdFromManager = manager.getTeam().getId();
-        if(!teamIdFromManager.equals(teamId)) {
+        if (!teamIdFromManager.equals(teamId)) {
             throw new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR);
         }
     }
