@@ -47,13 +47,13 @@ public class ProjectServiceImpl implements ProjectService{
         ProjectState state = createProjectStateOnProgress();
 
          /* project 저장 */
-        Team team = checkIfTeamExist(teamId); // 예외처리: teamId가 존재하는지 확인
+        Team team = teamRepository.findById(teamId).get();
         Project project = ProjectConverter.toProject(request, team, state);
         projectRepository.save(project);
 
          /* project member 저장 */
         Long managerId = request.managerId();
-        TeamMember manager = checkIfManagerIdExist(managerId);// 예외처리: managerId가 존재하는지 확인
+        TeamMember manager = teamMemberRepository.findById(managerId).get();
         checkIfTeamIdIsSame(manager, teamId); // 예외처리: 프론트에서 보내온 manager Id가 속해있는 team이 프론트에서 보내온 teamId의 team과 동일한지 확인
         createProjectMember(project, managerId);
 
@@ -77,18 +77,6 @@ public class ProjectServiceImpl implements ProjectService{
                 projectMemberRepository.save(projectMember);
             }
         });
-    }
-
-    @Override
-    public Team checkIfTeamExist(Long teamId) {
-        return teamRepository.findById(teamId)
-                .orElseThrow(NoSuchElementException::new);
-    }
-
-    @Override
-    public TeamMember checkIfManagerIdExist(Long managerId) {
-        return teamMemberRepository.findById(managerId)
-                .orElseThrow(NoSuchElementException::new);
     }
 
     @Override

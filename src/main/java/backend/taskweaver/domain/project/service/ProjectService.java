@@ -11,7 +11,5 @@ public interface ProjectService{
     ProjectState createProjectStateOnProgress();
     ProjectResponse createProject(ProjectRequest request, Long teamId);
     void createProjectMember(Project project, Long managerId);
-    Team checkIfTeamExist(Long teamId);
-    TeamMember checkIfManagerIdExist(Long managerId);
     void checkIfTeamIdIsSame(TeamMember manager, Long teamId);
 }
