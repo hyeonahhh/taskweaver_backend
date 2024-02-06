@@ -54,6 +54,15 @@ public enum ErrorCode {
     // 서버가 처리 할 방법을 모르는 경우 발생
     INTERNAL_SERVER_ERROR(500, "G999", "Internal Server Error Exception"),
 
+    // 토큰 만료 기한이 지났을 때 발생
+    EXPIRED_JWT_ERROR(404, "G013", "JWT Token expiration"),
+
+    // 토큰 유효성 검사가 실패할 때 발생
+    INVALID_JWT_ERROR(404, "G014", "Invalid JWT Token"),
+
+    // 토큰 검사시 사용자 인증 실패할 때 발생
+    USER_AUTH_ERROR(404, "G015", "User authentication failed"),
+
 
     /**
      * ******************************* Custom Error CodeList ***************************************
@@ -67,19 +76,14 @@ public enum ErrorCode {
     // Transaction Delete Error
     DELETE_ERROR(200, "9999", "Delete Transaction Error Exception"),
 
-    /**
-     * ******************************* Team Error CodeList ***************************************
-     */
-    NOT_EXIST_MEMBER(404, "TEAM4001", "That member does not exist"),
+    // PROJECT
+    BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team"),
 
-    NOT_EXIST_TEAM(404, "TEAM4002", "That team id does not exist"),
+    // TEAM
+    TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
+    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found");
+
     ; // End
-
-
-
-
-
-
 
     /**
      * ******************************* Error Code Constructor ***************************************

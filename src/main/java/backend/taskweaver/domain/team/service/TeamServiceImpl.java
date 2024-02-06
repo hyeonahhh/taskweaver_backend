@@ -63,12 +63,12 @@ public class TeamServiceImpl implements TeamService{
                     .member(matchingMember.get())
                     .state(InviteState.IN_PROGRESS)
                     .team(teamRepository.findById(teamId)
-                            .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_EXIST_TEAM)))
+                            .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND)))
                     .build();
             teamMemberStateRepository.save(teamMemberState);
         } else {
             // 처리 필요
-            throw new BusinessExceptionHandler(ErrorCode.NOT_EXIST_MEMBER);
+            throw new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND);
         }
         return request;
     }
@@ -81,10 +81,10 @@ public class TeamServiceImpl implements TeamService{
         System.out.println(userId);
         System.out.println(user);
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_EXIST_TEAM));
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
         Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_EXIST_MEMBER));
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
 
         TeamMember teamMember = TeamMember.builder()
                 .team(team)
