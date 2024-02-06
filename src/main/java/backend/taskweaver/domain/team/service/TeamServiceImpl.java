@@ -45,6 +45,7 @@ public class TeamServiceImpl implements TeamService{
     // 팀 초대
     public TeamInviteRequest.EmailInviteRequest inviteEmail(TeamInviteRequest.EmailInviteRequest request) {
         List<Member> members = memberRepository.findAll();
+        // 이메일 형식이 아닐 경우 추가
         Optional<Member> matchingMember = members.stream()
                 .filter(member -> member.getEmail().equals(request.getEmail()))
                 .findFirst();
@@ -52,12 +53,14 @@ public class TeamServiceImpl implements TeamService{
         if (matchingMember.isPresent()) {
             Long userId = matchingMember.get().getId();
             System.out.println(userId);
-            // teamId 일단 고정해놓음(request body)로 받아야 함
-            Team team = teamRepository.findById(1L).orElseThrow(() -> new EntityNotFoundException("Team not found with ID: 1"));
+
+            Long teamId = request.getTeam_id();
+
             TeamMemberState teamMemberState = TeamMemberState.builder()
                     .member(matchingMember.get())
                     .state(InviteState.valueOf("IN_PROGRESS"))
-                    .team(team)
+                    .team(teamRepository.findById(teamId)
+                            .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_EXIST_TEAM)))
                     .build();
             teamMemberStateRepository.save(teamMemberState);
         } else {

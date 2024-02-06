@@ -67,7 +67,19 @@ public enum ErrorCode {
     // Transaction Delete Error
     DELETE_ERROR(200, "9999", "Delete Transaction Error Exception"),
 
+    /**
+     * ******************************* Team Error CodeList ***************************************
+     */
+    NOT_EXIST_MEMBER(404, "TEAM4001", "That member does not exist"),
+
+    NOT_EXIST_TEAM(404, "TEAM4002", "That team id does not exist"),
     ; // End
+
+
+
+
+
+
 
     /**
      * ******************************* Error Code Constructor ***************************************
