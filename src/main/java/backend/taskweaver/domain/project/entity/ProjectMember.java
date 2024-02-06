@@ -24,13 +24,13 @@ public class ProjectMember extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "project_role", nullable = false)
-    private ProjectRole projectRole;
+    private ProjectRole role;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 }
