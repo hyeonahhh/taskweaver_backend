@@ -2,6 +2,7 @@ package backend.taskweaver.domain.team.service;
 
 
 import backend.taskweaver.domain.team.dto.TeamInviteRequest;
+import backend.taskweaver.domain.team.dto.TeamInviteResponse;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.dto.TeamResponse;
 
@@ -12,4 +13,6 @@ public interface TeamService {
     public TeamResponse.teamCreateResult createTeam(TeamRequest.teamCreateRequest request, Long user);
 
     public TeamInviteRequest.EmailInviteRequest inviteEmail(TeamInviteRequest.EmailInviteRequest request);
+
+    public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user);
 }

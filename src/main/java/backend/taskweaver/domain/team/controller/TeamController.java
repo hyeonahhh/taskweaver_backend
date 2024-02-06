@@ -54,4 +54,15 @@ public class TeamController {
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
+
+    @Operation(summary =  "팀원 초대 - 이메일로 초대 응답")
+    @PostMapping("/team/invitation/answer")
+    public ResponseEntity<ApiResponse> answerInviteEmail(@RequestBody TeamInviteRequest.InviteAnswerRequest request, @AuthenticationPrincipal User user) {
+        ApiResponse ar = ApiResponse.builder()
+                .result(teamService.answerInvite(request, Long.parseLong(user.getUsername())))
+                .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
 }

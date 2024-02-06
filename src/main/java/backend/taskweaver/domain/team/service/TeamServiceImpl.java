@@ -3,22 +3,23 @@ package backend.taskweaver.domain.team.service;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.team.dto.TeamInviteRequest;
+import backend.taskweaver.domain.team.dto.TeamInviteResponse;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.dto.TeamResponse;
 import backend.taskweaver.domain.team.entity.Team;
+import backend.taskweaver.domain.team.entity.TeamMember;
 import backend.taskweaver.domain.team.entity.TeamMemberState;
 import backend.taskweaver.domain.team.entity.enums.InviteState;
+import backend.taskweaver.domain.team.entity.enums.TeamRole;
+import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamMemberStateRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.TeamConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
-import backend.taskweaver.global.exception.handler.GlobalExceptionHandler;
-import ch.qos.logback.core.spi.ErrorCodes;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +34,8 @@ public class TeamServiceImpl implements TeamService{
     private final MemberRepository memberRepository;
     @Autowired
     private final TeamMemberStateRepository teamMemberStateRepository;
+    @Autowired
+    private final TeamMemberRepository teamMemberRepository;
 
     // 팀 생성
     // 우선 팀 생성자 필드로만 추가
@@ -58,7 +61,7 @@ public class TeamServiceImpl implements TeamService{
 
             TeamMemberState teamMemberState = TeamMemberState.builder()
                     .member(matchingMember.get())
-                    .state(InviteState.valueOf("IN_PROGRESS"))
+                    .state(InviteState.IN_PROGRESS)
                     .team(teamRepository.findById(teamId)
                             .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_EXIST_TEAM)))
                     .build();
@@ -69,4 +72,29 @@ public class TeamServiceImpl implements TeamService{
         }
         return request;
     }
+
+
+    // 초대 응답
+    public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user) {
+        Long teamId = request.getTeam_id();
+        Long userId = user;
+        System.out.println(userId);
+        System.out.println(user);
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_EXIST_TEAM));
+
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_EXIST_MEMBER));
+
+        TeamMember teamMember = TeamMember.builder()
+                .team(team)
+                .member(member)
+                .role(TeamRole.MEMBER) // 직접 MEMBER를 사용
+                .build();
+
+        teamMemberRepository.save(teamMember);
+
+        return TeamConverter.toInviteResponse(teamMember);
+    }
+
 }
