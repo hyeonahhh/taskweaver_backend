@@ -93,4 +93,12 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(ProjectConverter::toGetAllProjectResponse)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProjectResponse getOne(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(()-> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+        return ProjectConverter.toProjectResponse(project, project.getProjectState());
+    }
 }
