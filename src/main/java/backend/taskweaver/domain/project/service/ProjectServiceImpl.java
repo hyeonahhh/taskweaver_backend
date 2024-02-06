@@ -38,14 +38,16 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectState state = ProjectConverter.toProjectState(ProjectStateName.BEFORE);
 
         /* project 저장 */
-        Team team = teamRepository.findById(teamId).get();
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
         Project project = ProjectConverter.toProject(request, team, state);
         projectRepository.save(project);
 
         /* project member 저장 */
         Long managerId = request.managerId();
-        TeamMember manager = teamMemberRepository.findById(managerId).get();
-        checkIfTeamIdIsSame(manager, teamId); // 예외처리: 프론트에서 보내온 manager Id가 속해있는 team이 프론트에서 보내온 teamId의 team과 동일한지 확인
+        TeamMember manager = teamMemberRepository.findById(managerId)
+                .orElseThrow(()-> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+        checkIfTeamIdIsSame(manager, teamId);
         createProjectMember(project, managerId);
 
         return ProjectConverter.toProjectResponse(project, state);

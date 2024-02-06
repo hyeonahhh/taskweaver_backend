@@ -117,20 +117,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * [Exception]  Java 컬렉션에서 요소를 찾지 못한 경우
-     *
-     * @param e NoSuchElementException
-     * @return ResponseEntity<ErrorResponse>
-     */
-    @ExceptionHandler(NoSuchElementException.class)
-    protected ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException e) {
-        log.error("NoSuchElementException", e);
-        log.error("Element not found: {}", e.getMessage());
-        final ErrorResponse response = ErrorResponse.of(ErrorCode.NOT_FOUND_ERROR, e.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
-    }
-
-    /**
      * [Exception] NULL 값이 발생한 경우
      *
      * @param e NullPointerException
