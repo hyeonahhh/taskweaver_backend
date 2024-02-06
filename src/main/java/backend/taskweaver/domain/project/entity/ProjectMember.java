@@ -5,6 +5,8 @@ import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "project_member")
@@ -12,6 +14,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Getter
+@SQLDelete(sql = "UPDATE project_member SET deleted_at = NOW() WHERE id = ?")
+@Where(clause = "deleted_at is null")
 public class ProjectMember extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
