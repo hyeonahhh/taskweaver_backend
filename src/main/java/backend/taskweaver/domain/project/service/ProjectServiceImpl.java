@@ -35,7 +35,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public ProjectResponse createProject(ProjectRequest request, Long teamId) {
         /* project state 저장 */
-        ProjectState state = ProjectConverter.toProjectState(ProjectStateName.ON_PROGRESS);
+        ProjectState state = ProjectConverter.toProjectState(ProjectStateName.BEFORE);
 
         /* project 저장 */
         Team team = teamRepository.findById(teamId).get();
