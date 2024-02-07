@@ -19,6 +19,7 @@ public class TeamInviteRequest {
 
         @Schema(description = "해당 팀 id", example = "1")
         Long team_id;
+
     }
 
     // 이메일 초대 응답
@@ -28,5 +29,7 @@ public class TeamInviteRequest {
         @Schema(description = "해당 팀 id", example = "1")
         Long team_id;
 
+        @Schema(description = "수락/거절 여부", example = "1")
+        Long inviteState;
     }
 }

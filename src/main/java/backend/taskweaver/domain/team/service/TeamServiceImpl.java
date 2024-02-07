@@ -48,7 +48,7 @@ public class TeamServiceImpl implements TeamService{
     // 팀 초대
     public TeamInviteRequest.EmailInviteRequest inviteEmail(TeamInviteRequest.EmailInviteRequest request) {
         List<Member> members = memberRepository.findAll();
-        // 이메일 형식이 아닐 경우 추가
+
         Optional<Member> matchingMember = members.stream()
                 .filter(member -> member.getEmail().equals(request.getEmail()))
                 .findFirst();
@@ -67,7 +67,6 @@ public class TeamServiceImpl implements TeamService{
                     .build();
             teamMemberStateRepository.save(teamMemberState);
         } else {
-            // 처리 필요
             throw new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND);
         }
         return request;
@@ -86,15 +85,43 @@ public class TeamServiceImpl implements TeamService{
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
 
-        TeamMember teamMember = TeamMember.builder()
-                .team(team)
-                .member(member)
-                .role(TeamRole.MEMBER) // 직접 MEMBER를 사용
-                .build();
 
-        teamMemberRepository.save(teamMember);
+        // 초대 수락/거절 여부 확인
+        if (request.getInviteState() == 1) {
+            TeamMember teamMember = TeamMember.builder()
+                    .team(team)
+                    .member(member)
+                    .role(TeamRole.MEMBER)
+                    .build();
 
-        return TeamConverter.toInviteResponse(teamMember);
+            teamMemberRepository.save(teamMember);
+
+            // 초대 응답 후에 해당 team id와 user id가 일치하는 값을 TeamMemberState에서 찾아서 inviteState 값을 ACCEPT로 바꾸기
+            acceptInvite(teamId, userId);
+
+            return TeamConverter.toInviteResponse(teamMember);
+        } else {
+            // 초대를 수락하지 않은 경우
+            refuseInvite(teamId, userId);
+            return null;
+        }
+
     }
 
+    // 초대 응답 시에 해당 team id와 user id가 일치하는 값을 TeamMemberState에서 찾아서 inviteState 값을 ACCEPT로 바꾸는 메소드
+    private void acceptInvite(Long teamId, Long userId) {
+        Optional<TeamMemberState> teamMemberStateOptional = teamMemberStateRepository.findByTeamIdAndMemberId(teamId, userId);
+        teamMemberStateOptional.ifPresent(teamMemberState -> {
+            teamMemberState.setState(InviteState.ACCEPT);
+            teamMemberStateRepository.save(teamMemberState);
+        });
+    }
+
+    private void refuseInvite(Long teamId, Long userId) {
+        Optional<TeamMemberState> teamMemberStateOptional = teamMemberStateRepository.findByTeamIdAndMemberId(teamId, userId);
+        teamMemberStateOptional.ifPresent(teamMemberState -> {
+            teamMemberState.setState(InviteState.REFUSE);
+            teamMemberStateRepository.save(teamMemberState);
+        });
+    }
 }
