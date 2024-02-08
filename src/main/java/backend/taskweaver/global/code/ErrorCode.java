@@ -81,7 +81,8 @@ public enum ErrorCode {
 
     // TEAM
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
-    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found");
+    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found"),
+    TEAM_MEMBER_STATE_NOT_FOUND(404, "T003", "No matching data in the team invitation status table.");
 
     ; // End
 
