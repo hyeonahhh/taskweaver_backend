@@ -80,10 +80,11 @@ public enum ErrorCode {
     BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team"),
 
     // TEAM
+
     TEAM_MEMBER_STATE_NOT_FOUND(404, "T003", "No matching data in the team invitation status table."),
     INVITATION_ALREADY_SENT(404, "T004", "The invitation has already been sent."),
 
-    // TEAM
+
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
     TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found");
 

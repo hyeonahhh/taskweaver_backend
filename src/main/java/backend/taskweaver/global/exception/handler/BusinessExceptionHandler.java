@@ -4,9 +4,9 @@ import backend.taskweaver.global.code.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 
+@Getter
 public class BusinessExceptionHandler extends RuntimeException {
 
-    @Getter
     private final ErrorCode errorCode;
 
     @Builder

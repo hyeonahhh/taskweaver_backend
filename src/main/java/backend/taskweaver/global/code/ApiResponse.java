@@ -21,5 +21,4 @@ public class ApiResponse<T> {
         this.resultCode = resultCode;
         this.resultMsg = resultMsg;
     }
-
 }
