@@ -39,16 +39,16 @@ public class TeamController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Operation(summary = "팀 조회")
     @GetMapping("/team/{teamId}")
     public ResponseEntity<ApiResponse> findTeam(@PathVariable(name = "teamId") Long teamId) {
+
         ApiResponse ar = ApiResponse.builder()
                 .result(teamService.findTeam(teamId))
-                .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
-                .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }

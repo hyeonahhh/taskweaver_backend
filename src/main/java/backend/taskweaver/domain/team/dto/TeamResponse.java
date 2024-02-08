@@ -1,9 +1,11 @@
 package backend.taskweaver.domain.team.dto;
 
+import backend.taskweaver.domain.team.entity.TeamMember;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 public class TeamResponse {
@@ -38,5 +40,23 @@ public class TeamResponse {
 
         @Schema(description = "생성 날짜", example = "2024-02-08T22:58:10.061223")
         LocalDateTime createdAt;
+
+        List<TeamMemberInfo> teamMembers;
+    }
+
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TeamMemberInfo {
+        @Schema(description = "팀 멤버 ID", example = "1")
+        private Long memberId;
+
+        @Schema(description = "팀 멤버 이메일", example = "example@example.com")
+        private String email;
+
+        @Schema(description = "팀 멤버 이미지 url", example = "")
+        private String imageUrl;
     }
 }

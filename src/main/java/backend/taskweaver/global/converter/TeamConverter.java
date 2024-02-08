@@ -7,7 +7,9 @@ import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class TeamConverter {
 
@@ -37,13 +39,18 @@ public class TeamConverter {
         );
     }
 
-    public static TeamResponse.findTeamResult toGetTeamResponse(Team team) {
+    public static TeamResponse.findTeamResult toGetTeamResponse(Team team, List<TeamMember> teamMembers) {
+        List<TeamResponse.TeamMemberInfo> memberInfos = teamMembers.stream()
+                .map(member -> new TeamResponse.TeamMemberInfo(member.getMember().getId(), member.getMember().getEmail(), member.getMember().getImageUrl()))
+                .collect(Collectors.toList());
+
         return new TeamResponse.findTeamResult(
                 team.getId(),
                 team.getName(),
                 team.getTeamLeader(),
                 team.getInviteLink(),
-                team.getCreatedAt()
+                team.getCreatedAt(),
+                memberInfos
         );
     }
     public static String generateInviteLink() {
