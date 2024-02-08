@@ -14,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/v1")
 @Tag(name = "팀 관련")
@@ -30,7 +27,7 @@ public class TeamController {
     private final TeamService teamService;
 
     @Operation(summary = "팀 생성")
-    @PostMapping("/teams")
+    @PostMapping("/team")
     public ResponseEntity<ApiResponse> createTeam(@RequestBody TeamRequest.teamCreateRequest request, @AuthenticationPrincipal User user) {
         try {
             ApiResponse ar = ApiResponse.builder()
@@ -45,6 +42,16 @@ public class TeamController {
 
     }
 
+    @Operation(summary = "팀 조회")
+    @GetMapping("/team/{teamId}")
+    public ResponseEntity<ApiResponse> findTeam(@PathVariable(name = "teamId") Long teamId) {
+        ApiResponse ar = ApiResponse.builder()
+                .result(teamService.findTeam(teamId))
+                .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
 
     @Operation(summary = "팀원 초대 - 이메일로 초대")
     @PostMapping("/team/invitation/email")

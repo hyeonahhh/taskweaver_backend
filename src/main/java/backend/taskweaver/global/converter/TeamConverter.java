@@ -6,6 +6,7 @@ import backend.taskweaver.domain.team.dto.TeamResponse;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class TeamConverter {
@@ -33,6 +34,16 @@ public class TeamConverter {
                 teamMember.getRole(),
                 teamMember.getTeam().getId(),
                 teamMember.getMember().getId()
+        );
+    }
+
+    public static TeamResponse.findTeamResult toGetTeamResponse(Team team) {
+        return new TeamResponse.findTeamResult(
+                team.getId(),
+                team.getName(),
+                team.getTeamLeader(),
+                team.getInviteLink(),
+                team.getCreatedAt()
         );
     }
     public static String generateInviteLink() {
