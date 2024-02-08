@@ -59,6 +59,11 @@ public class TeamServiceImpl implements TeamService{
 
             Long teamId = request.getTeam_id();
 
+            // 이미 존재하는 팀 초대 요청인 경우
+            if (teamMemberStateRepository.existsByTeamIdAndMemberId(teamId, userId)) {
+                throw new BusinessExceptionHandler(ErrorCode.INVITATION_ALREADY_SENT);
+            }
+
             TeamMemberState teamMemberState = TeamMemberState.builder()
                     .member(matchingMember.get())
                     .state(InviteState.IN_PROGRESS)
