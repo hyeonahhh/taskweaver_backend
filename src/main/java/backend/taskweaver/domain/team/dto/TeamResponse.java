@@ -58,5 +58,8 @@ public class TeamResponse {
 
         @Schema(description = "팀 멤버 이미지 url", example = "")
         private String imageUrl;
+
+        @Schema(description = "팀 멤버 닉네임", example = "nickname")
+        private String nickname;
     }
 }

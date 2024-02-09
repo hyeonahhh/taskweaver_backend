@@ -41,7 +41,7 @@ public class TeamConverter {
 
     public static TeamResponse.findTeamResult toGetTeamResponse(Team team, List<TeamMember> teamMembers) {
         List<TeamResponse.TeamMemberInfo> memberInfos = teamMembers.stream()
-                .map(member -> new TeamResponse.TeamMemberInfo(member.getMember().getId(), member.getMember().getEmail(), member.getMember().getImageUrl()))
+                .map(member -> new TeamResponse.TeamMemberInfo(member.getMember().getId(), member.getMember().getEmail(), member.getMember().getImageUrl(), member.getMember().getNickname()))
                 .collect(Collectors.toList());
 
         return new TeamResponse.findTeamResult(
