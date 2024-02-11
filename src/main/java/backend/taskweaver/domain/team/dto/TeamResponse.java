@@ -42,6 +42,9 @@ public class TeamResponse {
         LocalDateTime createdAt;
 
         List<TeamMemberInfo> teamMembers;
+
+        @Schema(description = "전체 팀원 수", example = "3")
+        Long memberCount;
     }
 
 

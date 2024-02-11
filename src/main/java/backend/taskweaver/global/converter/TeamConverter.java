@@ -50,13 +50,17 @@ public class TeamConverter {
                         member.getRole().toString())) // Role 추가
                 .collect(Collectors.toList());
 
+        // 팀의 멤버 수 계산
+        long memberCount = memberInfos.size();
+
         return new TeamResponse.findTeamResult(
                 team.getId(),
                 team.getName(),
                 team.getTeamLeader(),
                 team.getInviteLink(),
                 team.getCreatedAt(),
-                memberInfos
+                memberInfos,
+                memberCount // 멤버 수 추가
         );
     }
 
