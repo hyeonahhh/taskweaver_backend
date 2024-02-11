@@ -46,15 +46,15 @@ public class TeamServiceImpl implements TeamService{
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
-        List<TeamMember> teamMembers = findAllTeamMembersByTeamId(id);
+        List<TeamMember> teamMembers = findAllTeamMemberWithTeam(id);
 
         return TeamConverter.toGetTeamResponse(team, teamMembers);
     }
 
-    // 팀 멤버 조회
-    public List<TeamMember> findAllTeamMembersByTeamId(Long teamId) {
+    public List<TeamMember> findAllTeamMemberWithTeam(Long teamId) {
         return teamMemberRepository.findAllByTeamId(teamId);
     }
+
     // 팀 초대
     public TeamInviteRequest.EmailInviteRequest inviteEmail(TeamInviteRequest.EmailInviteRequest request) {
         List<Member> members = memberRepository.findAll();

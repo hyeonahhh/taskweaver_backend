@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,18 @@ public class TeamController {
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
 
+    // 팀 멤버만 조회
+    @Operation(summary = "팀 조회")
+    @GetMapping("/team/{teamId}/member")
+    public ResponseEntity<ApiResponse> AllTeamMember(@PathVariable(name = "teamId") Long teamId) {
+        ApiResponse ar = ApiResponse.builder()
+                .result(teamService.findTeam(teamId))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
+
     @Operation(summary = "팀원 초대 - 이메일로 초대")
     @PostMapping("/team/invitation/email")
     public ResponseEntity<ApiResponse> inviteEmail(@RequestBody TeamInviteRequest.EmailInviteRequest request) {
@@ -74,4 +87,7 @@ public class TeamController {
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
+
+
+
 }

@@ -5,6 +5,9 @@ import backend.taskweaver.domain.team.dto.TeamInviteRequest;
 import backend.taskweaver.domain.team.dto.TeamInviteResponse;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.dto.TeamResponse;
+import backend.taskweaver.domain.team.entity.TeamMember;
+
+import java.util.List;
 
 
 public interface TeamService {
@@ -15,4 +18,5 @@ public interface TeamService {
     public TeamInviteRequest.EmailInviteRequest inviteEmail(TeamInviteRequest.EmailInviteRequest request);
 
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user);
+
 }

@@ -45,21 +45,26 @@ public class TeamResponse {
     }
 
 
+
     @Getter
     @Setter
-    @AllArgsConstructor
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class TeamMemberInfo {
-        @Schema(description = "팀 멤버 ID", example = "1")
-        private Long memberId;
+        @Schema(description = "멤버 id", example = "1")
+        private Long id;
 
-        @Schema(description = "팀 멤버 이메일", example = "example@example.com")
+        @Schema(description = "이메일", example = "example@example.com")
         private String email;
 
-        @Schema(description = "팀 멤버 이미지 url", example = "")
+        @Schema(description = "이미지 URL", example = "https://example.com/image.jpg")
         private String imageUrl;
 
-        @Schema(description = "팀 멤버 닉네임", example = "nickname")
+        @Schema(description = "닉네임", example = "user123")
         private String nickname;
+
+        @Schema(description = "역할", example = "MEMBER")
+        private String role; // Role 추가
     }
+
 }
