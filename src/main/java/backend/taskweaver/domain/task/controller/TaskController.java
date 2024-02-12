@@ -29,7 +29,7 @@ public class TaskController {
 
 
     @Operation(summary = "태스크 생성")
-    @PostMapping("/projects/{projectId}/tasks/{parentTaskId}")
+    @PostMapping({"/projects/{projectId}/tasks", "/projects/{projectId}/tasks/{parentTaskId}"})
     public ResponseEntity<ApiResponse> createTask(@RequestBody TaskRequest.taskCreate request, @AuthenticationPrincipal User user, @PathVariable Long projectId, @PathVariable(required = false) Long parentTaskId) {
         try {
             ApiResponse ar = ApiResponse.builder()
