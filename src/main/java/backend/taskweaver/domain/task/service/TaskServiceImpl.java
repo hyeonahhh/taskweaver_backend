@@ -34,12 +34,12 @@ public class TaskServiceImpl implements TaskService {
     private final MemberRepository memberRepository;
     private final TaskMemberRepository taskMemberRepository;
 
-    public TaskResponse.taskCreateResult createTask(TaskRequest.taskCreate request, Long user, Long projectId, Long parentTaskId) throws ParseException {
+    public TaskResponse.taskCreateResult createTask(TaskRequest.taskCreate request, Long user, Long projectId) throws ParseException {
         Task task;
-        if (parentTaskId == null) {
+        if (request.getParentTaskId() == null) {
             task = taskRepository.save(TaskConverter.toTask(request, projectRepository.findById(projectId).get(), TaskStateName.BEFORE));
         } else {
-            task = taskRepository.save(TaskConverter.toTask(request, projectRepository.findById(projectId).get(), taskRepository.findById(parentTaskId).get(), TaskStateName.BEFORE));
+            task = taskRepository.save(TaskConverter.toTask(request, projectRepository.findById(projectId).get(), taskRepository.findById(request.getParentTaskId()).get(), TaskStateName.BEFORE));
         }
 
         List<TaskMember> taskMembers = new ArrayList<>();

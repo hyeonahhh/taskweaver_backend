@@ -34,5 +34,8 @@ public class TaskRequest {
         @Schema(description = "태스크 색깔", example = "#FFFFFF")
         String color;
 
+        @Schema(description = "부모 태스크 ID", example = "1")
+        Long parentTaskId;
+
     }
 }

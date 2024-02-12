@@ -22,7 +22,8 @@ public class TaskResponse {
         private String startDate;
         private String endDate;
         private List<taskMemberResult> taskMember;
-        private Integer taskStateName;
+        private Integer taskState;
+        private Long parentTaskId;
     }
 
     @Builder

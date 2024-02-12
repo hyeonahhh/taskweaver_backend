@@ -29,11 +29,11 @@ public class TaskController {
 
 
     @Operation(summary = "태스크 생성")
-    @PostMapping({"/projects/{projectId}/tasks", "/projects/{projectId}/tasks/{parentTaskId}"})
-    public ResponseEntity<ApiResponse> createTask(@RequestBody TaskRequest.taskCreate request, @AuthenticationPrincipal User user, @PathVariable Long projectId, @PathVariable(required = false) Long parentTaskId) {
+    @PostMapping("/projects/{projectId}/tasks")
+    public ResponseEntity<ApiResponse> createTask(@RequestBody TaskRequest.taskCreate request, @AuthenticationPrincipal User user, @PathVariable Long projectId) {
         try {
             ApiResponse ar = ApiResponse.builder()
-                    .result(taskService.createTask(request, Long.parseLong(user.getUsername()), projectId, parentTaskId))
+                    .result(taskService.createTask(request, Long.parseLong(user.getUsername()), projectId))
                     .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                     .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                     .build();
