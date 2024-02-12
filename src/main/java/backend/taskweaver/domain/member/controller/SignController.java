@@ -26,7 +26,7 @@ public class SignController {
     @PostMapping("/v1/auth/sign-up")
     public ResponseEntity<ApiResponse> signUp(@RequestBody SignUpRequest request) {
         ApiResponse ar = ApiResponse.builder()
-                .result(signService.registMember(request))
+                .result(signService.registerMember(request))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();

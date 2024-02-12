@@ -21,7 +21,8 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(nullable = false, length = 40)
+    // unique = true를 추가하여, 동일한 이메일을 가지고 가입하려고 할 때 DataIntegrityViolationException이 일어나게 한다.
+    @Column(nullable = false, length = 40, unique = true)
     private String email;
 
     @Column(nullable = false, length = 60)

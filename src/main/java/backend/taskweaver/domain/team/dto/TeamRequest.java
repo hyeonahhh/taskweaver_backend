@@ -12,7 +12,7 @@ import lombok.Setter;
 public class TeamRequest {
 
     @Getter
-    public static class teamCreate {
+    public static class teamCreateRequest {
         @Schema(description = "팀 이름", example = "Team Name")
         String name;
     }

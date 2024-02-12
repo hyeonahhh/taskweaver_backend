@@ -4,11 +4,15 @@ import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "project")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLDelete(sql = "UPDATE project SET deleted_at = NOW() WHERE id = ?")
+@Where(clause = "deleted_at is null")
 public class Project extends BaseEntity {
 
     @Id
