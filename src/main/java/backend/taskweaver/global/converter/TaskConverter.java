@@ -63,7 +63,7 @@ public class TaskConverter {
                     .startDate(formatter.format(task.getStartDate()))
                     .endDate(formatter.format(task.getStartDate()))
                     .taskMember(taskMemberResults)
-                    .taskStateName(task.getTaskState().getValue())
+                    .taskState(task.getTaskState().getValue())
                     .build();
         } else {
             return TaskResponse.taskCreateResult.builder()
@@ -73,7 +73,7 @@ public class TaskConverter {
                     .startDate(formatter.format(task.getStartDate()))
                     .endDate(formatter.format(task.getStartDate()))
                     .taskMember(taskMemberResults)
-                    .taskStateName(task.getTaskState().getValue())
+                    .taskState(task.getTaskState().getValue())
                     .parentTaskId(task.getParentTask().getId())
                     .build();
         }
