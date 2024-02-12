@@ -78,6 +78,7 @@ public enum ErrorCode {
 
     // PROJECT
     BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team"),
+    PROJECT_NOT_FOUND(404, "T001", "Project Not Found"),
 
     // TEAM
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
