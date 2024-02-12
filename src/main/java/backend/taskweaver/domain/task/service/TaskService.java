@@ -12,5 +12,5 @@ import java.text.ParseException;
 public interface TaskService {
 
     // 우선 팀 생성자 필드로만 추가
-    public TaskResponse.taskCreateResult createTask(TaskRequest.taskCreate request, Long user, Long projectId, Long porentTaskId) throws ParseException;
+    public TaskResponse.taskCreateResult createTask(TaskRequest.taskCreate request, Long user, Long projectId) throws ParseException;
 }

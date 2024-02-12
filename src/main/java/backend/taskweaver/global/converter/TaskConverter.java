@@ -55,15 +55,29 @@ public class TaskConverter {
             taskMemberResults.add(new TaskResponse.taskMemberResult(taskMember.getMember().getId(), taskMember.getMember().getImageUrl(), taskMember.getMember().getNickname()));
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        return TaskResponse.taskCreateResult.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .content(task.getContent())
-                .startDate(formatter.format(task.getStartDate()))
-                .endDate(formatter.format(task.getStartDate()))
-                .taskMember(taskMemberResults)
-                .taskStateName(task.getTaskState().getValue())
-                .build();
+        if (task.getParentTask() == null) {
+            return TaskResponse.taskCreateResult.builder()
+                    .id(task.getId())
+                    .title(task.getTitle())
+                    .content(task.getContent())
+                    .startDate(formatter.format(task.getStartDate()))
+                    .endDate(formatter.format(task.getStartDate()))
+                    .taskMember(taskMemberResults)
+                    .taskStateName(task.getTaskState().getValue())
+                    .build();
+        } else {
+            return TaskResponse.taskCreateResult.builder()
+                    .id(task.getId())
+                    .title(task.getTitle())
+                    .content(task.getContent())
+                    .startDate(formatter.format(task.getStartDate()))
+                    .endDate(formatter.format(task.getStartDate()))
+                    .taskMember(taskMemberResults)
+                    .taskStateName(task.getTaskState().getValue())
+                    .parentTaskId(task.getParentTask().getId())
+                    .build();
+        }
+
     }
 
 
