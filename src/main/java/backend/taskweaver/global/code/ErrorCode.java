@@ -81,7 +81,10 @@ public enum ErrorCode {
 
     // TEAM
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
-    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found");
+    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found"),
+
+    //TASK
+    TASK_STATE_NOT_FOUND(404, "TS001", "Task State Not Found"),
 
     ; // End
 

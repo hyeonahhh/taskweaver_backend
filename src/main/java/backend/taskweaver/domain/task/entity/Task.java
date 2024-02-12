@@ -1,50 +1,67 @@
-package backend.taskweaver.domain.project.entity;
+package backend.taskweaver.domain.task.entity;
 
 import backend.taskweaver.domain.BaseEntity;
+import backend.taskweaver.domain.project.entity.Project;
+import backend.taskweaver.domain.project.entity.ProjectState;
+import backend.taskweaver.domain.task.entity.enums.TaskStateName;
 import backend.taskweaver.domain.team.entity.Team;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
-@Table(name = "project")
+@Table(name = "task")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Builder
+@AllArgsConstructor
 public class Task extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "project_id")
+    @Column(name = "task_id")
     private Long id;
 
-    @Column(name = "project_name", nullable = false)
-    private String name;
-
-    @Column(name = "poject_description", nullable = false)
-    private String description;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
-    private Team team;
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "project_state_id")
     private ProjectState projectState;
 
-    @Column(name = "manager_id")
-    private Long managerId;
+    @Column(name = "title")
+    private String title;
 
-    @Builder
-    public Task(String name, String description, Team team, ProjectState projectState) {
-        this.name = name;
-        this.description = description;
-        this.team = team;
-        this.projectState = projectState;
-    }
+    @Column(name = "content")
+    private String content;
 
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
-    }
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "color")
+    private String color;
+
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;
+
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
+
+    private TaskStateName taskState;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_task_id")
+    private Task parentTask;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "parentTask")
+    private List<Task> children = new ArrayList<>();
+
+
 }
