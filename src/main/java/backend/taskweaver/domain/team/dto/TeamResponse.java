@@ -70,4 +70,13 @@ public class TeamResponse {
         private String role; // Role 추가
     }
 
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class deleteTeamMemberResult {
+        @Schema(description = "삭제 원하는 id 리스트 형태로", example = "[1, 2, 3]")
+        List<Long> memberId;
+    }
 }

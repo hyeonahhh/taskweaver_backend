@@ -19,4 +19,5 @@ public interface TeamService {
 
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user);
 
+    public void deleteTeamMembers(Long teamId, List<Long> memberIds);
 }

@@ -17,6 +17,7 @@ import backend.taskweaver.domain.team.repository.TeamRepository;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.TeamConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,21 @@ public class TeamServiceImpl implements TeamService{
 
     public List<TeamMember> findAllTeamMemberWithTeam(Long teamId) {
         return teamMemberRepository.findAllByTeamId(teamId);
+    }
+
+
+    // 팀원 삭제
+    @Transactional
+    public void deleteTeamMembers(Long teamId, List<Long> memberIds) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+
+        for (Long memberId : memberIds) {
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+
+            teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
+        }
     }
 
     // 팀 초대

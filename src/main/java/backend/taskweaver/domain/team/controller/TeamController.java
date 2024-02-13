@@ -66,6 +66,17 @@ public class TeamController {
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
 
+    @Operation(summary =  "팀원 삭제")
+    @PostMapping("/team/{teamId}/delete")
+    public ResponseEntity<ApiResponse> deleteTeamMembers(@PathVariable Long teamId, @RequestBody TeamRequest.teamDeleteRequest request) {
+        teamService.deleteTeamMembers(teamId, request.getMemberId()); // deleteTeamMembers 메서드 직접 호출
+        ApiResponse ar = ApiResponse.builder()
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
+
     @Operation(summary = "팀원 초대 - 이메일로 초대")
     @PostMapping("/team/invitation/email")
     public ResponseEntity<ApiResponse> inviteEmail(@RequestBody TeamInviteRequest.EmailInviteRequest request) {
