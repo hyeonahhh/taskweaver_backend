@@ -61,25 +61,29 @@ public class TeamServiceImpl implements TeamService{
     // 팀원 삭제
     @Transactional
     public void deleteTeamMembers(Long teamId, List<Long> memberIds, Long user) {
-        // 해당 팀 정보 가져오기
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
-        System.out.println(user);
         // 팀 리더인지 확인
         if (team.getTeamLeader().equals(user)) {
-            // 팀 리더인 경우에만 팀원 삭제 작업 실행
             for (Long memberId : memberIds) {
-                // 팀원 정보 가져오기
                 Member member = memberRepository.findById(memberId)
                         .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
-                teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
+
+                // 팀 리더인 경우에만 팀원 삭제 작업 실행
+                if (!memberId.equals(user)) {
+                    teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
+                } else {
+                    // 팀 리더가 팀원을 삭제할 수 없음
+                    throw new BusinessExceptionHandler(ErrorCode.CANNOT_DELETE_TEAM_LEADER);
+                }
             }
         } else {
             // 팀 리더가 아닌 경우 예외 처리
             throw new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
         }
     }
+
 
 
     // 팀 초대

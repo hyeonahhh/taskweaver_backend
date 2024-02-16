@@ -81,14 +81,14 @@ public enum ErrorCode {
 
     // TEAM
 
-    TEAM_MEMBER_STATE_NOT_FOUND(404, "T003", "No matching data in the team invitation status table."),
-    INVITATION_ALREADY_SENT(404, "T004", "The invitation has already been sent."),
 
 
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
     TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found"),
-    NOT_TEAM_LEADER(404, "T005", " Not the leader of the team.");
-
+    TEAM_MEMBER_STATE_NOT_FOUND(404, "T003", "No matching data in the team invitation status table."),
+    INVITATION_ALREADY_SENT(404, "T004", "The invitation has already been sent."),
+    NOT_TEAM_LEADER(404, "T005", " Not the leader of the team."),
+    CANNOT_DELETE_TEAM_LEADER(404, "T006", "Team leader cannot be deleted");
     ; // End
 
     /**
