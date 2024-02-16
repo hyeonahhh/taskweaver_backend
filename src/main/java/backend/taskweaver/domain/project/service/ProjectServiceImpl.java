@@ -1,5 +1,6 @@
 package backend.taskweaver.domain.project.service;
 
+import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.entity.Project;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,5 +80,25 @@ public class ProjectServiceImpl implements ProjectService {
         if (!teamIdFromManager.equals(teamId)) {
             throw new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<GetAllProjectResponse> getAll(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(()-> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+        List<Project> projects = projectRepository.findAllByTeam(team);
+
+        return  projects.stream()
+                .map(ProjectConverter::toGetAllProjectResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProjectResponse getOne(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(()-> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+        return ProjectConverter.toProjectResponse(project, project.getProjectState());
     }
 }

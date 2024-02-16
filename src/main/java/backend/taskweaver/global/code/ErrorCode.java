@@ -78,6 +78,7 @@ public enum ErrorCode {
 
     // PROJECT
     BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team"),
+    PROJECT_NOT_FOUND(404, "T001", "Project Not Found"),
 
     // TEAM
 
@@ -86,7 +87,14 @@ public enum ErrorCode {
 
 
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
-    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found");
+    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found"),
+
+    //TASK
+    TASK_STATE_NOT_FOUND(404, "TS001", "Task State Not Found"),
+
+    // MEMBER
+    DUPLICATED_EMAIL(409, "M001", "Email is duplicated"),
+
 
     ; // End
 
