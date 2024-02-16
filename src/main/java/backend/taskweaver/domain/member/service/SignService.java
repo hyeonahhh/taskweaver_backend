@@ -9,7 +9,9 @@ import backend.taskweaver.domain.member.entity.MemberRefreshToken;
 import backend.taskweaver.domain.member.entity.enums.LoginType;
 import backend.taskweaver.domain.member.repository.MemberRefreshTokenRepository;
 import backend.taskweaver.domain.member.repository.MemberRepository;
+import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.MemberConverter;
+import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import backend.taskweaver.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,14 +29,13 @@ public class SignService {
 
 
     @Transactional
-    public SignUpResponse registMember(SignUpRequest request) {
-        Member member = memberRepository.save(MemberConverter.toMember(request, encoder));
+    public SignUpResponse registerMember(SignUpRequest request) {
         try {
-            memberRepository.flush();
+            Member member = memberRepository.saveAndFlush(MemberConverter.toMember(request, encoder));
+            return MemberConverter.toSignUpResponse(member);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("이미 사용중인 아이디입니다.");
+            throw new BusinessExceptionHandler(ErrorCode.DUPLICATED_EMAIL);
         }
-        return MemberConverter.toSignUpResponse(member);
     }
 
     //@Transactional(readOnly = true)
