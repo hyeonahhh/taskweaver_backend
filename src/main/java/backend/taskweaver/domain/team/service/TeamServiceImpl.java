@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static backend.taskweaver.global.converter.TeamConverter.generateInviteLink;
+
 @RequiredArgsConstructor
 @Service
 public class TeamServiceImpl implements TeamService{
@@ -38,11 +40,18 @@ public class TeamServiceImpl implements TeamService{
     // 팀 생성
     // 우선 팀 생성자 필드로만 추가
     public TeamResponse.teamCreateResult createTeam(TeamRequest.teamCreateRequest request, Long user) {
-        Team team =  teamRepository.save(TeamConverter.toTeam(request));
-        team.setTeamLeader(user);
+        // 팀 리더 정보를 설정하여 팀 객체 생성
+        Team team =  Team.builder()
+                .name(request.getName())
+                .inviteLink(generateInviteLink())
+                .teamLeader(user) // 팀 리더 설정
+                .build();
+
+        // 팀 저장
+        team = teamRepository.save(team);
+
         return TeamConverter.toCreateResponse(team);
     }
-
     // 해당 팀 조회
     public TeamResponse.findTeamResult findTeam(Long id) {
         Team team = teamRepository.findById(id)
