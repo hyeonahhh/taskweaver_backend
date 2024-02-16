@@ -5,8 +5,12 @@ import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.dto.TeamResponse;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class TeamConverter {
 
@@ -35,6 +39,32 @@ public class TeamConverter {
                 teamMember.getMember().getId()
         );
     }
+
+    public static TeamResponse.findTeamResult toGetTeamResponse(Team team, List<TeamMember> teamMembers) {
+        List<TeamResponse.TeamMemberInfo> memberInfos = teamMembers.stream()
+                .map(member -> new TeamResponse.TeamMemberInfo(
+                        member.getMember().getId(),
+                        member.getMember().getEmail(),
+                        member.getMember().getImageUrl(),
+                        member.getMember().getNickname(),
+                        member.getRole().toString())) // Role 추가
+                .collect(Collectors.toList());
+
+        // 팀의 멤버 수 계산
+        long memberCount = memberInfos.size();
+
+        return new TeamResponse.findTeamResult(
+                team.getId(),
+                team.getName(),
+                team.getTeamLeader(),
+                team.getInviteLink(),
+                team.getCreatedAt(),
+                memberInfos,
+                memberCount // 멤버 수 추가
+        );
+    }
+
+
     public static String generateInviteLink() {
         UUID uuid = UUID.randomUUID();
         // 도메인 결정 후

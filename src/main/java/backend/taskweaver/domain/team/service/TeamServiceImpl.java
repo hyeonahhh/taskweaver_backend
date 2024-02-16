@@ -28,13 +28,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class TeamServiceImpl implements TeamService{
-    @Autowired
     private final TeamRepository teamRepository;
-    @Autowired
     private final MemberRepository memberRepository;
-    @Autowired
     private final TeamMemberStateRepository teamMemberStateRepository;
-    @Autowired
     private final TeamMemberRepository teamMemberRepository;
 
     // 팀 생성
@@ -43,6 +39,20 @@ public class TeamServiceImpl implements TeamService{
         Team team =  teamRepository.save(TeamConverter.toTeam(request));
         team.setTeamLeader(user);
         return TeamConverter.toCreateResponse(team);
+    }
+
+    // 해당 팀 조회
+    public TeamResponse.findTeamResult findTeam(Long id) {
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+
+        List<TeamMember> teamMembers = findAllTeamMemberWithTeam(id);
+
+        return TeamConverter.toGetTeamResponse(team, teamMembers);
+    }
+
+    public List<TeamMember> findAllTeamMemberWithTeam(Long teamId) {
+        return teamMemberRepository.findAllByTeamId(teamId);
     }
 
     // 팀 초대
@@ -113,7 +123,7 @@ public class TeamServiceImpl implements TeamService{
 
     }
 
-    // 초대 응답 시에 해당 team id와 user id가 일치하는 값을 TeamMemberState에서 찾아서 inviteState 값을 ACCEPT로 바꾸는 메소드
+    // 초대 응답 수락 시에 해당 team id와 user id가 일치하는 값을 TeamMemberState에서 찾아서 inviteState 값을 ACCEPT로 바꾸는 메소드
     private void acceptInvite(Long teamId, Long userId) {
         Optional<TeamMemberState> teamMemberStateOptional = teamMemberStateRepository.findByTeamIdAndMemberId(teamId, userId);
         teamMemberStateOptional.ifPresentOrElse(teamMemberState -> {
@@ -124,6 +134,8 @@ public class TeamServiceImpl implements TeamService{
             throw new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_STATE_NOT_FOUND);
         });
     }
+
+    // 초대 응답 거부
     private void refuseInvite(Long teamId, Long userId) {
         Optional<TeamMemberState> teamMemberStateOptional = teamMemberStateRepository.findByTeamIdAndMemberId(teamId, userId);
         teamMemberStateOptional.ifPresentOrElse(teamMemberState -> {
@@ -134,4 +146,6 @@ public class TeamServiceImpl implements TeamService{
             throw new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_STATE_NOT_FOUND);
         });
     }
+
+
 }
