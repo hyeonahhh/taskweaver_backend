@@ -68,8 +68,8 @@ public class TeamController {
 
     @Operation(summary =  "팀원 삭제")
     @PostMapping("/team/{teamId}/delete")
-    public ResponseEntity<ApiResponse> deleteTeamMembers(@PathVariable Long teamId, @RequestBody TeamRequest.teamDeleteRequest request) {
-        teamService.deleteTeamMembers(teamId, request.getMemberId()); // deleteTeamMembers 메서드 직접 호출
+    public ResponseEntity<ApiResponse> deleteTeamMembers(@PathVariable Long teamId, @RequestBody TeamRequest.teamDeleteRequest request, @AuthenticationPrincipal User user) {
+        teamService.deleteTeamMembers(teamId, request.getMemberId(), Long.parseLong(user.getUsername())); // deleteTeamMembers 메서드 직접 호출
         ApiResponse ar = ApiResponse.builder()
                 .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())

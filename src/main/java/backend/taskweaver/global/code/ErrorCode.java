@@ -86,7 +86,8 @@ public enum ErrorCode {
 
 
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
-    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found");
+    TEAM_MEMBER_NOT_FOUND(404, "T002", "Team member Not Found"),
+    NOT_TEAM_LEADER(404, "T005", " Not the leader of the team.");
 
     ; // End
 

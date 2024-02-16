@@ -6,6 +6,7 @@ import backend.taskweaver.domain.team.dto.TeamInviteResponse;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.dto.TeamResponse;
 import backend.taskweaver.domain.team.entity.TeamMember;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.List;
 
@@ -19,5 +20,5 @@ public interface TeamService {
 
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user);
 
-    public void deleteTeamMembers(Long teamId, List<Long> memberIds);
+    public void deleteTeamMembers(Long teamId, List<Long> memberIds, Long user);
 }

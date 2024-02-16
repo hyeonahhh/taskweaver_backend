@@ -21,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,17 +60,27 @@ public class TeamServiceImpl implements TeamService{
 
     // 팀원 삭제
     @Transactional
-    public void deleteTeamMembers(Long teamId, List<Long> memberIds) {
+    public void deleteTeamMembers(Long teamId, List<Long> memberIds, Long user) {
+        // 해당 팀 정보 가져오기
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
-        for (Long memberId : memberIds) {
-            Member member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
-
-            teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
+        System.out.println(user);
+        // 팀 리더인지 확인
+        if (team.getTeamLeader().equals(user)) {
+            // 팀 리더인 경우에만 팀원 삭제 작업 실행
+            for (Long memberId : memberIds) {
+                // 팀원 정보 가져오기
+                Member member = memberRepository.findById(memberId)
+                        .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+                teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
+            }
+        } else {
+            // 팀 리더가 아닌 경우 예외 처리
+            throw new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
         }
     }
+
 
     // 팀 초대
     public TeamInviteRequest.EmailInviteRequest inviteEmail(TeamInviteRequest.EmailInviteRequest request) {
