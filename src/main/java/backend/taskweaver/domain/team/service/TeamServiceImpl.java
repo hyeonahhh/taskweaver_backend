@@ -17,9 +17,11 @@ import backend.taskweaver.domain.team.repository.TeamRepository;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.TeamConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,6 +56,35 @@ public class TeamServiceImpl implements TeamService{
     public List<TeamMember> findAllTeamMemberWithTeam(Long teamId) {
         return teamMemberRepository.findAllByTeamId(teamId);
     }
+
+
+    // 팀원 삭제
+    @Transactional
+    public void deleteTeamMembers(Long teamId, List<Long> memberIds, Long user) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+
+        // 팀 리더인지 확인
+        if (team.getTeamLeader().equals(user)) {
+            for (Long memberId : memberIds) {
+                Member member = memberRepository.findById(memberId)
+                        .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+
+                // 팀 리더인 경우에만 팀원 삭제 작업 실행
+                if (!memberId.equals(user)) {
+                    teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
+                } else {
+                    // 팀 리더가 팀원을 삭제할 수 없음
+                    throw new BusinessExceptionHandler(ErrorCode.CANNOT_DELETE_TEAM_LEADER);
+                }
+            }
+        } else {
+            // 팀 리더가 아닌 경우 예외 처리
+            throw new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
+        }
+    }
+
+
 
     // 팀 초대
     public TeamInviteRequest.EmailInviteRequest inviteEmail(TeamInviteRequest.EmailInviteRequest request) {
