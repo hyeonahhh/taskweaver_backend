@@ -1,5 +1,6 @@
 package backend.taskweaver.domain.project.controller;
 
+import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.service.ProjectServiceImpl;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
@@ -25,8 +28,7 @@ public class ProjectController {
     // todo: 응답부분 swagger 고치기
     
     @PostMapping("/team/{teamId}/project")
-    @Operation(summary = "프로젝트 등록 메서드", description = "프로젝트 등록 메서드입니다.")
-    //@ApiResponse(responseCode = "201", description = "프로젝트 등록 성공", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    @Operation(summary = "프로젝트 등록 메서드", description = "프로젝트 등록 api입니다.")
     public ResponseEntity<ApiResponse> addProject(@RequestBody @Valid ProjectRequest request,
                                                   @PathVariable @Parameter(description = "팀 ID") Long teamId) {
         ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
@@ -37,4 +39,30 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(apiResponse);
     }
+
+    @GetMapping("/team/{teamId}/projects")
+    @Operation(summary = "프로젝트 전체 조회 메서드", description = "팀 내 모든 프로젝트를 조회하는 api입니다.")
+    public ResponseEntity<ApiResponse> getAllProject(@PathVariable @Parameter(description = "팀 ID") Long teamId) {
+        ApiResponse apiResponse = ApiResponse.<List<GetAllProjectResponse>>builder()
+                .result(projectService.getAll(teamId))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
+    @GetMapping("/project/{projectId}")
+    @Operation(summary = "프로젝트 상세 조회 메서드", description = "한 프로젝트에 대해 상세 조회하는 api입니다.")
+    public ResponseEntity<ApiResponse> getOneProject(@PathVariable @Parameter(description = "프로젝트 ID")Long projectId) {
+        ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
+                .result(projectService.getOne(projectId))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
+
 }
