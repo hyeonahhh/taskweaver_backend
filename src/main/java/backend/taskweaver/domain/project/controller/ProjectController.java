@@ -68,7 +68,8 @@ public class ProjectController {
     }
 
     @GetMapping("/project/{projectId}/state")
-    public ResponseEntity<ApiResponse> updateState(@PathVariable Long projectId,
+    @Operation(summary = "프로젝트 상태 변경 메서드", description = "프로젝트의 상태를 변경하는 api입니다.")
+    public ResponseEntity<ApiResponse> updateState(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
                                                    @RequestBody @Valid UpdateStateRequest request,
                                                    @AuthenticationPrincipal User user) {
         projectService.updateState(projectId, request, Long.parseLong(user.getUsername()));
