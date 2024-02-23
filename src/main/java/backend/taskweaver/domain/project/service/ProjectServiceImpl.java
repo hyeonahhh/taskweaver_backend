@@ -1,5 +1,7 @@
 package backend.taskweaver.domain.project.service;
 
+import backend.taskweaver.domain.member.entity.Member;
+import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
@@ -30,27 +32,24 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
 
     @Override
     @Transactional
     public ProjectResponse createProject(ProjectRequest request, Long teamId) {
-        /* project state 저장 */
+        // project state 저장
         ProjectState state = ProjectConverter.toProjectState(ProjectStateName.BEFORE);
 
-        /* project 저장 */
+        // project 저장
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
         Project project = ProjectConverter.toProject(request, team, state);
         projectRepository.save(project);
 
-        /* project member 저장 */
-        Long managerId = request.managerId();
-        TeamMember manager = teamMemberRepository.findById(managerId)
-                .orElseThrow(()-> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
-        checkIfTeamIdIsSame(manager, teamId);
-        createProjectMember(project, managerId);
+        // project member 저장
+        createProjectMember(project, request.managerId());
 
         return ProjectConverter.toProjectResponse(project, state);
     }
@@ -58,28 +57,27 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void createProjectMember(Project project, Long managerId) {
-        Team team = project.getTeam();
-        List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
+        // 매니저 id가 존재하는지 확인
+        Member member = memberRepository.findById(managerId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
 
+        // 해당 매니저가 해당 팀에 존재하는지 확인
+        Team team = project.getTeam();
+        teamMemberRepository.findByTeamAndMember(team, member)
+                .orElseThrow(()->new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR));
+
+        List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
         teamMembers.forEach(teamMember -> {
-            Long teamMemberId = teamMember.getId();
-            if (teamMemberId.equals(managerId)) {
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, teamMember, ProjectRole.MANAGER);
+            Member foundMember = teamMember.getMember();
+            if (foundMember.getId().equals(managerId)) {
+                ProjectMember projectMember = ProjectConverter.toProjectMember(project, foundMember, ProjectRole.MANAGER);
                 projectMemberRepository.save(projectMember);
-                project.setManagerId(teamMemberId);
+                project.setManagerId(managerId);
             } else {
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, teamMember, ProjectRole.NON_MANAGER);
+                ProjectMember projectMember = ProjectConverter.toProjectMember(project, foundMember, ProjectRole.NON_MANAGER);
                 projectMemberRepository.save(projectMember);
             }
         });
-    }
-
-    @Override
-    public void checkIfTeamIdIsSame(TeamMember manager, Long teamId) {
-        Long teamIdFromManager = manager.getTeam().getId();
-        if (!teamIdFromManager.equals(teamId)) {
-            throw new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR);
-        }
     }
 
     @Override
