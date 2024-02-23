@@ -3,6 +3,7 @@ package backend.taskweaver.domain.project.controller;
 import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
+import backend.taskweaver.domain.project.dto.UpdateStateRequest;
 import backend.taskweaver.domain.project.service.ProjectServiceImpl;
 import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
@@ -13,6 +14,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,5 +67,16 @@ public class ProjectController {
                 .body(apiResponse);
     }
 
-
+    @GetMapping("/project/{projectId}/state")
+    public ResponseEntity<ApiResponse> updateState(@PathVariable Long projectId,
+                                                   @RequestBody @Valid UpdateStateRequest request,
+                                                   @AuthenticationPrincipal User user) {
+        projectService.updateState(projectId, request, Long.parseLong(user.getUsername()));
+        ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(apiResponse);
+    }
 }

@@ -21,4 +21,8 @@ public class ProjectState extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "project_state_name", nullable = false)
     private ProjectStateName stateName;
+
+    public void changeProjectState(ProjectStateName projectStateName) {
+        this.stateName = projectStateName;
+    }
 }
