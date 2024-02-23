@@ -67,7 +67,8 @@ public class ProjectController {
     }
 
     @DeleteMapping("/project/{projectId}")
-    public ResponseEntity<ApiResponse> deleteProject(@PathVariable Long projectId,
+    @Operation(summary = "프로젝트 삭제 메서드", description = "프로젝트 담당자가 프로젝트를 삭제하는 api입니다.")
+    public ResponseEntity<ApiResponse> deleteProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
                                                      @AuthenticationPrincipal User user) {
         projectService.delete(projectId, Long.parseLong(user.getUsername()));
         ApiResponse apiResponse = ApiResponse.builder()
