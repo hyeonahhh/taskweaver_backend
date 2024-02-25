@@ -96,6 +96,7 @@ public enum ErrorCode {
     // MEMBER
     DUPLICATED_EMAIL(409, "M001", "Email is duplicated"),
     MEMBER_NOT_FOUND(404, "M002", "Member Not Found"),
+    PASSWORD_NOT_MATCH(403, "M003", "Password doesn't match")
 
 
     ; // End
