@@ -73,11 +73,11 @@ public class ProjectController {
                                                    @RequestBody @Valid UpdateStateRequest request,
                                                    @AuthenticationPrincipal User user) {
         projectService.updateState(projectId, request, Long.parseLong(user.getUsername()));
-        ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(apiResponse);
     }
 
@@ -87,11 +87,11 @@ public class ProjectController {
                                                    @RequestBody @Valid ProjectRequest request,
                                                    @AuthenticationPrincipal User user) {
         projectService.updateProject(projectId, request, Long.parseLong(user.getUsername()));
-        ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(apiResponse);
     }
 }
