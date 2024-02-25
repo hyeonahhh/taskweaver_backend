@@ -14,4 +14,5 @@ public interface ProjectService{
     List<GetAllProjectResponse> getAll(Long teamId);
     ProjectResponse getOne(Long projectId);
     void updateState(Long projectId, UpdateStateRequest request, Long memberId);
+    void updateProject(Long projectId, ProjectRequest request, Long memberId);
 }

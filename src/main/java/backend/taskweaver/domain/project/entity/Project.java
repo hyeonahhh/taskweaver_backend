@@ -1,6 +1,7 @@
 package backend.taskweaver.domain.project.entity;
 
 import backend.taskweaver.domain.BaseEntity;
+import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;
@@ -47,5 +48,11 @@ public class Project extends BaseEntity {
 
     public void setManagerId(Long managerId) {
         this.managerId = managerId;
+    }
+
+    public void updateProject(ProjectRequest request) {
+        this.description = request.description();
+        this.name = request.name();
+        this.managerId= request.managerId();
     }
 }

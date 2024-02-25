@@ -80,4 +80,18 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(apiResponse);
     }
+
+    @PatchMapping("/project/{projectId}")
+    @Operation(summary = "프로젝트 수정 메서드", description = "프로젝트의 이름, 내용, 담당자를 변경하는 api입니다.")
+    public ResponseEntity<ApiResponse> updateProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
+                                                   @RequestBody @Valid ProjectRequest request,
+                                                   @AuthenticationPrincipal User user) {
+        projectService.updateProject(projectId, request, Long.parseLong(user.getUsername()));
+        ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(apiResponse);
+    }
 }

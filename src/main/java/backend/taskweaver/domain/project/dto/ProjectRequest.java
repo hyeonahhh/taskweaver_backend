@@ -14,7 +14,7 @@ public record ProjectRequest(
         String description,
 
         @NotNull
-        @Schema(description = "프로젝트 담당자 ID (팀 멤버 ID)", example = "1")
+        @Schema(description = "프로젝트 담당자 ID", example = "1")
         Long managerId
 ) {
 }
