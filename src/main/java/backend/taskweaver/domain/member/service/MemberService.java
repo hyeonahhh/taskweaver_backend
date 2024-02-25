@@ -5,7 +5,9 @@ import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.entity.MemberRefreshToken;
 import backend.taskweaver.domain.member.repository.MemberRefreshTokenRepository;
 import backend.taskweaver.domain.member.repository.MemberRepository;
+import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.MemberConverter;
+import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import backend.taskweaver.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,4 +33,14 @@ public class MemberService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
 
+    @Transactional
+    public void updatePassword(Long memberId, UpdatePasswordRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+        if(encoder.matches(request.oldPassword(), member.getPassword())) {
+            member.updatePassword(encoder.encode(request.newPassword()));
+        } else {
+            throw new BusinessExceptionHandler(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+    }
 }

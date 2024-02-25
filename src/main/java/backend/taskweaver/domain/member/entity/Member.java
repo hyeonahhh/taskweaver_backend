@@ -38,4 +38,8 @@ public class Member {
     private LoginType loginType;
 
     private String imageUrl;
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }
