@@ -38,12 +38,12 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
 
-        // 비밀번호가 같은지 확인한다.
+        // 비밀번호가 같은지 확인
         if(!encoder.matches(request.oldPassword(), member.getPassword())) {
             throw new BusinessExceptionHandler(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
-        // 똑같은 비밀번호로 변경 불가능하다.
+        // 현재 비밀번호와 같은 비밀번호로 변경 불가능
         if(request.oldPassword().equals(request.newPassword())) {
             throw new BusinessExceptionHandler(ErrorCode.SAME_PASSWORD);
         }
