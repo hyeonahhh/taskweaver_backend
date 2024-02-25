@@ -108,19 +108,16 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
 
-        // 지금 로그인한 사용자가 매니저면 프로젝트를 삭제한다.
-        if (project.getManagerId().equals(memberId)) {
-            ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
-                    .filter(stateName -> stateName.toString().equals(request.projectState()))
-                    .findFirst()
-                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_STATE_NOT_FOUND));
+        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        checkIfIsManager(project.getManagerId(), memberId);
 
-            ProjectState projectState = project.getProjectState();
-            projectState.changeProjectState(foundState);
-        } // 지금 로그인한 사용자가 매니저가 아니면 에러를 던진다.
-        else {
-            throw new BusinessExceptionHandler(ErrorCode.NOT_PROJECT_MANAGER);
-        }
+        ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
+                .filter(stateName -> stateName.toString().equals(request.projectState()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_STATE_NOT_FOUND));
+
+        ProjectState projectState = project.getProjectState();
+        projectState.changeProjectState(foundState);
     }
 
     @Override
