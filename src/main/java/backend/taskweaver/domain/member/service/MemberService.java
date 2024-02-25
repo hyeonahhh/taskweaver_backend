@@ -37,10 +37,17 @@ public class MemberService {
     public void updatePassword(Long memberId, UpdatePasswordRequest request) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
-        if(encoder.matches(request.oldPassword(), member.getPassword())) {
-            member.updatePassword(encoder.encode(request.newPassword()));
-        } else {
+
+        // 비밀번호가 같은지 확인한다.
+        if(!encoder.matches(request.oldPassword(), member.getPassword())) {
             throw new BusinessExceptionHandler(ErrorCode.PASSWORD_NOT_MATCH);
         }
+
+        // 똑같은 비밀번호로 변경 불가능하다.
+        if(request.oldPassword().equals(request.newPassword())) {
+            throw new BusinessExceptionHandler(ErrorCode.SAME_PASSWORD);
+        }
+
+        member.updatePassword(encoder.encode(request.newPassword()));
     }
 }
