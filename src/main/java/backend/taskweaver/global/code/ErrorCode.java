@@ -62,7 +62,12 @@ public enum ErrorCode {
 
     // 토큰 검사시 사용자 인증 실패할 때 발생
     USER_AUTH_ERROR(404, "G015", "User authentication failed"),
+    
+    // 지원하지 않는 JWT 토큰일 때 발생
+    UNSUPPORTED_JWT_TOKEN(400,"G017", "Unsupported jwt token"),
 
+    // 토큰 클레임이 비어있을 때 발생
+    // TOKEN_CLAIM_EMPTY(400,"G016", "JWT claim is empty"),
 
     /**
      * ******************************* Custom Error CodeList ***************************************
