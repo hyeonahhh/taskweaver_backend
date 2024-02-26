@@ -104,6 +104,26 @@ public class ProjectServiceImpl implements ProjectService {
         return ProjectConverter.toProjectResponse(project, project.getProjectState());
     }
 
+    public void delete(Long projectId, Long memberId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+
+        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        checkIfIsManager(project.getManagerId(), memberId);
+
+        // project members 삭제
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+        projectMembers.stream()
+                .map(ProjectMember::getId)
+                .forEach(projectMemberRepository::deleteById);
+
+        // project state 삭제
+        projectStateRepository.deleteById(project.getProjectState().getId());
+
+        // project 삭제
+        projectRepository.deleteById(projectId);
+    }
+
     @Override
     @Transactional
     public void updateState(Long projectId, UpdateStateRequest request, Long memberId) {
@@ -137,7 +157,7 @@ public class ProjectServiceImpl implements ProjectService {
             changeRole(request.managerId(), projectId, ProjectRole.MANAGER); // 새로운 매니저로 임명한다!
             project.updateProject(request);
 
-        // 이미 담당자인 사람을 선택했을 경우
+            // 이미 담당자인 사람을 선택했을 경우
         } else {
             throw new BusinessExceptionHandler(ErrorCode.SAME_PROJECT_MANAGER);
         }
@@ -153,28 +173,5 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_MEMBER_NOT_FOUND));
         projectMember.changeRole(role);
-    }
-    public void delete(Long projectId, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-
-        // 지금 로그인한 사용자가 매니저면 프로젝트를 삭제한다.
-        if(project.getManagerId().equals(memberId)) {
-            // project members 삭제
-            List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
-            projectMembers.stream()
-                    .map(ProjectMember::getId)
-                    .forEach(projectMemberRepository::deleteById);
-
-            // project state 삭제
-            projectStateRepository.deleteById(project.getProjectState().getId());
-
-            // project 삭제
-            projectRepository.deleteById(projectId);
-
-            // 지금 로그인한 사용자가 매니저가 아니면 에러를 던진다.
-        } else {
-            throw new BusinessExceptionHandler(ErrorCode.NOT_PROJECT_MANAGER);
-        }
     }
 }
