@@ -15,4 +15,5 @@ public interface ProjectService{
     ProjectResponse getOne(Long projectId);
     void updateState(Long projectId, UpdateStateRequest request, Long memberId);
     void updateProject(Long projectId, ProjectRequest request, Long memberId);
+    void delete(Long projectId, Long memberId);
 }

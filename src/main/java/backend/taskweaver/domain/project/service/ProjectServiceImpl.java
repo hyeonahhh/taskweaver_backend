@@ -13,6 +13,7 @@ import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
+import backend.taskweaver.domain.project.repository.ProjectStateRepository;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
@@ -37,6 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ProjectStateRepository projectStateRepository;
 
     @Override
     @Transactional
@@ -151,5 +153,28 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_MEMBER_NOT_FOUND));
         projectMember.changeRole(role);
+    }
+    public void delete(Long projectId, Long memberId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+
+        // 지금 로그인한 사용자가 매니저면 프로젝트를 삭제한다.
+        if(project.getManagerId().equals(memberId)) {
+            // project members 삭제
+            List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+            projectMembers.stream()
+                    .map(ProjectMember::getId)
+                    .forEach(projectMemberRepository::deleteById);
+
+            // project state 삭제
+            projectStateRepository.deleteById(project.getProjectState().getId());
+
+            // project 삭제
+            projectRepository.deleteById(projectId);
+
+            // 지금 로그인한 사용자가 매니저가 아니면 에러를 던진다.
+        } else {
+            throw new BusinessExceptionHandler(ErrorCode.NOT_PROJECT_MANAGER);
+        }
     }
 }
