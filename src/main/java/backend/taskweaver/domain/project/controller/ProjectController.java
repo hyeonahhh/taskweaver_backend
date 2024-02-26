@@ -3,6 +3,7 @@ package backend.taskweaver.domain.project.controller;
 import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
+import backend.taskweaver.domain.project.dto.UpdateStateRequest;
 import backend.taskweaver.domain.project.service.ProjectServiceImpl;
 import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
@@ -61,6 +62,34 @@ public class ProjectController {
                 .result(projectService.getOne(projectId))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
+    @PatchMapping("/project/{projectId}/state")
+    @Operation(summary = "프로젝트 상태 변경 메서드", description = "프로젝트의 상태를 변경하는 api입니다.")
+    public ResponseEntity<ApiResponse> updateState(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
+                                                   @RequestBody @Valid UpdateStateRequest request,
+                                                   @AuthenticationPrincipal User user) {
+        projectService.updateState(projectId, request, Long.parseLong(user.getUsername()));
+        ApiResponse apiResponse = ApiResponse.builder()
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
+    @PatchMapping("/project/{projectId}")
+    @Operation(summary = "프로젝트 수정 메서드", description = "프로젝트의 이름, 내용, 담당자를 변경하는 api입니다.")
+    public ResponseEntity<ApiResponse> updateProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
+                                                   @RequestBody @Valid ProjectRequest request,
+                                                   @AuthenticationPrincipal User user) {
+        projectService.updateProject(projectId, request, Long.parseLong(user.getUsername()));
+        ApiResponse apiResponse = ApiResponse.builder()
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(apiResponse);

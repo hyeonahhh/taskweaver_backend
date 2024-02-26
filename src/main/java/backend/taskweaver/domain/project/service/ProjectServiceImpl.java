@@ -5,6 +5,7 @@ import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
+import backend.taskweaver.domain.project.dto.UpdateStateRequest;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.entity.ProjectState;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
         // 해당 매니저가 해당 팀에 존재하는지 확인
         Team team = project.getTeam();
         teamMemberRepository.findByTeamAndMember(team, member)
-                .orElseThrow(()->new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR));
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR));
 
         List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
         teamMembers.forEach(teamMember -> {
@@ -86,10 +88,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public List<GetAllProjectResponse> getAll(Long teamId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(()-> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
         List<Project> projects = projectRepository.findAllByTeam(team);
 
-        return  projects.stream()
+        return projects.stream()
                 .map(ProjectConverter::toGetAllProjectResponse)
                 .collect(Collectors.toList());
     }
@@ -98,33 +100,78 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public ProjectResponse getOne(Long projectId) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(()-> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
         return ProjectConverter.toProjectResponse(project, project.getProjectState());
     }
 
-    @Override
-    @Transactional
     public void delete(Long projectId, Long memberId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
 
-        // 지금 로그인한 사용자가 매니저면 프로젝트를 삭제한다.
-        if(project.getManagerId().equals(memberId)) {
-            // project members 삭제
-            List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
-            projectMembers.stream()
-                    .map(ProjectMember::getId)
-                    .forEach(projectMemberRepository::deleteById);
+        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        checkIfIsManager(project.getManagerId(), memberId);
 
-            // project state 삭제
-            projectStateRepository.deleteById(project.getProjectState().getId());
+        // project members 삭제
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+        projectMembers.stream()
+                .map(ProjectMember::getId)
+                .forEach(projectMemberRepository::deleteById);
 
-            // project 삭제
-            projectRepository.deleteById(projectId);
+        // project state 삭제
+        projectStateRepository.deleteById(project.getProjectState().getId());
 
-            // 지금 로그인한 사용자가 매니저가 아니면 에러를 던진다.
+        // project 삭제
+        projectRepository.deleteById(projectId);
+    }
+
+    @Override
+    @Transactional
+    public void updateState(Long projectId, UpdateStateRequest request, Long memberId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+
+        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        checkIfIsManager(project.getManagerId(), memberId);
+
+        ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
+                .filter(stateName -> stateName.toString().equals(request.projectState()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_STATE_NOT_FOUND));
+
+        ProjectState projectState = project.getProjectState();
+        projectState.changeProjectState(foundState);
+    }
+
+    @Override
+    @Transactional
+    public void updateProject(Long projectId, ProjectRequest request, Long memberId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+
+        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        checkIfIsManager(project.getManagerId(), memberId);
+
+        // 이미 담당자인 사람을 선택하지 않았을 경우
+        if (!request.managerId().equals(project.getManagerId())) {
+            changeRole(project.getManagerId(), projectId, ProjectRole.NON_MANAGER); // 기존 매니저의 권한을 없앤다.
+            changeRole(request.managerId(), projectId, ProjectRole.MANAGER); // 새로운 매니저로 임명한다!
+            project.updateProject(request);
+
+            // 이미 담당자인 사람을 선택했을 경우
         } else {
+            throw new BusinessExceptionHandler(ErrorCode.SAME_PROJECT_MANAGER);
+        }
+    }
+
+    private void checkIfIsManager(Long projectManagerId, Long memberId) {
+        if (!projectManagerId.equals(memberId)) {
             throw new BusinessExceptionHandler(ErrorCode.NOT_PROJECT_MANAGER);
         }
+    }
+
+    private void changeRole(Long memberId, Long projectId, ProjectRole role) {
+        ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_MEMBER_NOT_FOUND));
+        projectMember.changeRole(role);
     }
 }

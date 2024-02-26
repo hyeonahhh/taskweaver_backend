@@ -31,4 +31,8 @@ public class ProjectMember extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void changeRole(ProjectRole role) {
+        this.role = role;
+    }
 }
