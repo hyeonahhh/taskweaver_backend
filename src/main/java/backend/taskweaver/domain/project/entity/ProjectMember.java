@@ -14,8 +14,6 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @Builder
 @Getter
-@SQLDelete(sql = "UPDATE project_member SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = "deleted_at is null")
 public class ProjectMember extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,7 +11,7 @@ import org.hibernate.annotations.Where;
 @Table(name = "project")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SQLDelete(sql = "UPDATE project SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE project SET deleted_at = NOW() WHERE project_id = ?")
 @Where(clause = "deleted_at is null")
 public class Project extends BaseEntity {
 
@@ -30,7 +30,7 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "project_state_id")
     private ProjectState projectState;
 

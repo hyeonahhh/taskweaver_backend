@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,5 +66,16 @@ public class ProjectController {
                 .body(apiResponse);
     }
 
-
+    @DeleteMapping("/project/{projectId}")
+    @Operation(summary = "프로젝트 삭제 메서드", description = "프로젝트 담당자가 프로젝트를 삭제하는 api입니다.")
+    public ResponseEntity<ApiResponse> deleteProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
+                                                     @AuthenticationPrincipal User user) {
+        projectService.delete(projectId, Long.parseLong(user.getUsername()));
+        ApiResponse apiResponse = ApiResponse.builder()
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
 }
