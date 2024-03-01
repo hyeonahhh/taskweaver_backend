@@ -3,6 +3,9 @@ package backend.taskweaver.global.security;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.exception.handler.JwtTokenHandler;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,17 +45,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             AbstractAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(user, accessToken, user.getAuthorities());
             authenticated.setDetails(new WebAuthenticationDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticated);
-        } catch (ExpiredJwtException e) {	// 토큰이 만료됐을 때
-            log.error("the token is expired and not valid anymore", e);
-            reissueAccessToken(request, response, e);
-            throw new JwtTokenHandler(ErrorCode.EXPIRED_JWT_ERROR);
-        } catch (IllegalArgumentException e) {
-            log.error("an error occured during getting username from token", e);
-            throw new JwtTokenHandler(ErrorCode.INVALID_JWT_ERROR);
-        } catch (AuthenticationException e){
-            log.error("Authentication Failed. Username or Password not valid.", e);
-            throw new JwtTokenHandler(ErrorCode.USER_AUTH_ERROR);
+        } catch (ExpiredJwtException e) {
+            request.setAttribute("exception", ErrorCode.EXPIRED_JWT_ERROR.getMessage());
+        } catch (MalformedJwtException | SignatureException e) {
+            request.setAttribute("exception", ErrorCode.INVALID_JWT_ERROR.getMessage());
+        } catch (UnsupportedJwtException e) {
+            request.setAttribute("exception", ErrorCode.UNSUPPORTED_JWT_TOKEN.getMessage());
+        } catch (AuthenticationException | NullPointerException e) {
+            request.setAttribute("exception", ErrorCode.USER_AUTH_ERROR.getMessage());
         }
+//        catch (IllegalArgumentException e) {
+//            request.setAttribute("exception", ErrorCode.TOKEN_CLAIM_EMPTY.getMessage());
 
         filterChain.doFilter(request, response);
     }
