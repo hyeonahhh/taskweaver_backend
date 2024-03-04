@@ -46,7 +46,7 @@ public class ProjectController {
     @GetMapping("/team/{teamId}/projects")
     @Operation(summary = "프로젝트 전체 조회 메서드", description = "팀 내 모든 프로젝트를 조회하는 api입니다.")
     public ResponseEntity<ApiResponse> getAllProject(@PathVariable @Parameter(description = "팀 ID") Long teamId) {
-        ApiResponse apiResponse = ApiResponse.<List<GetAllProjectResponse>>builder()
+        ApiResponse apiResponse = ApiResponse.<List<ProjectResponse>>builder()
                 .result(projectService.getAll(teamId))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
