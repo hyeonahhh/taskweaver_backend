@@ -2,7 +2,6 @@ package backend.taskweaver.domain.project.service;
 
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
-import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.dto.UpdateStateRequest;
@@ -86,13 +85,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GetAllProjectResponse> getAll(Long teamId) {
+    public List<ProjectResponse> getAll(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
         List<Project> projects = projectRepository.findAllByTeam(team);
 
         return projects.stream()
-                .map(ProjectConverter::toGetAllProjectResponse)
+                .map(project -> ProjectConverter.toProjectResponse(project, project.getProjectState()))
                 .collect(Collectors.toList());
     }
 
