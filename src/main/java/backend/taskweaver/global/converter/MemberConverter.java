@@ -32,6 +32,8 @@ public class MemberConverter {
                 member.getId(),
                 member.getEmail(),
                 member.getLoginType(),
+                member.getNickname(),
+                member.getImageUrl(),
                 accessToken,
                 refreshToken
         );
