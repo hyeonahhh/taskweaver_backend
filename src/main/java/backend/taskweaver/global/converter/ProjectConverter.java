@@ -1,7 +1,6 @@
 package backend.taskweaver.global.converter;
 
 import backend.taskweaver.domain.member.entity.Member;
-import backend.taskweaver.domain.project.dto.GetAllProjectResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.entity.Project;
@@ -44,11 +43,5 @@ public class ProjectConverter {
                 .member(member)
                 .project(project)
                 .build();
-    }
-    public static GetAllProjectResponse toGetAllProjectResponse(Project project) {
-        return new GetAllProjectResponse(
-                project.getId(),
-                project.getName()
-        );
     }
 }
