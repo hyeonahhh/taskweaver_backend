@@ -34,7 +34,7 @@ public class TokenProvider {
                 .setSubject(userSpecification)
                 .setIssuer(jwtProperties.getIssuer())
                 .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
-                .setExpiration(Date.from(Instant.now().plus(jwtProperties.getExpirationMinutes(), ChronoUnit.HOURS)))
+                .setExpiration(Date.from(Instant.now().plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES)))
                 .compact();
     }
 

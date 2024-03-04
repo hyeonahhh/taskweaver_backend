@@ -55,14 +55,19 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "G999", "Internal Server Error Exception"),
 
     // 토큰 만료 기한이 지났을 때 발생
-    EXPIRED_JWT_ERROR(404, "G013", "JWT Token expiration"),
+    EXPIRED_JWT_ERROR(404, "G013", "The provided JWT token is expired"),
 
     // 토큰 유효성 검사가 실패할 때 발생
-    INVALID_JWT_ERROR(404, "G014", "Invalid JWT Token"),
+    INVALID_JWT_ERROR(404, "G014", "The provided JWT token is invalid"),
 
     // 토큰 검사시 사용자 인증 실패할 때 발생
     USER_AUTH_ERROR(404, "G015", "User authentication failed"),
+    
+    // 지원하지 않는 JWT 토큰일 때 발생
+    UNSUPPORTED_JWT_TOKEN(400,"G017", "The provided JWT token is not supported"),
 
+    // 토큰 클레임이 비어있을 때 발생
+    // TOKEN_CLAIM_EMPTY(400,"G016", "JWT claim is empty"),
 
     /**
      * ******************************* Custom Error CodeList ***************************************
