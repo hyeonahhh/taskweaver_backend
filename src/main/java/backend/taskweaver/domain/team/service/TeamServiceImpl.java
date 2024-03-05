@@ -50,6 +50,19 @@ public class TeamServiceImpl implements TeamService{
         // 팀 저장
         team = teamRepository.save(team);
 
+        // 팀 멤버 생성 및 저장
+        Member leader = memberRepository.findById(user)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+
+        TeamMember teamMember = TeamMember.builder()
+                .team(team)
+                .member(leader)
+                .role(TeamRole.LEADER) // 팀 멤버의 역할 설정 (여기서는 일반 사용자)
+                .build();
+
+        // 팀 멤버 저장
+        teamMemberRepository.save(teamMember);
+
         return TeamConverter.toCreateResponse(team);
     }
     // 해당 팀 조회
@@ -139,7 +152,6 @@ public class TeamServiceImpl implements TeamService{
 
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
-
 
         // 초대 수락/거절 여부 확인
         if (request.getInviteState() == 1) {
