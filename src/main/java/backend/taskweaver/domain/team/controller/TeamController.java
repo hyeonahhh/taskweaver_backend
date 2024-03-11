@@ -1,6 +1,7 @@
 package backend.taskweaver.domain.team.controller;
 
 import backend.taskweaver.domain.team.dto.TeamInviteRequest;
+import backend.taskweaver.domain.team.dto.TeamLeaderRequest;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.service.TeamService;
 import backend.taskweaver.global.code.ApiResponse;
@@ -73,6 +74,18 @@ public class TeamController {
         ApiResponse ar = ApiResponse.builder()
                 .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
+
+    // 팀장 권한 변경
+    @Operation(summary =  "팀장 권한 변경")
+    @PutMapping("/team/{teamId}/changeLeader")
+    public ResponseEntity<ApiResponse> changeTeamLeader(@PathVariable Long teamId, @RequestBody TeamLeaderRequest.ChangeLeaderRequest request, @AuthenticationPrincipal User user) {
+        teamService.changeTeamLeader(teamId, request, Long.parseLong(user.getUsername())); // deleteTeamMembers 메서드 직접 호출
+        ApiResponse ar = ApiResponse.builder()
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
