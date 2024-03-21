@@ -108,15 +108,15 @@ public class TeamServiceImpl implements TeamService{
         // 요청으로부터 팀 ID와 새로운 팀장 ID를 가져옵니다.
         Long newLeaderId = request.getNew_leader_id();
 
-        // 로그인한 유저가 팀장인지 확인합니다.
+        // 로그인한 유저가 팀장인지 확인
         Team team = (Team) teamRepository.findByIdAndTeamLeader(teamId, user)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER));
 
-        // 새로운 팀장 정보가 유효한지 확인합니다.
+        // 새로운 팀장 정보가 유효한지 확인
         Member newLeader = memberRepository.findById(newLeaderId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
 
-        // 새로운 팀장으로 변경합니다.
+        // 새로운 팀장으로 변경
         team.setTeamLeader(newLeaderId);
         teamRepository.save(team);
     }
