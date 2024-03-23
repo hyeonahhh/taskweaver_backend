@@ -116,6 +116,19 @@ public class TeamServiceImpl implements TeamService{
         Member newLeader = memberRepository.findById(newLeaderId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
 
+        // 기존 팀 리더의 role을 MEMBER로 변경
+        TeamMember currentLeaderMember = (TeamMember) teamMemberRepository.findByTeamIdAndMemberId(teamId, user)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+        currentLeaderMember.setRole(TeamRole.MEMBER);
+        teamMemberRepository.save(currentLeaderMember);
+
+        // 새로운 팀 리더의 role을 LEADER로 변경
+        TeamMember newLeaderMember = (TeamMember) teamMemberRepository.findByTeamIdAndMemberId(teamId, newLeaderId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+        newLeaderMember.setRole(TeamRole.LEADER);
+        teamMemberRepository.save(newLeaderMember);
+
+
         // 새로운 팀장으로 변경
         team.setTeamLeader(newLeaderId);
         teamRepository.save(team);
