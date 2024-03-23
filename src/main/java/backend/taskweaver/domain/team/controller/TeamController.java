@@ -84,6 +84,7 @@ public class TeamController {
     public ResponseEntity<ApiResponse> changeTeamLeader(@PathVariable Long teamId, @RequestBody TeamLeaderRequest.ChangeLeaderRequest request, @AuthenticationPrincipal User user) {
         teamService.changeTeamLeader(teamId, request, Long.parseLong(user.getUsername())); // deleteTeamMembers 메서드 직접 호출
         ApiResponse apiResponse = ApiResponse.builder()
+                .result(teamService.changeTeamLeader(teamId, request, Long.parseLong(user.getUsername())))
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
