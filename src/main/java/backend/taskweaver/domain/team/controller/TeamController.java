@@ -32,12 +32,12 @@ public class TeamController {
     @PostMapping("/team")
     public ResponseEntity<ApiResponse> createTeam(@RequestBody TeamRequest.teamCreateRequest request, @AuthenticationPrincipal User user) {
         try {
-            ApiResponse ar = ApiResponse.builder()
+            ApiResponse apiResponse = ApiResponse.builder()
                     .result(teamService.createTeam(request, Long.parseLong(user.getUsername())))
                     .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                     .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                     .build();
-            return new ResponseEntity<>(ar, HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -47,35 +47,35 @@ public class TeamController {
     @GetMapping("/team/{teamId}")
     public ResponseEntity<ApiResponse> findTeam(@PathVariable(name = "teamId") Long teamId) {
 
-        ApiResponse ar = ApiResponse.builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .result(teamService.findTeam(teamId))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
                 .build();
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     // 팀 멤버만 조회
     @Operation(summary = "팀 조회")
     @GetMapping("/team/{teamId}/member")
     public ResponseEntity<ApiResponse> AllTeamMember(@PathVariable(name = "teamId") Long teamId) {
-        ApiResponse ar = ApiResponse.builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .result(teamService.findTeam(teamId))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
                 .build();
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     @Operation(summary =  "팀원 삭제")
     @PostMapping("/team/{teamId}/delete")
     public ResponseEntity<ApiResponse> deleteTeamMembers(@PathVariable Long teamId, @RequestBody TeamRequest.teamDeleteRequest request, @AuthenticationPrincipal User user) {
         teamService.deleteTeamMembers(teamId, request.getMemberId(), Long.parseLong(user.getUsername())); // deleteTeamMembers 메서드 직접 호출
-        ApiResponse ar = ApiResponse.builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
                 .build();
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     // 팀장 권한 변경
@@ -83,33 +83,33 @@ public class TeamController {
     @PutMapping("/team/{teamId}/changeLeader")
     public ResponseEntity<ApiResponse> changeTeamLeader(@PathVariable Long teamId, @RequestBody TeamLeaderRequest.ChangeLeaderRequest request, @AuthenticationPrincipal User user) {
         teamService.changeTeamLeader(teamId, request, Long.parseLong(user.getUsername())); // deleteTeamMembers 메서드 직접 호출
-        ApiResponse ar = ApiResponse.builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     @Operation(summary = "팀원 초대 - 이메일로 초대")
     @PostMapping("/team/invitation/email")
     public ResponseEntity<ApiResponse> inviteEmail(@RequestBody TeamInviteRequest.EmailInviteRequest request) {
-        ApiResponse ar = ApiResponse.builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .result(teamService.inviteEmail(request))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
     @Operation(summary =  "팀원 초대 - 이메일로 초대 응답")
     @PostMapping("/team/invitation/answer")
     public ResponseEntity<ApiResponse> answerInviteEmail(@RequestBody TeamInviteRequest.InviteAnswerRequest request, @AuthenticationPrincipal User user) {
-        ApiResponse ar = ApiResponse.builder()
+        ApiResponse apiResponse = ApiResponse.builder()
                 .result(teamService.answerInvite(request, Long.parseLong(user.getUsername())))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
 
