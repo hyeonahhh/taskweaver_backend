@@ -2,10 +2,7 @@ package backend.taskweaver.domain.team.service;
 
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
-import backend.taskweaver.domain.team.dto.TeamInviteRequest;
-import backend.taskweaver.domain.team.dto.TeamInviteResponse;
-import backend.taskweaver.domain.team.dto.TeamRequest;
-import backend.taskweaver.domain.team.dto.TeamResponse;
+import backend.taskweaver.domain.team.dto.*;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.entity.TeamMember;
 import backend.taskweaver.domain.team.entity.TeamMemberState;
@@ -104,6 +101,39 @@ public class TeamServiceImpl implements TeamService{
             // 팀 리더가 아닌 경우 예외 처리
             throw new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
         }
+    }
+
+    // 팀장 권한 변경
+    public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user) {
+        // 요청으로부터 팀 ID와 새로운 팀장 ID를 가져옵니다.
+        Long newLeaderId = request.getNew_leader_id();
+
+        // 로그인한 유저가 팀장인지 확인
+        Team team = (Team) teamRepository.findByIdAndTeamLeader(teamId, user)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER));
+
+        // 새로운 팀장 정보가 유효한지 확인
+        Member newLeader = memberRepository.findById(newLeaderId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+
+        // 기존 팀 리더의 role을 MEMBER로 변경
+        TeamMember currentLeaderMember = (TeamMember) teamMemberRepository.findByTeamIdAndMemberId(teamId, user)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+        currentLeaderMember.setRole(TeamRole.MEMBER);
+        teamMemberRepository.save(currentLeaderMember);
+
+        // 새로운 팀 리더의 role을 LEADER로 변경
+        TeamMember newLeaderMember = (TeamMember) teamMemberRepository.findByTeamIdAndMemberId(teamId, newLeaderId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
+        newLeaderMember.setRole(TeamRole.LEADER);
+        teamMemberRepository.save(newLeaderMember);
+
+
+        // 새로운 팀장으로 변경
+        team.setTeamLeader(newLeaderId);
+        teamRepository.save(team);
+
+        return TeamConverter.toChangeLeaderResponse(team, newLeaderId);
     }
 
 

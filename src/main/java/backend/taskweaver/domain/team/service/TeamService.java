@@ -1,10 +1,7 @@
 package backend.taskweaver.domain.team.service;
 
 
-import backend.taskweaver.domain.team.dto.TeamInviteRequest;
-import backend.taskweaver.domain.team.dto.TeamInviteResponse;
-import backend.taskweaver.domain.team.dto.TeamRequest;
-import backend.taskweaver.domain.team.dto.TeamResponse;
+import backend.taskweaver.domain.team.dto.*;
 import backend.taskweaver.domain.team.entity.TeamMember;
 import org.springframework.security.core.userdetails.User;
 
@@ -21,4 +18,6 @@ public interface TeamService {
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user);
 
     public void deleteTeamMembers(Long teamId, List<Long> memberIds, Long user);
+
+    public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user);
 }
