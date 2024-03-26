@@ -1,7 +1,6 @@
 package backend.taskweaver.domain.task.dto;
 
 
-import backend.taskweaver.domain.task.entity.enums.TaskStateName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,6 +35,31 @@ public class TaskRequest {
 
         @Schema(description = "부모 태스크 ID", example = "1")
         Long parentTaskId;
+
+    }
+
+    @Getter
+    public static class taskStateChange {
+        @Schema(description = "변경하고자 하는 태스크 상태", example = "0, 1, 2")
+        Integer taskState;
+    }
+
+    @Getter
+    public static class taskChange {
+        @Schema(description = "변경하고자 하는 태스크 제목", example = "Task Title")
+        String taskTitle;
+
+        @Schema(description = "변경하고자 하는 태스크 내용", example = "Task Content")
+        String taskContent;
+
+        @Schema(description = "변경하고자 하는 마감 기한", example = "2024-12-31")
+        String endDate;
+
+        @Schema(description = "변경하고자 하는 태스크 참여자", example = "[1, 2, 3]")
+        List<Long> members;
+
+        @Schema(description = "태스크 색깔", example = "#FFFFFF")
+        String color;
 
     }
 }

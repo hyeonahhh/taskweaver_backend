@@ -1,12 +1,10 @@
 package backend.taskweaver.domain.task.dto;
 
-import backend.taskweaver.domain.task.entity.enums.TaskStateName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -15,7 +13,7 @@ public class TaskResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class taskCreateResult {
+    public static class taskCreateOrUpdateResult {
         private Long id;
         private String title;
         private String content;
@@ -24,6 +22,13 @@ public class TaskResponse {
         private List<taskMemberResult> taskMember;
         private Integer taskState;
         private Long parentTaskId;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class taskDeleteResult {
+        private Long id;
     }
 
     @Builder
@@ -36,4 +41,24 @@ public class TaskResponse {
         private String nickname;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class taskChangeStateResult {
+        private Long id;
+        private Integer taskState;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class taskUpdateResult {
+        private Long id;
+        private String title;
+        private String content;
+        private String endDate;
+        private String color;
+    }
 }
