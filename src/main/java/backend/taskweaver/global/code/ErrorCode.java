@@ -100,7 +100,9 @@ public enum ErrorCode {
 
 
     //TASK
-    TASK_STATE_NOT_FOUND(404, "TS001", "Task State Not Found"),
+    TASK_NOT_FOUND(404, "TS001", "Task Not Found"),
+    TASK_STATE_NOT_FOUND(404, "TS002", "Task State Not Found"),
+    TASK_MEMBER_NOT_FOUND(404, "TS003", "Task Member Not Found"),
 
     // MEMBER
     DUPLICATED_EMAIL(409, "M001", "Email is duplicated"),
