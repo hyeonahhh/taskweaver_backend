@@ -6,16 +6,11 @@ import backend.taskweaver.domain.task.dto.TaskResponse;
 import backend.taskweaver.domain.task.entity.Task;
 import backend.taskweaver.domain.task.entity.TaskMember;
 import backend.taskweaver.domain.task.entity.enums.TaskStateName;
-import backend.taskweaver.domain.team.dto.TeamRequest;
-import backend.taskweaver.domain.team.dto.TeamResponse;
-import backend.taskweaver.domain.team.entity.Team;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class TaskConverter {
 
@@ -49,14 +44,14 @@ public class TaskConverter {
 
 
 
-    public static TaskResponse.taskCreateResult toCreateResponse(Task task, List<TaskMember> taskMembers) {
+    public static TaskResponse.taskCreateOrUpdateResult toCreateResponse(Task task, List<TaskMember> taskMembers) {
         List<TaskResponse.taskMemberResult> taskMemberResults = new ArrayList<>();
         for (TaskMember taskMember : taskMembers) {
             taskMemberResults.add(new TaskResponse.taskMemberResult(taskMember.getMember().getId(), taskMember.getMember().getImageUrl(), taskMember.getMember().getNickname()));
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (task.getParentTask() == null) {
-            return TaskResponse.taskCreateResult.builder()
+            return TaskResponse.taskCreateOrUpdateResult.builder()
                     .id(task.getId())
                     .title(task.getTitle())
                     .content(task.getContent())
@@ -66,7 +61,7 @@ public class TaskConverter {
                     .taskState(task.getTaskState().getValue())
                     .build();
         } else {
-            return TaskResponse.taskCreateResult.builder()
+            return TaskResponse.taskCreateOrUpdateResult.builder()
                     .id(task.getId())
                     .title(task.getTitle())
                     .content(task.getContent())

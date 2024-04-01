@@ -1,11 +1,7 @@
 package backend.taskweaver.domain.task.controller;
 
-import backend.taskweaver.domain.project.repository.ProjectRepository;
 import backend.taskweaver.domain.task.dto.TaskRequest;
-import backend.taskweaver.domain.task.repository.TaskRepository;
 import backend.taskweaver.domain.task.service.TaskService;
-import backend.taskweaver.domain.team.dto.TeamRequest;
-import backend.taskweaver.domain.team.service.TeamService;
 import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +32,52 @@ public class TaskController {
                     .result(taskService.createTask(request, Long.parseLong(user.getUsername()), projectId))
                     .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                     .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
+                    .build();
+            return new ResponseEntity<>(ar, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Operation(summary = "태스크 삭제")
+    @DeleteMapping("/task/{taskId}")
+    public ResponseEntity<ApiResponse> deleteTask(@AuthenticationPrincipal User user, @PathVariable Long taskId) {
+        try {
+            ApiResponse ar = ApiResponse.builder()
+                    .result(taskService.deleteTask(Long.parseLong(user.getUsername()), taskId))
+                    .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                    .build();
+            return new ResponseEntity<>(ar, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Operation(summary = "태스크 상태 변경")
+    @PatchMapping("/task/state/{taskId}")
+    public ResponseEntity<ApiResponse> changeTaskState(@RequestBody TaskRequest.taskStateChange request, @AuthenticationPrincipal User user, @PathVariable Long taskId) {
+        try {
+            ApiResponse ar = ApiResponse.builder()
+                    .result(taskService.changeTaskState(request, Long.parseLong(user.getUsername()), taskId))
+                    .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                    .build();
+            return new ResponseEntity<>(ar, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Operation(summary = "태스크 수정")
+    @PatchMapping("/task/{taskId}")
+    public ResponseEntity<ApiResponse> changeTask(@RequestBody TaskRequest.taskChange request, @AuthenticationPrincipal User user, @PathVariable Long taskId) {
+        try {
+            ApiResponse ar = ApiResponse.builder()
+                    .result(taskService.changeTask(request, Long.parseLong(user.getUsername()), taskId))
+                    .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                     .build();
             return new ResponseEntity<>(ar, HttpStatus.OK);
         } catch (Exception e) {
