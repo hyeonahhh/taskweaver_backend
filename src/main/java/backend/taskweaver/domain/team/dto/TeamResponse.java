@@ -89,5 +89,15 @@ public class TeamResponse {
         String name;
         String myRole;
         int totalMembers;
+        List<MemberInfo> members; // members 추가
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberInfo {
+        private Long id;
+        private String imageUrl;
     }
 }

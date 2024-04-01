@@ -77,17 +77,28 @@ public class TeamServiceImpl implements TeamService{
 
 
 
+
+
     public List<TeamResponse.AllTeamInfo> findTeamsByUserId(Long userId) {
         List<TeamMember> teamMembers = teamMemberRepository.findAllByMemberId(userId);
         return teamMembers.stream()
                 .map(teamMember -> {
+                    Team team = teamMember.getTeam();
                     String myRole = teamMember.getRole().toString();
+                    List<TeamResponse.MemberInfo> members = team.getTeamMembers()
+                            .stream()
+                            .filter(member -> !member.getMember().getId().equals(userId)) // 로그인한 유저 제외
+                            .limit(3) // 최대 3명만 가져오기
+                            .map(TeamMember::getMember)
+                            .map(member -> new TeamResponse.MemberInfo(member.getId(), member.getImageUrl()))
+                            .collect(Collectors.toList());
                     int totalMembers = teamMember.getTeam().getTeamMembers().size(); // 전체 인원수 가져오기
-                    int adjustedTotalMembers = totalMembers - 3;
+                    int adjustedTotalMembers = totalMembers - 4; // 전체 인원수에서 3을 뺌// 전체 인원수는 수정된 멤버 리스트의 크기로 설정
                     return TeamConverter.toGetAllTeamResponse(
-                            teamMember.getTeam(),
+                            team,
                             myRole,
-                            adjustedTotalMembers < 0 ? 0 : adjustedTotalMembers // 만약 음수라면 0을 반환
+                            adjustedTotalMembers < 0 ? 0 : adjustedTotalMembers, // 만약 음수라면 0을 반환
+                            members
                     );
                 })
                 .collect(Collectors.toList());
