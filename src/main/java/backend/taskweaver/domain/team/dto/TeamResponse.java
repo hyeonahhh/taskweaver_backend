@@ -85,6 +85,7 @@ public class TeamResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AllTeamInfo {
+
         @Schema(description = "팀 id", example = "1")
         Long id;
         @Schema(description = "팀 이름", example = "team name")
@@ -102,6 +103,7 @@ public class TeamResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberInfo {
+
         @Schema(description = "멤버 id", example = "1")
         private Long id;
         @Schema(description = "프로필 사진 url", example = "domain 주소")
