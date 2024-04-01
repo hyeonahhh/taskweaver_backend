@@ -73,13 +73,13 @@ public enum ErrorCode {
      * ******************************* Custom Error CodeList ***************************************
      */
     // Transaction Insert Error
-    INSERT_ERROR(200, "9999", "Insert Transaction Error Exception"),
+    INSERT_ERROR(500, "9999", "Insert Transaction Error Exception"),
 
     // Transaction Update Error
-    UPDATE_ERROR(200, "9999", "Update Transaction Error Exception"),
+    UPDATE_ERROR(500, "9999", "Update Transaction Error Exception"),
 
     // Transaction Delete Error
-    DELETE_ERROR(200, "9999", "Delete Transaction Error Exception"),
+    DELETE_ERROR(500, "9999", "Delete Transaction Error Exception"),
 
     // PROJECT
     BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team"),
