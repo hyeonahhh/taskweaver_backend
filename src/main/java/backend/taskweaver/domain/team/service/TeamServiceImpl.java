@@ -178,7 +178,7 @@ public class TeamServiceImpl implements TeamService{
             Long userId = matchingMember.get().getId();
             System.out.println(userId);
 
-            Long teamId = request.getTeam_id();
+            Long teamId = request.getTeamId();
 
             // 이미 존재하는 팀 초대 요청인 경우
             if (teamMemberStateRepository.existsByTeamIdAndMemberId(teamId, userId)) {
@@ -201,7 +201,7 @@ public class TeamServiceImpl implements TeamService{
 
     // 초대 응답
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user) {
-        Long teamId = request.getTeam_id();
+        Long teamId = request.getTeamId();
         Long userId = user;
         System.out.println(userId);
         System.out.println(user);
