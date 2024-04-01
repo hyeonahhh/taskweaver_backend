@@ -41,6 +41,12 @@ public class TeamConverter {
         );
     }
 
+    public static TeamResponse.AllTeamInfo toGetAllTeamResponse(Team team) {
+        return new TeamResponse.AllTeamInfo(
+                team.getId(),
+                team.getName()
+        );
+    }
     public static TeamResponse.findTeamResult toGetTeamResponse(Team team, List<TeamMember> teamMembers) {
         List<TeamResponse.TeamMemberInfo> memberInfos = teamMembers.stream()
                 .map(member -> new TeamResponse.TeamMemberInfo(

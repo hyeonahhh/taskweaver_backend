@@ -79,4 +79,13 @@ public class TeamResponse {
         @Schema(description = "삭제 원하는 id 리스트 형태로", example = "[1, 2, 3]")
         List<Long> memberId;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AllTeamInfo {
+        Long id;
+        String name;
+    }
 }

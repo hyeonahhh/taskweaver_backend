@@ -17,12 +17,11 @@ import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static backend.taskweaver.global.converter.TeamConverter.generateInviteLink;
 
@@ -74,6 +73,14 @@ public class TeamServiceImpl implements TeamService{
 
     public List<TeamMember> findAllTeamMemberWithTeam(Long teamId) {
         return teamMemberRepository.findAllByTeamId(teamId);
+    }
+
+
+    public List<TeamResponse.AllTeamInfo> findTeamsByUserId(Long userId) {
+        List<TeamMember> teamMembers = teamMemberRepository.findAllByMemberId(userId);
+        return teamMembers.stream()
+                .map(teamMember -> TeamConverter.toGetAllTeamResponse(teamMember.getTeam()))
+                .collect(Collectors.toList());
     }
 
 

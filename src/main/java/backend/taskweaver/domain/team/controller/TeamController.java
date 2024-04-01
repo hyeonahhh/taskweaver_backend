@@ -67,6 +67,18 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+    // 팀 전체 조회
+    @Operation(summary =  "로그인한 유저의 팀 전체 조회")
+    @GetMapping("/teams")
+    public ResponseEntity<ApiResponse> AllTeam(@AuthenticationPrincipal User user) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .result(teamService.findTeamsByUserId(Long.parseLong(user.getUsername())))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
     @Operation(summary =  "팀원 삭제")
     @PostMapping("/team/{teamId}/delete")
     public ResponseEntity<ApiResponse> deleteTeamMembers(@PathVariable Long teamId, @RequestBody TeamRequest.teamDeleteRequest request, @AuthenticationPrincipal User user) {
