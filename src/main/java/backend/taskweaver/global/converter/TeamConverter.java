@@ -41,10 +41,12 @@ public class TeamConverter {
         );
     }
 
-    public static TeamResponse.AllTeamInfo toGetAllTeamResponse(Team team) {
+    public static TeamResponse.AllTeamInfo toGetAllTeamResponse(Team team, String myRole, int totalMembers) {
         return new TeamResponse.AllTeamInfo(
                 team.getId(),
-                team.getName()
+                team.getName(),
+                myRole,
+                totalMembers
         );
     }
     public static TeamResponse.findTeamResult toGetTeamResponse(Team team, List<TeamMember> teamMembers) {

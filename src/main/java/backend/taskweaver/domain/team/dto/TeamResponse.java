@@ -87,5 +87,7 @@ public class TeamResponse {
     public static class AllTeamInfo {
         Long id;
         String name;
+        String myRole;
+        int totalMembers;
     }
 }
