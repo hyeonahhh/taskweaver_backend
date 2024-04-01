@@ -18,7 +18,7 @@ public class TeamInviteRequest {
         String email;
 
         @Schema(description = "해당 팀 id", example = "1")
-        Long team_id;
+        Long teamId;
 
     }
 
@@ -27,7 +27,7 @@ public class TeamInviteRequest {
     public static class InviteAnswerRequest {
 
         @Schema(description = "해당 팀 id", example = "1")
-        Long team_id;
+        Long teamId;
 
         @Schema(description = "수락/거절 여부", example = "1")
         Long inviteState;
