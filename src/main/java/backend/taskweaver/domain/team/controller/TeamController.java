@@ -91,6 +91,7 @@ public class TeamController {
     }
 
     // 팀장 권한 변경
+    /*
     @Operation(summary =  "팀장 권한 변경")
     @PutMapping("/team/{teamId}/changeLeader")
     public ResponseEntity<ApiResponse> changeTeamLeader(@PathVariable Long teamId, @RequestBody TeamLeaderRequest.ChangeLeaderRequest request, @AuthenticationPrincipal User user) {
@@ -102,6 +103,8 @@ public class TeamController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+    */
+
 
     @Operation(summary = "팀원 초대 - 이메일로 초대")
     @PostMapping("/team/invitation/email")
