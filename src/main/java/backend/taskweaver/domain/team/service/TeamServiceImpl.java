@@ -78,7 +78,7 @@ public class TeamServiceImpl implements TeamService{
 
 
 
-
+    // 전체 리스트 조회
     public List<TeamResponse.AllTeamInfo> findTeamsByUserId(Long userId) {
         List<TeamMember> teamMembers = teamMemberRepository.findAllByMemberId(userId);
         return teamMembers.stream()
@@ -117,11 +117,10 @@ public class TeamServiceImpl implements TeamService{
                 Member member = memberRepository.findById(memberId)
                         .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
 
-                // 팀 리더인 경우에만 팀원 삭제 작업 실행
+                // 팀 리더는 삭제할 수 없음
                 if (!memberId.equals(user)) {
                     teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
                 } else {
-                    // 팀 리더가 팀원을 삭제할 수 없음
                     throw new BusinessExceptionHandler(ErrorCode.CANNOT_DELETE_TEAM_LEADER);
                 }
             }
@@ -179,6 +178,17 @@ public class TeamServiceImpl implements TeamService{
             System.out.println(userId);
 
             Long teamId = request.getTeamId();
+
+            // 팀 리더인지 확인
+            Team team = teamRepository.findById(teamId)
+                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+
+            Long teamLeaderId = team.getTeamLeader(); // 팀 리더의 ID 가져오기
+
+            if (userId.equals(teamLeaderId)) {
+                throw new BusinessExceptionHandler(ErrorCode.CANNOT_INVITE_TEAM_LEADER);
+            }
+
 
             // 이미 존재하는 팀 초대 요청인 경우
             if (teamMemberStateRepository.existsByTeamIdAndMemberId(teamId, userId)) {
