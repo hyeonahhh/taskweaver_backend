@@ -235,10 +235,13 @@ public class TeamServiceImpl implements TeamService{
             acceptInvite(teamId, userId);
 
             return TeamConverter.toInviteResponse(teamMember);
-        } else {
-            // 초대를 수락하지 않은 경우 null 값 반환 수정 필요
+        } else if (request.getInviteState() == 2) {
+            // 초대를 거절한 경우
             refuseInvite(teamId, userId);
             return null;
+        } else {
+            // 잘못된 응답 값에 대한 오류 처리
+            throw new BusinessExceptionHandler(ErrorCode.INVALID_INVITE_RESPONSE);
         }
 
     }
