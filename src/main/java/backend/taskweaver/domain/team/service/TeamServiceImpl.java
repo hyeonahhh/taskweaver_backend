@@ -78,7 +78,7 @@ public class TeamServiceImpl implements TeamService{
 
 
 
-
+    // 전체 리스트 조회
     public List<TeamResponse.AllTeamInfo> findTeamsByUserId(Long userId) {
         List<TeamMember> teamMembers = teamMemberRepository.findAllByMemberId(userId);
         return teamMembers.stream()
@@ -117,11 +117,10 @@ public class TeamServiceImpl implements TeamService{
                 Member member = memberRepository.findById(memberId)
                         .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
 
-                // 팀 리더인 경우에만 팀원 삭제 작업 실행
+                // 팀 리더는 삭제할 수 없음
                 if (!memberId.equals(user)) {
                     teamMemberRepository.deleteByTeamIdAndMemberId(teamId, memberId);
                 } else {
-                    // 팀 리더가 팀원을 삭제할 수 없음
                     throw new BusinessExceptionHandler(ErrorCode.CANNOT_DELETE_TEAM_LEADER);
                 }
             }
@@ -134,12 +133,16 @@ public class TeamServiceImpl implements TeamService{
     // 팀장 권한 변경
     public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user) {
         // 요청으로부터 팀 ID와 새로운 팀장 ID를 가져옵니다.
-        Long newLeaderId = request.getNew_leader_id();
+        Long newLeaderId = request.getNewLeaderId();
 
         // 로그인한 유저가 팀장인지 확인
-        Team team = (Team) teamRepository.findByIdAndTeamLeader(teamId, user)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER));
-
+        Optional<Team> optionalTeam = teamRepository.findById(teamId);
+        Team team = optionalTeam.filter(t -> t.getTeamLeader().equals(user))
+                .orElseThrow(() -> {
+                    System.out.println("팀 리더 ID: " + optionalTeam.map(Team::getTeamLeader).orElse(null)); // 팀 리더 ID 출력
+                    System.out.println("로그인한 유저 ID: " + user); // 로그인한 유저 ID 출력
+                    return new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
+                });
         // 새로운 팀장 정보가 유효한지 확인
         Member newLeader = memberRepository.findById(newLeaderId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
@@ -179,6 +182,17 @@ public class TeamServiceImpl implements TeamService{
             System.out.println(userId);
 
             Long teamId = request.getTeamId();
+
+            // 팀 리더인지 확인
+            Team team = teamRepository.findById(teamId)
+                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+
+            Long teamLeaderId = team.getTeamLeader(); // 팀 리더의 ID 가져오기
+
+            if (userId.equals(teamLeaderId)) {
+                throw new BusinessExceptionHandler(ErrorCode.CANNOT_INVITE_TEAM_LEADER);
+            }
+
 
             // 이미 존재하는 팀 초대 요청인 경우
             if (teamMemberStateRepository.existsByTeamIdAndMemberId(teamId, userId)) {
@@ -225,10 +239,13 @@ public class TeamServiceImpl implements TeamService{
             acceptInvite(teamId, userId);
 
             return TeamConverter.toInviteResponse(teamMember);
-        } else {
-            // 초대를 수락하지 않은 경우 null 값 반환 수정 필요
+        } else if (request.getInviteState() == 2) {
+            // 초대를 거절한 경우
             refuseInvite(teamId, userId);
             return null;
+        } else {
+            // 잘못된 응답 값에 대한 오류 처리
+            throw new BusinessExceptionHandler(ErrorCode.INVALID_INVITE_RESPONSE);
         }
 
     }

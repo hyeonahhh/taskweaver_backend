@@ -97,7 +97,8 @@ public enum ErrorCode {
     INVITATION_ALREADY_SENT(404, "T004", "The invitation has already been sent."),
     NOT_TEAM_LEADER(404, "T005", " Not the leader of the team."),
     CANNOT_DELETE_TEAM_LEADER(404, "T006", "Team leader cannot be deleted"),
-
+    CANNOT_INVITE_TEAM_LEADER(404, "T007", "Team leaders are not eligible for invitations."),
+    INVALID_INVITE_RESPONSE(404, "T008", "InviteState values must be 1 or 2."),
 
     //TASK
     TASK_NOT_FOUND(404, "TS001", "Task Not Found"),

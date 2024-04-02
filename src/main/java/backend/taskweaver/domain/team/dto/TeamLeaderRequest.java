@@ -14,7 +14,7 @@ public class TeamLeaderRequest {
     public static class ChangeLeaderRequest {
 
         @Schema(description = "변경할 팀장 id", example = "1")
-        Long new_leader_id;
+        Long newLeaderId;
 
     }
 }
