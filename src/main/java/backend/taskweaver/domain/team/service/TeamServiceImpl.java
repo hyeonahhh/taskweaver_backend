@@ -134,7 +134,7 @@ public class TeamServiceImpl implements TeamService{
     // 팀장 권한 변경
     public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user) {
         // 요청으로부터 팀 ID와 새로운 팀장 ID를 가져옵니다.
-        Long newLeaderId = request.getNew_leader_id();
+        Long newLeaderId = request.getNewLeaderId();
 
         // 로그인한 유저가 팀장인지 확인
         Team team = (Team) teamRepository.findByIdAndTeamLeader(teamId, user)
