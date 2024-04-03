@@ -3,7 +3,10 @@ package backend.taskweaver.domain.task.entity;
 import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +21,10 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "depth")
+    @Column(name = "depth", nullable = false)
     private int depth;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,4 +41,25 @@ public class Comment extends BaseEntity {
 
     @OneToMany(mappedBy = "parentComment")
     private List<Comment> childrenComment = new ArrayList<>();
+
+    @Builder(builderMethodName = "parentBuilder", buildMethodName = "parentBuild")
+    public Comment(String content, int depth, Member member, Task task) {
+        this.content = content;
+        this.depth = depth;
+        this.member = member;
+        this.task = task;
+    }
+
+    @Builder(builderMethodName = "childBuilder", buildMethodName = "childBuild")
+    public Comment(String content, int depth, Member member, Task task, Comment parentComment) {
+        this.content = content;
+        this.depth = depth;
+        this.member = member;
+        this.task = task;
+        this.parentComment = parentComment;
+    }
+
+    public void addChildrenComment(Comment comment) {
+        this.childrenComment.add(comment);
+    }
 }
