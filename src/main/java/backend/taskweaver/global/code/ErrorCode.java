@@ -73,13 +73,13 @@ public enum ErrorCode {
      * ******************************* Custom Error CodeList ***************************************
      */
     // Transaction Insert Error
-    INSERT_ERROR(200, "9999", "Insert Transaction Error Exception"),
+    INSERT_ERROR(500, "9999", "Insert Transaction Error Exception"),
 
     // Transaction Update Error
-    UPDATE_ERROR(200, "9999", "Update Transaction Error Exception"),
+    UPDATE_ERROR(500, "9999", "Update Transaction Error Exception"),
 
     // Transaction Delete Error
-    DELETE_ERROR(200, "9999", "Delete Transaction Error Exception"),
+    DELETE_ERROR(500, "9999", "Delete Transaction Error Exception"),
 
     // PROJECT
     BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team"),
@@ -97,10 +97,13 @@ public enum ErrorCode {
     INVITATION_ALREADY_SENT(404, "T004", "The invitation has already been sent."),
     NOT_TEAM_LEADER(404, "T005", " Not the leader of the team."),
     CANNOT_DELETE_TEAM_LEADER(404, "T006", "Team leader cannot be deleted"),
-
+    CANNOT_INVITE_TEAM_LEADER(404, "T007", "Team leaders are not eligible for invitations."),
+    INVALID_INVITE_RESPONSE(404, "T008", "InviteState values must be 1 or 2."),
 
     //TASK
-    TASK_STATE_NOT_FOUND(404, "TS001", "Task State Not Found"),
+    TASK_NOT_FOUND(404, "TS001", "Task Not Found"),
+    TASK_STATE_NOT_FOUND(404, "TS002", "Task State Not Found"),
+    TASK_MEMBER_NOT_FOUND(404, "TS003", "Task Member Not Found"),
 
     // MEMBER
     DUPLICATED_EMAIL(409, "M001", "Email is duplicated"),

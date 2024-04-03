@@ -1,6 +1,7 @@
 package backend.taskweaver.global.converter;
 
 import backend.taskweaver.domain.team.dto.TeamInviteResponse;
+import backend.taskweaver.domain.team.dto.TeamLeaderResponse;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.dto.TeamResponse;
 import backend.taskweaver.domain.team.entity.Team;
@@ -40,6 +41,16 @@ public class TeamConverter {
         );
     }
 
+    public static TeamResponse.AllTeamInfo toGetAllTeamResponse(Team team, String myRole, int totalMembers, List<TeamResponse.MemberInfo> members) {
+        return new TeamResponse.AllTeamInfo(
+                team.getId(),
+                team.getName(),
+                myRole,
+                totalMembers,
+                members
+        );
+    }
+
     public static TeamResponse.findTeamResult toGetTeamResponse(Team team, List<TeamMember> teamMembers) {
         List<TeamResponse.TeamMemberInfo> memberInfos = teamMembers.stream()
                 .map(member -> new TeamResponse.TeamMemberInfo(
@@ -62,6 +73,13 @@ public class TeamConverter {
                 memberInfos,
                 memberCount // 멤버 수 추가
         );
+    }
+
+    public static TeamLeaderResponse.ChangeLeaderResponse toChangeLeaderResponse(Team team, Long newLeaderId) {
+        return TeamLeaderResponse.ChangeLeaderResponse.builder()
+                .team_id(team.getId())
+                .new_leader_id(newLeaderId)
+                .build();
     }
 
 

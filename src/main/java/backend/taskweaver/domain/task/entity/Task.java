@@ -16,6 +16,7 @@ import java.util.*;
 @Table(name = "task")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 public class Task extends BaseEntity {
