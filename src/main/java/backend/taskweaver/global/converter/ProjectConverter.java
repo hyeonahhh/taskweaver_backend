@@ -33,7 +33,8 @@ public class ProjectConverter {
                 project.getName(),
                 project.getDescription(),
                 project.getManagerId(),
-                state.getStateName()
+                state.getStateName(),
+                project.getCreatedAt()
         );
     }
 
