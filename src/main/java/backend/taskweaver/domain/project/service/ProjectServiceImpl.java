@@ -150,15 +150,15 @@ public class ProjectServiceImpl implements ProjectService {
         // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
         checkIfIsManager(project.getManagerId(), memberId);
 
-        // 이미 담당자인 사람을 선택하지 않았을 경우
+        // 담당자가 변경됐을 경우
         if (!request.managerId().equals(project.getManagerId())) {
             changeRole(project.getManagerId(), projectId, ProjectRole.NON_MANAGER); // 기존 매니저의 권한을 없앤다.
-            changeRole(request.managerId(), projectId, ProjectRole.MANAGER); // 새로운 매니저로 임명한다!
+            changeRole(request.managerId(), projectId, ProjectRole.MANAGER); // 새로운 매니저를 임명한다!
+            project.setManagerId(request.managerId());
             project.updateProject(request);
-
-            // 이미 담당자인 사람을 선택했을 경우
+        // 변경되지 않았을 경우
         } else {
-            throw new BusinessExceptionHandler(ErrorCode.SAME_PROJECT_MANAGER);
+            project.updateProject(request);
         }
     }
 
