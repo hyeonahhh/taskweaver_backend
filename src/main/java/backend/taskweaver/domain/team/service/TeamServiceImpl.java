@@ -19,8 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static backend.taskweaver.global.converter.TeamConverter.generateInviteLink;
@@ -66,17 +65,25 @@ public class TeamServiceImpl implements TeamService{
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
-        List<TeamMember> teamMembers = findAllTeamMemberWithTeam(id);
+        List<TeamMember> teamMembers = findAllDistinctTeamMembersWithTeam(id);
 
         return TeamConverter.toGetTeamResponse(team, teamMembers);
     }
 
-    public List<TeamMember> findAllTeamMemberWithTeam(Long teamId) {
-        return teamMemberRepository.findAllByTeamId(teamId);
+    public List<TeamMember> findAllDistinctTeamMembersWithTeam(Long teamId) {
+        List<TeamMember> allTeamMembers = teamMemberRepository.findAllByTeamId(teamId);
+        Set<Long> memberIds = new HashSet<>();
+        List<TeamMember> distinctTeamMembers = new ArrayList<>();
+
+        for (TeamMember teamMember : allTeamMembers) {
+            if (!memberIds.contains(teamMember.getMember().getId())) {
+                distinctTeamMembers.add(teamMember);
+                memberIds.add(teamMember.getMember().getId());
+            }
+        }
+
+        return distinctTeamMembers;
     }
-
-
-
 
     // 전체 리스트 조회
     public List<TeamResponse.AllTeamInfo> findTeamsByUserId(Long userId) {
@@ -85,25 +92,48 @@ public class TeamServiceImpl implements TeamService{
                 .map(teamMember -> {
                     Team team = teamMember.getTeam();
                     String myRole = teamMember.getRole().toString();
-                    List<TeamResponse.MemberInfo> members = team.getTeamMembers()
-                            .stream()
+
+                    // 중복된 팀 멤버를 제거하고, 최대 3명의 유일한 멤버를 선택하되, 로그인한 유저는 제외
+                    List<TeamMember> distinctTeamMembers = removeDuplicates(team.getTeamMembers());
+                    List<TeamMember> filteredMembers = distinctTeamMembers.stream()
                             .filter(member -> !member.getMember().getId().equals(userId)) // 로그인한 유저 제외
-                            .limit(3) // 최대 3명만 가져오기
-                            .map(TeamMember::getMember)
-                            .map(member -> new TeamResponse.MemberInfo(member.getId(), member.getImageUrl()))
+                            .limit(3) // 최대 3명까지 선택
                             .collect(Collectors.toList());
-                    int totalMembers = teamMember.getTeam().getTeamMembers().size(); // 전체 인원수 가져오기
-                    int adjustedTotalMembers = totalMembers - 4; // 전체 인원수에서 3을 뺌// 전체 인원수는 수정된 멤버 리스트의 크기로 설정
+
+                    // 유일한 멤버 정보를 MemberInfo 객체로 매핑
+                    List<TeamResponse.MemberInfo> members = filteredMembers.stream()
+                            .map(member -> new TeamResponse.MemberInfo(member.getMember().getId(), member.getMember().getImageUrl()))
+                            .collect(Collectors.toList());
+
+                    // 전체 인원수 계산
+                    int totalMembers = distinctTeamMembers.size(); // 중복 제거된 멤버 수를 기준으로 전체 인원수 계산
+                    int adjustedTotalMembers = totalMembers - 3; // 전체 인원수에서 3을 뺌
+
+                    // 음수일 경우 0으로 설정
+                    adjustedTotalMembers = Math.max(0, adjustedTotalMembers);
+
+                    // 팀 정보 반환
                     return TeamConverter.toGetAllTeamResponse(
                             team,
                             myRole,
-                            adjustedTotalMembers < 0 ? 0 : adjustedTotalMembers, // 만약 음수라면 0을 반환
+                            adjustedTotalMembers,
                             members
                     );
                 })
                 .collect(Collectors.toList());
     }
 
+    // 중복된 팀 멤버 제거
+    private List<TeamMember> removeDuplicates(Set<TeamMember> teamMembers) {
+        Set<Long> seen = new HashSet<>();
+        List<TeamMember> uniqueTeamMembers = new ArrayList<>();
+        for (TeamMember teamMember : teamMembers) {
+            if (seen.add(teamMember.getMember().getId())) {
+                uniqueTeamMembers.add(teamMember);
+            }
+        }
+        return uniqueTeamMembers;
+    }
 
     // 팀원 삭제
     @Transactional
@@ -214,11 +244,13 @@ public class TeamServiceImpl implements TeamService{
 
 
     // 초대 응답
+
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user) {
         Long teamId = request.getTeamId();
         Long userId = user;
         System.out.println(userId);
         System.out.println(user);
+
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
@@ -227,6 +259,11 @@ public class TeamServiceImpl implements TeamService{
 
         // 초대 수락/거절 여부 확인
         if (request.getInviteState() == 1) {
+            // 중복 확인
+            if (teamMemberRepository.existsByTeamAndMember(team, member)) {
+                throw new BusinessExceptionHandler(ErrorCode.DUPLICATE_TEAM_MEMBER);
+            }
+
             TeamMember teamMember = TeamMember.builder()
                     .team(team)
                     .member(member)
@@ -247,7 +284,6 @@ public class TeamServiceImpl implements TeamService{
             // 잘못된 응답 값에 대한 오류 처리
             throw new BusinessExceptionHandler(ErrorCode.INVALID_INVITE_RESPONSE);
         }
-
     }
 
     // 초대 응답 수락 시에 해당 team id와 user id가 일치하는 값을 TeamMemberState에서 찾아서 inviteState 값을 ACCEPT로 바꾸는 메소드
