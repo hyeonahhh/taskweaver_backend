@@ -19,8 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static backend.taskweaver.global.converter.TeamConverter.generateInviteLink;
@@ -66,17 +65,25 @@ public class TeamServiceImpl implements TeamService{
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
-        List<TeamMember> teamMembers = findAllTeamMemberWithTeam(id);
+        List<TeamMember> teamMembers = findAllDistinctTeamMembersWithTeam(id);
 
         return TeamConverter.toGetTeamResponse(team, teamMembers);
     }
 
-    public List<TeamMember> findAllTeamMemberWithTeam(Long teamId) {
-        return teamMemberRepository.findAllByTeamId(teamId);
+    public List<TeamMember> findAllDistinctTeamMembersWithTeam(Long teamId) {
+        List<TeamMember> allTeamMembers = teamMemberRepository.findAllByTeamId(teamId);
+        Set<Long> memberIds = new HashSet<>();
+        List<TeamMember> distinctTeamMembers = new ArrayList<>();
+
+        for (TeamMember teamMember : allTeamMembers) {
+            if (!memberIds.contains(teamMember.getMember().getId())) {
+                distinctTeamMembers.add(teamMember);
+                memberIds.add(teamMember.getMember().getId());
+            }
+        }
+
+        return distinctTeamMembers;
     }
-
-
-
 
     // 전체 리스트 조회
     public List<TeamResponse.AllTeamInfo> findTeamsByUserId(Long userId) {
@@ -214,11 +221,13 @@ public class TeamServiceImpl implements TeamService{
 
 
     // 초대 응답
+
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user) {
         Long teamId = request.getTeamId();
         Long userId = user;
         System.out.println(userId);
         System.out.println(user);
+
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
@@ -227,6 +236,11 @@ public class TeamServiceImpl implements TeamService{
 
         // 초대 수락/거절 여부 확인
         if (request.getInviteState() == 1) {
+            // 중복 확인
+            if (teamMemberRepository.existsByTeamAndMember(team, member)) {
+                throw new BusinessExceptionHandler(ErrorCode.DUPLICATE_TEAM_MEMBER);
+            }
+
             TeamMember teamMember = TeamMember.builder()
                     .team(team)
                     .member(member)
@@ -247,7 +261,6 @@ public class TeamServiceImpl implements TeamService{
             // 잘못된 응답 값에 대한 오류 처리
             throw new BusinessExceptionHandler(ErrorCode.INVALID_INVITE_RESPONSE);
         }
-
     }
 
     // 초대 응답 수락 시에 해당 team id와 user id가 일치하는 값을 TeamMemberState에서 찾아서 inviteState 값을 ACCEPT로 바꾸는 메소드
