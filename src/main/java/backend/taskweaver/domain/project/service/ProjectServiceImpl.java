@@ -80,6 +80,20 @@ public class ProjectServiceImpl implements ProjectService {
         projectMemberRepository.saveAll(projectMembers);
     }
 
+    @Override
+    @Transactional
+    public void updateProject(Long projectId, ProjectRequest request, Long memberId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+
+        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        checkIfIsManager(project.getManagerId(), memberId);
+
+        project.updateProject(request);
+        projectMemberRepository.deleteAllByProject(project);
+        createProjectMember(project, request);
+    }
+
 //    @Override
 //    @Transactional(readOnly = true)
 //    public List<ProjectResponse> getAll(Long teamId) {
