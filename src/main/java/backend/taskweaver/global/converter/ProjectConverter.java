@@ -1,14 +1,17 @@
 package backend.taskweaver.global.converter;
 
 import backend.taskweaver.domain.member.entity.Member;
+import backend.taskweaver.domain.project.dto.ProjectMemberResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.entity.ProjectState;
-import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.team.entity.Team;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProjectConverter {
 
@@ -27,19 +30,30 @@ public class ProjectConverter {
                 .build();
     }
 
-    public static ProjectResponse toProjectResponse(Project project, ProjectState state) {
+    public static ProjectResponse toProjectResponse(Project project, List<Long> memberIdList) {
         return new ProjectResponse(
                 project.getId(),
                 project.getName(),
                 project.getDescription(),
                 project.getManagerId(),
-                state.getStateName()
+                memberIdList,
+                project.getProjectState().getStateName(),
+                project.getCreatedAt()
         );
     }
 
-    public static ProjectMember toProjectMember(Project project, Member member, ProjectRole role) {
+    public static ProjectMemberResponse toProjectMemberResponse(List<ProjectMember> projectMembers) {
+        List<ProjectMemberResponse.MemberList> memberList = projectMembers.stream()
+                .map(projectMember -> new ProjectMemberResponse.MemberList(
+                        projectMember.getMember().getId(),
+                        projectMember.getMember().getImageUrl(),
+                        projectMember.getMember().getNickname()))
+                .collect(Collectors.toList());
+        return new ProjectMemberResponse(memberList);
+    }
+
+    public static ProjectMember toProjectMember(Project project, Member member) {
         return ProjectMember.builder()
-                .role(role)
                 .member(member)
                 .project(project)
                 .build();

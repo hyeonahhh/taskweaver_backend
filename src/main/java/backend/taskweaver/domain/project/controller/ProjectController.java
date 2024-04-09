@@ -1,5 +1,6 @@
 package backend.taskweaver.domain.project.controller;
 
+import backend.taskweaver.domain.project.dto.ProjectMemberResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.dto.UpdateStateRequest;
@@ -59,6 +60,18 @@ public class ProjectController {
     public ResponseEntity<ApiResponse> getOneProject(@PathVariable @Parameter(description = "프로젝트 ID")Long projectId) {
         ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
                 .result(projectService.getOne(projectId))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
+    @GetMapping("/project/{projectId}/members")
+    @Operation(summary = "프로젝트 멤버 전체 조회 메서드", description = "프로젝트 내의 모든 프로젝트원들을 조회하는 api입니다.")
+    public ResponseEntity<ApiResponse> getAllProjectMembers(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId) {
+        ApiResponse apiResponse = ApiResponse.<ProjectMemberResponse>builder()
+                .result(projectService.getAllProjectMembers(projectId))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
                 .build();

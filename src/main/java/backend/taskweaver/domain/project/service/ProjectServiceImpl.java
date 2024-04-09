@@ -2,19 +2,18 @@ package backend.taskweaver.domain.project.service;
 
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
+import backend.taskweaver.domain.project.dto.ProjectMemberResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.dto.UpdateStateRequest;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.entity.ProjectState;
-import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
 import backend.taskweaver.domain.project.repository.ProjectStateRepository;
 import backend.taskweaver.domain.team.entity.Team;
-import backend.taskweaver.domain.team.entity.TeamMember;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
 import backend.taskweaver.global.code.ErrorCode;
@@ -24,12 +23,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectServiceImpl implements ProjectService {
 
     private final TeamRepository teamRepository;
@@ -52,62 +53,90 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
 
         // project member 저장
-        createProjectMember(project, request.managerId());
+        createProjectMember(project, request);
 
-        return ProjectConverter.toProjectResponse(project, state);
+        return ProjectConverter.toProjectResponse(project, request.memberIdList());
     }
 
     @Override
     @Transactional
-    public void createProjectMember(Project project, Long managerId) {
-        // 매니저 id가 존재하는지 확인
-        Member member = memberRepository.findById(managerId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+    public void createProjectMember(Project project, ProjectRequest request) {
+        // 담당자 id가 member id list에 있는지 확인
+        if (!request.memberIdList().contains(request.managerId())) {
+            throw new BusinessExceptionHandler(ErrorCode.MANAGER_ID_NOT_IN_MEMBER_ID_LIST);
+        }
 
-        // 해당 매니저가 해당 팀에 존재하는지 확인
-        Team team = project.getTeam();
-        teamMemberRepository.findByTeamAndMember(team, member)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR));
+        List<ProjectMember> projectMembers = new ArrayList<>();
+        request.memberIdList().forEach(memberId -> {
+            // 해당 회원이 존재하는지 확인
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
 
-        List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
-        teamMembers.forEach(teamMember -> {
-            Member foundMember = teamMember.getMember();
-            if (foundMember.getId().equals(managerId)) {
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, foundMember, ProjectRole.MANAGER);
-                projectMemberRepository.save(projectMember);
-                project.setManagerId(managerId);
-            } else {
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, foundMember, ProjectRole.NON_MANAGER);
-                projectMemberRepository.save(projectMember);
+            // 해당 회원이 해당 팀에 존재하는지 확인
+            teamMemberRepository.findByTeamAndMember(project.getTeam(), member)
+                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
+
+            // 프로젝트 담당자면 담당자 설정
+            if (memberId.equals(request.managerId())) {
+                project.setManagerId(request.managerId());
             }
+
+            // 프로젝트 멤버 저장
+            ProjectMember projectMember = ProjectConverter.toProjectMember(project, member);
+            projectMembers.add(projectMember);
         });
+        projectMemberRepository.saveAll(projectMembers);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
+    public void updateProject(Long projectId, ProjectRequest request, Long memberId) {
+        // 프로젝트 존재하는지 확인
+        Project project = validateProject(projectId);
+
+        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
+        checkIfIsManager(project.getManagerId(), memberId);
+
+        project.updateProject(request);
+        projectMemberRepository.deleteAllByProject(project);
+        createProjectMember(project, request);
+    }
+
+    @Override
     public List<ProjectResponse> getAll(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
         List<Project> projects = projectRepository.findAllByTeam(team);
-
         return projects.stream()
-                .map(project -> ProjectConverter.toProjectResponse(project, project.getProjectState()))
+                .map(project -> ProjectConverter.toProjectResponse(project, null))
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ProjectResponse getOne(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-        return ProjectConverter.toProjectResponse(project, project.getProjectState());
+        Project project = validateProject(projectId);
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+        List<Long> memberIdList  = projectMembers.stream()
+                .map(projectMember -> projectMember.getMember().getId())
+                .collect(Collectors.toList());
+        return ProjectConverter.toProjectResponse(project, memberIdList);
     }
 
-    public void delete(Long projectId, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+    @Override
+    @Transactional
+    public ProjectMemberResponse getAllProjectMembers(Long projectId) {
+        Project project = validateProject(projectId);
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+        return ProjectConverter.toProjectMemberResponse(projectMembers);
+    }
 
-        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+    @Override
+    @Transactional
+    public void delete(Long projectId, Long memberId) {
+        // 프로젝트 존재하는지 확인
+        Project project = validateProject(projectId);
+
+        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
         checkIfIsManager(project.getManagerId(), memberId);
 
         // project members 삭제
@@ -126,10 +155,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void updateState(Long projectId, UpdateStateRequest request, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+        // 프로젝트 존재하는지 확인
+        Project project = validateProject(projectId);
 
-        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
         checkIfIsManager(project.getManagerId(), memberId);
 
         ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
@@ -141,36 +170,14 @@ public class ProjectServiceImpl implements ProjectService {
         projectState.changeProjectState(foundState);
     }
 
-    @Override
-    @Transactional
-    public void updateProject(Long projectId, ProjectRequest request, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-
-        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
-        checkIfIsManager(project.getManagerId(), memberId);
-
-        // 이미 담당자인 사람을 선택하지 않았을 경우
-        if (!request.managerId().equals(project.getManagerId())) {
-            changeRole(project.getManagerId(), projectId, ProjectRole.NON_MANAGER); // 기존 매니저의 권한을 없앤다.
-            changeRole(request.managerId(), projectId, ProjectRole.MANAGER); // 새로운 매니저로 임명한다!
-            project.updateProject(request);
-
-            // 이미 담당자인 사람을 선택했을 경우
-        } else {
-            throw new BusinessExceptionHandler(ErrorCode.SAME_PROJECT_MANAGER);
-        }
-    }
-
     private void checkIfIsManager(Long projectManagerId, Long memberId) {
         if (!projectManagerId.equals(memberId)) {
             throw new BusinessExceptionHandler(ErrorCode.NOT_PROJECT_MANAGER);
         }
     }
 
-    private void changeRole(Long memberId, Long projectId, ProjectRole role) {
-        ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_MEMBER_NOT_FOUND));
-        projectMember.changeRole(role);
+    private Project validateProject(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
     }
 }
