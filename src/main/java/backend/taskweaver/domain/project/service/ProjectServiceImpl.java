@@ -26,9 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectServiceImpl implements ProjectService {
 
     private final TeamRepository teamRepository;
@@ -86,7 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
 
-        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        // 지금 로그인한 사용자가 매니저인지 확인하고 아니면 에러를 던진다.
         checkIfIsManager(project.getManagerId(), memberId);
 
         project.updateProject(request);
@@ -94,26 +96,27 @@ public class ProjectServiceImpl implements ProjectService {
         createProjectMember(project, request);
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<ProjectResponse> getAll(Long teamId) {
-//        Team team = teamRepository.findById(teamId)
-//                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
-//        List<Project> projects = projectRepository.findAllByTeam(team);
-//
-//        return projects.stream()
-//                .map(project -> ProjectConverter.toProjectResponse(project, project.getProjectState()))
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    @Transactional(readOnly = true)
-//    public ProjectResponse getOne(Long projectId) {
-//        Project project = projectRepository.findById(projectId)
-//                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-//        return ProjectConverter.toProjectResponse(project, project.getProjectState());
-//    }
+    @Override
+    public List<ProjectResponse> getAll(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+        List<Project> projects = projectRepository.findAllByTeam(team);
 
+        return projects.stream()
+                .map(project -> ProjectConverter.toProjectResponse(project, project.getProjectState()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ProjectResponse getOne(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+        List<Long> memberIdList  = projectMembers.stream()
+                .map(projectMember -> projectMember.getMember().getId())
+                .collect(Collectors.toList());
+        return ProjectConverter.toProjectResponse(project, memberIdList);
+    }
 
     @Override
     @Transactional
@@ -124,11 +127,13 @@ public class ProjectServiceImpl implements ProjectService {
         return ProjectConverter.toProjectMemberResponse(projectMembers);
     }
 
+    @Override
+    @Transactional
     public void delete(Long projectId, Long memberId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
 
-        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        // 지금 로그인한 사용자가 매니저인지 확인하고 아니면 에러를 던진다.
         checkIfIsManager(project.getManagerId(), memberId);
 
         // project members 삭제
@@ -150,7 +155,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
 
-        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
+        // 지금 로그인한 사용자가 매니저인지 확인하고 아니면 에러를 던진다.
         checkIfIsManager(project.getManagerId(), memberId);
 
         ProjectStateName foundState = Arrays.stream(ProjectStateName.values())

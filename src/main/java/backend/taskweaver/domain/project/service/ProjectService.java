@@ -11,8 +11,8 @@ import java.util.List;
 public interface ProjectService{
     ProjectResponse createProject(ProjectRequest request, Long teamId);
     void createProjectMember(Project project, ProjectRequest request);
-    //List<ProjectResponse> getAll(Long teamId);
-    //ProjectResponse getOne(Long projectId);
+    List<ProjectResponse> getAll(Long teamId);
+    ProjectResponse getOne(Long projectId);
     ProjectMemberResponse getAllProjectMembers(Long projectId);
     void updateState(Long projectId, UpdateStateRequest request, Long memberId);
     void updateProject(Long projectId, ProjectRequest request, Long memberId);
