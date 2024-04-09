@@ -61,6 +61,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void createProjectMember(Project project, ProjectRequest request) {
+        // 담당자 id가 member id list에 있는지 확인
+        if (!request.memberIdList().contains(request.managerId())) {
+            throw new BusinessExceptionHandler(ErrorCode.MANAGER_ID_NOT_IN_MEMBER_ID_LIST);
+        }
+
         List<ProjectMember> projectMembers = new ArrayList<>();
         request.memberIdList().forEach(memberId -> {
             // 해당 회원이 존재하는지 확인
@@ -71,13 +76,14 @@ public class ProjectServiceImpl implements ProjectService {
             teamMemberRepository.findByTeamAndMember(project.getTeam(), member)
                     .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
 
-            ProjectMember projectMember = ProjectConverter.toProjectMember(project, member);
-            projectMembers.add(projectMember);
-
-            // 매니저면 매니저 ID 설정
+            // 프로젝트 담당자면 담당자 설정
             if (memberId.equals(request.managerId())) {
                 project.setManagerId(request.managerId());
             }
+
+            // 프로젝트 멤버 저장
+            ProjectMember projectMember = ProjectConverter.toProjectMember(project, member);
+            projectMembers.add(projectMember);
         });
         projectMemberRepository.saveAll(projectMembers);
     }
@@ -85,7 +91,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void updateProject(Long projectId, ProjectRequest request, Long memberId) {
+        // 프로젝트 존재하는지 확인
         Project project = validateProject(projectId);
+
+        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
         checkIfIsManager(project.getManagerId(), memberId);
 
         project.updateProject(request);
@@ -124,7 +133,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void delete(Long projectId, Long memberId) {
+        // 프로젝트 존재하는지 확인
         Project project = validateProject(projectId);
+
+        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
         checkIfIsManager(project.getManagerId(), memberId);
 
         // project members 삭제
@@ -143,7 +155,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void updateState(Long projectId, UpdateStateRequest request, Long memberId) {
+        // 프로젝트 존재하는지 확인
         Project project = validateProject(projectId);
+
+        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
         checkIfIsManager(project.getManagerId(), memberId);
 
         ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
