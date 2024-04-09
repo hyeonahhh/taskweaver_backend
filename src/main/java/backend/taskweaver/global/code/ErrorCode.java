@@ -87,7 +87,7 @@ public enum ErrorCode {
     NOT_PROJECT_MANAGER(403, "P003", "Only Project manager can do this work."),
     PROJECT_STATE_NOT_FOUND(404, "POO4", "Project State Not Found"),
     PROJECT_MEMBER_NOT_FOUND(404, "P005", "Project Member Not Found"),
-    MANAGER_ID_NOT_IN_MEMBER_ID_LIST(400, "P004", "Member id list doesn't include manager id. Include manager id in member id list"),
+    MANAGER_ID_NOT_IN_MEMBER_ID_LIST(400, "P006", "Member id list doesn't include manager id. Include manager id in member id list"),
 
     // TEAM
     TEAM_NOT_FOUND(404, "T001", "Team Not Found"),
