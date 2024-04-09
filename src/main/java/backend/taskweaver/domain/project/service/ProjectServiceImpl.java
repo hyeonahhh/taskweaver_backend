@@ -101,9 +101,8 @@ public class ProjectServiceImpl implements ProjectService {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
         List<Project> projects = projectRepository.findAllByTeam(team);
-
         return projects.stream()
-                .map(project -> ProjectConverter.toProjectResponse(project, project.getProjectState()))
+                .map(project -> ProjectConverter.toProjectResponse(project, null))
                 .collect(Collectors.toList());
     }
 
