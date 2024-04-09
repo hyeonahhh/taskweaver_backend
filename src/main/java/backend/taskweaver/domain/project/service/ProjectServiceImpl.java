@@ -85,10 +85,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void updateProject(Long projectId, ProjectRequest request, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-
-        // 지금 로그인한 사용자가 매니저인지 확인하고 아니면 에러를 던진다.
+        Project project = validateProject(projectId);
         checkIfIsManager(project.getManagerId(), memberId);
 
         project.updateProject(request);
@@ -108,8 +105,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponse getOne(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+        Project project = validateProject(projectId);
         List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
         List<Long> memberIdList  = projectMembers.stream()
                 .map(projectMember -> projectMember.getMember().getId())
@@ -120,8 +116,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public ProjectMemberResponse getAllProjectMembers(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+        Project project = validateProject(projectId);
         List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
         return ProjectConverter.toProjectMemberResponse(projectMembers);
     }
@@ -129,10 +124,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void delete(Long projectId, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-
-        // 지금 로그인한 사용자가 매니저인지 확인하고 아니면 에러를 던진다.
+        Project project = validateProject(projectId);
         checkIfIsManager(project.getManagerId(), memberId);
 
         // project members 삭제
@@ -151,10 +143,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void updateState(Long projectId, UpdateStateRequest request, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-
-        // 지금 로그인한 사용자가 매니저인지 확인하고 아니면 에러를 던진다.
+        Project project = validateProject(projectId);
         checkIfIsManager(project.getManagerId(), memberId);
 
         ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
@@ -166,10 +155,14 @@ public class ProjectServiceImpl implements ProjectService {
         projectState.changeProjectState(foundState);
     }
 
-
     private void checkIfIsManager(Long projectManagerId, Long memberId) {
         if (!projectManagerId.equals(memberId)) {
             throw new BusinessExceptionHandler(ErrorCode.NOT_PROJECT_MANAGER);
         }
+    }
+
+    private Project validateProject(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
     }
 }
