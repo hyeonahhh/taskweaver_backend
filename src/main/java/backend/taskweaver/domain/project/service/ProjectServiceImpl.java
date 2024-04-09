@@ -9,13 +9,11 @@ import backend.taskweaver.domain.project.dto.UpdateStateRequest;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.entity.ProjectState;
-import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
 import backend.taskweaver.domain.project.repository.ProjectStateRepository;
 import backend.taskweaver.domain.team.entity.Team;
-import backend.taskweaver.domain.team.entity.TeamMember;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
 import backend.taskweaver.global.code.ErrorCode;
@@ -25,10 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,19 +67,16 @@ public class ProjectServiceImpl implements ProjectService {
             teamMemberRepository.findByTeamAndMember(project.getTeam(), member)
                     .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
 
-            // 만약 매니저면 매니저로 저장
-            if (memberId.equals(request.managerId())){
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, member, ProjectRole.MANAGER);
-                projectMemberRepository.save(projectMember);
-                project.setManagerId(request.managerId());
+            ProjectMember projectMember = ProjectConverter.toProjectMember(project, member);
+            projectMemberRepository.save(projectMember);
 
-            // 일반 프로젝트원으로 저장
-            } else {
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, member, ProjectRole.NON_MANAGER);
-                projectMemberRepository.save(projectMember);
+            // 매니저면 매니저 ID 거장
+            if (memberId.equals(request.managerId())) {
+                project.setManagerId(request.managerId());
             }
         });
     }
+
 
 //    @Override
 //    @Transactional(readOnly = true)
@@ -153,36 +146,10 @@ public class ProjectServiceImpl implements ProjectService {
         projectState.changeProjectState(foundState);
     }
 
-    @Override
-    @Transactional
-    public void updateProject(Long projectId, ProjectRequest request, Long memberId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-
-        // 지금 로그인한 사용자가 매니저인지 확인한다. 아니면 에러를 던진다.
-        checkIfIsManager(project.getManagerId(), memberId);
-
-        // 담당자가 변경됐을 경우
-        if (!request.managerId().equals(project.getManagerId())) {
-            changeRole(project.getManagerId(), projectId, ProjectRole.NON_MANAGER); // 기존 매니저의 권한을 없앤다.
-            changeRole(request.managerId(), projectId, ProjectRole.MANAGER); // 새로운 매니저를 임명한다!
-            project.setManagerId(request.managerId());
-            project.updateProject(request);
-        // 변경되지 않았을 경우
-        } else {
-            project.updateProject(request);
-        }
-    }
 
     private void checkIfIsManager(Long projectManagerId, Long memberId) {
         if (!projectManagerId.equals(memberId)) {
             throw new BusinessExceptionHandler(ErrorCode.NOT_PROJECT_MANAGER);
         }
-    }
-
-    private void changeRole(Long memberId, Long projectId, ProjectRole role) {
-        ProjectMember projectMember = projectMemberRepository.findByMemberIdAndProjectId(memberId, projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_MEMBER_NOT_FOUND));
-        projectMember.changeRole(role);
     }
 }

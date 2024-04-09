@@ -2,8 +2,6 @@ package backend.taskweaver.domain.task.entity;
 
 import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.Member;
-import backend.taskweaver.domain.project.entity.Project;
-import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import jakarta.persistence.*;
 import lombok.*;
 

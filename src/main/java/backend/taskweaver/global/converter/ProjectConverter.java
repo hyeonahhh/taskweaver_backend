@@ -7,7 +7,6 @@ import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.entity.ProjectState;
-import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.team.entity.Team;
 
@@ -53,9 +52,8 @@ public class ProjectConverter {
         return new ProjectMemberResponse(memberList);
     }
 
-    public static ProjectMember toProjectMember(Project project, Member member, ProjectRole role) {
+    public static ProjectMember toProjectMember(Project project, Member member) {
         return ProjectMember.builder()
-                .role(role)
                 .member(member)
                 .project(project)
                 .build();
