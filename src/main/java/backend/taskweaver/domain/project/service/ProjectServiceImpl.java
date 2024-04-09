@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,6 +59,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void createProjectMember(Project project, ProjectRequest request) {
+        List<ProjectMember> projectMembers = new ArrayList<>();
         request.memberIdList().forEach(memberId -> {
             // 해당 회원이 존재하는지 확인
             Member member = memberRepository.findById(memberId)
@@ -68,15 +70,15 @@ public class ProjectServiceImpl implements ProjectService {
                     .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
 
             ProjectMember projectMember = ProjectConverter.toProjectMember(project, member);
-            projectMemberRepository.save(projectMember);
+            projectMembers.add(projectMember);
 
-            // 매니저면 매니저 ID 거장
+            // 매니저면 매니저 ID 설정
             if (memberId.equals(request.managerId())) {
                 project.setManagerId(request.managerId());
             }
         });
+        projectMemberRepository.saveAll(projectMembers);
     }
-
 
 //    @Override
 //    @Transactional(readOnly = true)
