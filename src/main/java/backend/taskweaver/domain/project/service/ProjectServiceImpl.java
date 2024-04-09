@@ -52,56 +52,56 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
 
         // project member 저장
-        createProjectMember(project, request.managerId());
+        createProjectMember(project, request);
 
-        return ProjectConverter.toProjectResponse(project, state);
+        return ProjectConverter.toProjectResponse(project, request.memberIdList());
     }
 
     @Override
     @Transactional
-    public void createProjectMember(Project project, Long managerId) {
-        // 매니저 id가 존재하는지 확인
-        Member member = memberRepository.findById(managerId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+    public void createProjectMember(Project project, ProjectRequest request) {
+        request.memberIdList().forEach(memberId -> {
+            // 해당 회원이 존재하는지 확인
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
 
-        // 해당 매니저가 해당 팀에 존재하는지 확인
-        Team team = project.getTeam();
-        teamMemberRepository.findByTeamAndMember(team, member)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.BELONG_TO_WRONG_TEAM_ERROR));
+            // 해당 회원이 해당 팀에 존재하는지 확인
+            teamMemberRepository.findByTeamAndMember(project.getTeam(), member)
+                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
 
-        List<TeamMember> teamMembers = teamMemberRepository.findAllByTeam(team);
-        teamMembers.forEach(teamMember -> {
-            Member foundMember = teamMember.getMember();
-            if (foundMember.getId().equals(managerId)) {
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, foundMember, ProjectRole.MANAGER);
+            // 만약 매니저면 매니저로 저장
+            if (memberId.equals(request.managerId())){
+                ProjectMember projectMember = ProjectConverter.toProjectMember(project, member, ProjectRole.MANAGER);
                 projectMemberRepository.save(projectMember);
-                project.setManagerId(managerId);
+                project.setManagerId(request.managerId());
+
+            // 일반 프로젝트원으로 저장
             } else {
-                ProjectMember projectMember = ProjectConverter.toProjectMember(project, foundMember, ProjectRole.NON_MANAGER);
+                ProjectMember projectMember = ProjectConverter.toProjectMember(project, member, ProjectRole.NON_MANAGER);
                 projectMemberRepository.save(projectMember);
             }
         });
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProjectResponse> getAll(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
-        List<Project> projects = projectRepository.findAllByTeam(team);
-
-        return projects.stream()
-                .map(project -> ProjectConverter.toProjectResponse(project, project.getProjectState()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ProjectResponse getOne(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
-        return ProjectConverter.toProjectResponse(project, project.getProjectState());
-    }
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<ProjectResponse> getAll(Long teamId) {
+//        Team team = teamRepository.findById(teamId)
+//                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+//        List<Project> projects = projectRepository.findAllByTeam(team);
+//
+//        return projects.stream()
+//                .map(project -> ProjectConverter.toProjectResponse(project, project.getProjectState()))
+//                .collect(Collectors.toList());
+//    }
+//
+//    @Override
+//    @Transactional(readOnly = true)
+//    public ProjectResponse getOne(Long projectId) {
+//        Project project = projectRepository.findById(projectId)
+//                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+//        return ProjectConverter.toProjectResponse(project, project.getProjectState());
+//    }
 
     public void delete(Long projectId, Long memberId) {
         Project project = projectRepository.findById(projectId)

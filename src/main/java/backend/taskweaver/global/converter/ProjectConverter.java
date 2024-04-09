@@ -10,6 +10,8 @@ import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.team.entity.Team;
 
+import java.util.List;
+
 public class ProjectConverter {
 
     public static Project toProject(ProjectRequest request, Team team, ProjectState state) {
@@ -27,13 +29,14 @@ public class ProjectConverter {
                 .build();
     }
 
-    public static ProjectResponse toProjectResponse(Project project, ProjectState state) {
+    public static ProjectResponse toProjectResponse(Project project, List<Long> memberIdList) {
         return new ProjectResponse(
                 project.getId(),
                 project.getName(),
                 project.getDescription(),
                 project.getManagerId(),
-                state.getStateName(),
+                memberIdList,
+                project.getProjectState().getStateName(),
                 project.getCreatedAt()
         );
     }

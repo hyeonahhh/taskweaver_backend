@@ -82,7 +82,7 @@ public enum ErrorCode {
     DELETE_ERROR(500, "9999", "Delete Transaction Error Exception"),
 
     // PROJECT
-    BELONG_TO_WRONG_TEAM_ERROR(400, "P001", "This Manager doesn't belong to this team"),
+    MEMBER_NOT_BELONG_TO_TEAM(400, "P001", "Member doesn't belong to this team"),
     PROJECT_NOT_FOUND(404, "P002", "Project Not Found"),
     NOT_PROJECT_MANAGER(403, "P003", "Only Project manager can do this work."),
     PROJECT_STATE_NOT_FOUND(404, "POO4", "Project State Not Found"),

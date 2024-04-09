@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 @Schema(description = "프로젝트 요청 DTO")
 public record ProjectRequest(
         @NotBlank
@@ -16,6 +18,10 @@ public record ProjectRequest(
 
         @NotNull
         @Schema(description = "프로젝트 담당자 ID", example = "1")
-        Long managerId
+        Long managerId,
+
+        @NotNull
+        @Schema(description = "프로젝트 멤버 ID", example = "[1, 2, 3]")
+        List<Long> memberIdList
 ) {
 }
