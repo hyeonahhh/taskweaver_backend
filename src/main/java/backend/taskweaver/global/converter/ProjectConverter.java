@@ -1,6 +1,7 @@
 package backend.taskweaver.global.converter;
 
 import backend.taskweaver.domain.member.entity.Member;
+import backend.taskweaver.domain.project.dto.ProjectMemberResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.entity.Project;
@@ -11,6 +12,7 @@ import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.team.entity.Team;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProjectConverter {
 
@@ -39,6 +41,16 @@ public class ProjectConverter {
                 project.getProjectState().getStateName(),
                 project.getCreatedAt()
         );
+    }
+
+    public static ProjectMemberResponse toProjectMemberResponse(List<ProjectMember> projectMembers) {
+        List<ProjectMemberResponse.MemberList> memberList = projectMembers.stream()
+                .map(projectMember -> new ProjectMemberResponse.MemberList(
+                        projectMember.getMember().getId(),
+                        projectMember.getMember().getImageUrl(),
+                        projectMember.getMember().getNickname()))
+                .collect(Collectors.toList());
+        return new ProjectMemberResponse(memberList);
     }
 
     public static ProjectMember toProjectMember(Project project, Member member, ProjectRole role) {

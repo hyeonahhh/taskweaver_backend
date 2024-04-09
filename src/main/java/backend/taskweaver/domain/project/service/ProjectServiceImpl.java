@@ -2,6 +2,7 @@ package backend.taskweaver.domain.project.service;
 
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
+import backend.taskweaver.domain.project.dto.ProjectMemberResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.dto.UpdateStateRequest;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -102,6 +104,16 @@ public class ProjectServiceImpl implements ProjectService {
 //                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
 //        return ProjectConverter.toProjectResponse(project, project.getProjectState());
 //    }
+
+
+    @Override
+    @Transactional
+    public ProjectMemberResponse getAllProjectMembers(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_NOT_FOUND));
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+        return ProjectConverter.toProjectMemberResponse(projectMembers);
+    }
 
     public void delete(Long projectId, Long memberId) {
         Project project = projectRepository.findById(projectId)
