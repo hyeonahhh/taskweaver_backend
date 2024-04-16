@@ -54,7 +54,7 @@ public class TokenProvider {
                 .signWith(new SecretKeySpec(jwtProperties.getSecretKey().getBytes(), SignatureAlgorithm.HS512.getJcaName()))
                 .setIssuer(jwtProperties.getIssuer())
                 .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
-                .setExpiration(Date.from(Instant.now().plus(jwtProperties.getRefreshExpirationHours(), ChronoUnit.HOURS)))
+                .setExpiration(Date.from(Instant.now().plus(jwtProperties.getRefreshExpirationDays(), ChronoUnit.DAYS)))
                 .compact();
     }
 
@@ -62,7 +62,7 @@ public class TokenProvider {
     public String recreateAccessToken(String oldAccessToken) throws JsonProcessingException {
         String subject = decodeJwtPayloadSubject(oldAccessToken);
         long reissueLimit = jwtProperties.getReissueLimit();
-        reissueLimit = jwtProperties.getRefreshExpirationHours()* 60 / jwtProperties.getExpirationMinutes();
+        //long reissueLimit = jwtProperties.getRefreshExpirationDays()* 60 / jwtProperties.getExpirationMinutes();
         memberRefreshTokenRepository.findByMemberIdAndReissueCountLessThan(Long.valueOf(subject.split(":")[0]), reissueLimit)
                 .ifPresentOrElse(
                         MemberRefreshToken::increaseReissueCount,
@@ -76,17 +76,17 @@ public class TokenProvider {
         validateAndParseToken(refreshToken);
         String memberId = decodeJwtPayloadSubject(oldAccessToken).split(":")[0];
         long reissueLimit = jwtProperties.getReissueLimit();
-        reissueLimit = jwtProperties.getRefreshExpirationHours()* 60 / jwtProperties.getExpirationMinutes();
+//        reissueLimit = jwtProperties.getRefreshExpirationDays()* 60 / jwtProperties.getExpirationMinutes();
         memberRefreshTokenRepository.findByMemberIdAndReissueCountLessThan(Long.valueOf(memberId), reissueLimit)
                 .filter(memberRefreshToken -> memberRefreshToken.validateRefreshToken(refreshToken))
                 .orElseThrow(() -> new ExpiredJwtException(null, null, "Refresh token expired."));
     }
 
     private Jws<Claims> validateAndParseToken(String token) {	// validateTokenAndGetSubject에서 따로 분리
-        return Jwts.parserBuilder()
-                .setSigningKey(jwtProperties.getSecretKey().getBytes())
-                .build()
-                .parseClaimsJws(token);
+            return Jwts.parserBuilder()
+                    .setSigningKey(jwtProperties.getSecretKey().getBytes())
+                    .build()
+                    .parseClaimsJws(token);
     }
 
     private String decodeJwtPayloadSubject(String oldAccessToken) throws JsonProcessingException {
