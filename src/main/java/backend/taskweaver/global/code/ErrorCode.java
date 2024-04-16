@@ -66,8 +66,8 @@ public enum ErrorCode {
     // 지원하지 않는 JWT 토큰일 때 발생
     UNSUPPORTED_JWT_TOKEN(400,"G017", "The provided JWT token is not supported"),
 
-    // 토큰 클레임이 비어있을 때 발생
-    // TOKEN_CLAIM_EMPTY(400,"G016", "JWT claim is empty"),
+    // 토큰이 없을 때 발생
+    TOKEN_MISSING_ERROR(401, "G018", "Token is missing."),
 
     /**
      * ******************************* Custom Error CodeList ***************************************

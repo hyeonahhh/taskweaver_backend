@@ -29,9 +29,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             setResponse(response, ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } else if (exception.equals(ErrorCode.USER_AUTH_ERROR.getMessage())) {
             setResponse(response, ErrorCode.USER_AUTH_ERROR);
+        } else if(exception.equals(ErrorCode.TOKEN_MISSING_ERROR.getMessage())) {
+            setResponse(response, ErrorCode.TOKEN_MISSING_ERROR);
         }
-//        else if (exception.equals(ErrorCode.TOKEN_CLAIM_EMPTY.getMessage())) {
-//            setResponse(response, ErrorCode.TOKEN_CLAIM_EMPTY);
     }
 
     private void setResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
