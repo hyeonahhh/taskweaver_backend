@@ -26,6 +26,7 @@ public class CommentResponse {
     @NoArgsConstructor
     @Getter
     public static class Member {
+        Long memberId;
         String nickname;
         String imageUrl;
     }

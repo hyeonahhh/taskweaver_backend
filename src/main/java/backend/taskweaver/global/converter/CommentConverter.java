@@ -29,6 +29,7 @@ public class CommentConverter {
 
     public static CommentResponse toCommentResponse(Comment comment, Member member) {
         CommentResponse.Member memberResponse = new CommentResponse.Member(
+                member.getId(),
                 member.getNickname(),
                 member.getImageUrl());
 
