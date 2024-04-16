@@ -20,7 +20,7 @@ public class MemberRefreshToken {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    private String refreshToken; //  얘의 역할을 모르겠음.. 이따 수정할 것
+    private String refreshToken;
 
     private int reissueCount = 0;
 
