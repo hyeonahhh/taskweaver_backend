@@ -4,6 +4,7 @@ import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.task.dto.CommentRequest;
 import backend.taskweaver.domain.task.dto.CommentResponse;
+import backend.taskweaver.domain.task.dto.UpdateCommentRequest;
 import backend.taskweaver.domain.task.entity.Comment;
 import backend.taskweaver.domain.task.entity.Task;
 import backend.taskweaver.domain.task.repository.CommentRepository;
@@ -50,5 +51,16 @@ public class CommentServiceImpl implements CommentService {
             parentComment.addChildrenComment(comment);
             return CommentConverter.toCommentResponse(comment, member);
         }
+    }
+
+    @Transactional
+    @Override
+    public void update(UpdateCommentRequest request, Long commentId, Long memberId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.COMMENT_NOT_FOUND));
+        if(!comment.getMember().getId().equals(memberId)) {
+            throw new BusinessExceptionHandler(ErrorCode.NOT_COMMENT_WRITER);
+        }
+        comment.updateComment(request);
     }
 }

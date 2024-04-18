@@ -2,6 +2,7 @@ package backend.taskweaver.domain.task.entity;
 
 import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.Member;
+import backend.taskweaver.domain.task.dto.UpdateCommentRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -61,5 +62,9 @@ public class Comment extends BaseEntity {
 
     public void addChildrenComment(Comment comment) {
         this.childrenComment.add(comment);
+    }
+
+    public void updateComment(UpdateCommentRequest request) {
+        this.content = request.getContent();
     }
 }
