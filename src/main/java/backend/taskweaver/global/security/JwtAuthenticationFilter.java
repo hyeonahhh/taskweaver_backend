@@ -1,7 +1,7 @@
 package backend.taskweaver.global.security;
 
 import backend.taskweaver.global.code.ErrorCode;
-import backend.taskweaver.global.exception.handler.JwtTokenHandler;
+import backend.taskweaver.global.exception.handler.JwtTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -53,9 +53,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             request.setAttribute("exception", ErrorCode.UNSUPPORTED_JWT_TOKEN.getMessage());
         } catch (AuthenticationException | NullPointerException e) {
             request.setAttribute("exception", ErrorCode.USER_AUTH_ERROR.getMessage());
+        } catch (JwtTokenException e) {
+            request.setAttribute("exception", ErrorCode.TOKEN_MISSING_ERROR.getMessage());
         }
-//        catch (IllegalArgumentException e) {
-//            request.setAttribute("exception", ErrorCode.TOKEN_CLAIM_EMPTY.getMessage());
 
         filterChain.doFilter(request, response);
     }
@@ -71,13 +71,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String[] split = Optional.ofNullable(token)
                 .filter(subject -> subject.length() >= 10)
                 .map(tokenProvider::validateTokenAndGetSubject)
-                .orElse("anonymous:anonymous")
+                .orElseThrow(()->new JwtTokenException(ErrorCode.TOKEN_MISSING_ERROR))
                 .split(":");
         System.out.println(split[0]);
         System.out.println(split[1]);
 
         return new User(split[0], "", List.of(new SimpleGrantedAuthority(split[1])));
     }
+
 
     private void reissueAccessToken(HttpServletRequest request, HttpServletResponse response, Exception exception) {
         try {
