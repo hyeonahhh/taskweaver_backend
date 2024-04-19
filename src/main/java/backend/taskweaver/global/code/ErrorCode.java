@@ -109,10 +109,12 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(409, "M001", "Email is duplicated"),
     MEMBER_NOT_FOUND(404, "M002", "Member Not Found"),
     PASSWORD_NOT_MATCH(403, "M003", "Password doesn't match"),
-    SAME_PASSWORD(400, "M004", "New password cannot be the same as the current password")
+    SAME_PASSWORD(400, "M004", "New password cannot be the same as the current password"),
 
-
-    ; // End
+    // COMENT
+    COMMENT_NOT_FOUND(404, "C001", "Comment Not Found"),
+    COMMENT_DEPTH_EXCEED(404, "C002", "Comment Depth is Exceeded."),
+    NOT_COMMENT_WRITER(403, "C003", "Only comment writer can edit this comment.");
 
     /**
      * ******************************* Error Code Constructor ***************************************
