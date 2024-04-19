@@ -4,6 +4,9 @@ import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.code.ErrorResponse;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -20,6 +23,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -170,6 +176,65 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(ErrorCode.REQUEST_BODY_MISSING_ERROR.getStatus()));
     }
 
+    /**
+     * io.jsonwebtoken 내의 ExpiredJwtException이 발생하는 경우
+     * 토큰의 유효 기간이 만료된 경우에 발생
+     * Exception 발생시 UTC 기준을 KST(한국 시간) 기준으로 바꿔 오류 메세지 출력하게 함
+     *
+     * @param ex ExpiredJwtException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(ExpiredJwtException.class)
+    protected ResponseEntity<ErrorResponse> handleExpiredJwtException(ExpiredJwtException ex) {
+        log.error("handleExpiredJwtException", ex);
+
+        // 원래의 에러 메시지
+        String originalMessage = ex.getMessage();
+
+        // 에러 메시지에서 시간을 추출
+        String expiredAtUtc = originalMessage.substring(originalMessage.indexOf("at") + 3, originalMessage.indexOf("Z.") + 1);
+        String currentAtUtc = originalMessage.substring(originalMessage.indexOf("time:") + 6, originalMessage.indexOf("Z,", originalMessage.indexOf("time:")) + 1);
+
+        // 한국 시간대로 변환 (UTC+9)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ssX", Locale.US);
+        ZonedDateTime expiredAtKst = ZonedDateTime.parse(expiredAtUtc, formatter).plusHours(9);
+        ZonedDateTime currentAtKst = ZonedDateTime.parse(currentAtUtc, formatter).plusHours(9);
+
+        // 변환된 시간을 사용하여 새로운 에러 메시지 생성
+        String newMessage = originalMessage
+                .replace(expiredAtUtc, expiredAtKst.format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ssX")))
+                .replace(currentAtUtc, currentAtKst.format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ssX")));
+
+        // 새로운 에러 메시지로 ErrorResponse 생성
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.EXPIRED_JWT_ERROR, newMessage);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(ErrorCode.EXPIRED_JWT_ERROR.getStatus()));
+    }
+
+    /**
+     * io.jsonwebtoken.security 내의 SignatureException이 발생하는 경우
+     *
+     * @param ex SignatureException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(SignatureException.class)
+    protected ResponseEntity<ErrorResponse> handleSignatureException(SignatureException ex) {
+        log.error("handleJsonProcessingException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_JWT_ERROR, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(ErrorCode.INVALID_JWT_ERROR.getStatus()));
+    }
+
+    /**
+     * io.jsonwebtoken 내의 MalformedJwtException이 발생하는 경우
+     *
+     * @param ex MalformedJwtException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(MalformedJwtException.class)
+    protected ResponseEntity<ErrorResponse> handleMalformedJwtException(MalformedJwtException ex) {
+        log.error("handleJsonProcessingException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_JWT_ERROR, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(ErrorCode.INVALID_JWT_ERROR.getStatus()));
+    }
 
     // ==================================================================================================================
 
