@@ -38,6 +38,7 @@ public class TeamServiceImpl implements TeamService{
         // 팀 리더 정보를 설정하여 팀 객체 생성
         Team team =  Team.builder()
                 .name(request.getName())
+                .description(request.getDescription())
                 .inviteLink(generateInviteLink())
                 .teamLeader(user) // 팀 리더 설정
                 .build();

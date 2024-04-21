@@ -16,6 +16,7 @@ public class TeamResponse {
     public static class teamCreateResult {
         Long id;
         String name;
+        String description;
         String inviteLink;
         Long teamLeader;
         LocalDateTime createdAt;
@@ -31,6 +32,10 @@ public class TeamResponse {
 
         @Schema(description = "팀 이름", example = "팀 이름")
         String name;
+
+        @Schema(description = "팀 소개", example = "팀 소개")
+        String description;
+
 
         @Schema(description = "팀 리더 id", example = "1")
         Long teamLeader;
@@ -95,6 +100,9 @@ public class TeamResponse {
 
         @Schema(description = "팀 이름", example = "팀 이름")
         String name;
+
+        @Schema(description = "팀 소개", example = "팀 소개")
+        String description;
 
         @Schema(description = "팀 리더 id", example = "1")
         Long teamLeader;
