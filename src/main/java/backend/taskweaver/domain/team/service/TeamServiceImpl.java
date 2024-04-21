@@ -61,14 +61,27 @@ public class TeamServiceImpl implements TeamService{
         return TeamConverter.toCreateResponse(team);
     }
     // 해당 팀 조회
-    public TeamResponse.findTeamResult findTeam(Long id) {
+    public TeamResponse.findTeamResult findTeam(Long id, Long userId) {
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
         List<TeamMember> teamMembers = findAllDistinctTeamMembersWithTeam(id);
 
-        return TeamConverter.toGetTeamResponse(team, teamMembers);
+        // 로그인한 유저의 역할(role)을 조회
+        String myRole = ""; // 초기값 설정
+
+        // 로그인한 유저의 역할 조회 로직
+        Optional<TeamMember> userTeamMember = teamMembers.stream()
+                .filter(member -> member.getMember().getId().equals(userId))
+                .findFirst();
+
+        if (userTeamMember.isPresent()) {
+            myRole = userTeamMember.get().getRole().toString();
+        }
+
+        return TeamConverter.toGetTeamResponse(team, myRole, teamMembers);
     }
+
 
     public List<TeamMember> findAllDistinctTeamMembersWithTeam(Long teamId) {
         List<TeamMember> allTeamMembers = teamMemberRepository.findAllByTeamId(teamId);

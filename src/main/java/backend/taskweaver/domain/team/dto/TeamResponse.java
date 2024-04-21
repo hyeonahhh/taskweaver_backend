@@ -41,6 +41,9 @@ public class TeamResponse {
         @Schema(description = "생성 날짜", example = "2024-02-08T22:58:10.061223")
         LocalDateTime createdAt;
 
+        @Schema(description = "로그인한 유저 권한", example = "LEADER")
+        String myRole;
+
         List<TeamMemberInfo> teamMembers;
 
         @Schema(description = "전체 팀원 수", example = "3")
@@ -59,6 +62,7 @@ public class TeamResponse {
 
         @Schema(description = "이메일", example = "example@example.com")
         private String email;
+
 
         @Schema(description = "이미지 URL", example = "https://example.com/image.jpg")
         private String imageUrl;
@@ -88,8 +92,19 @@ public class TeamResponse {
 
         @Schema(description = "팀 id", example = "1")
         Long id;
-        @Schema(description = "팀 이름", example = "team name")
+
+        @Schema(description = "팀 이름", example = "팀 이름")
         String name;
+
+        @Schema(description = "팀 리더 id", example = "1")
+        Long teamLeader;
+
+        @Schema(description = "초대 링크", example = "https://localhost:8081/invite/abea91ea-c861-40aa-b1fe-be2fe98ba4e2")
+        String inviteLink;
+
+        @Schema(description = "생성 날짜", example = "2024-02-08T22:58:10.061223")
+        LocalDateTime createdAt;
+
         @Schema(description = "로그인한 유저 권한", example = "LEADER")
         String myRole;
         @Schema(description = "추가 멤버 수", example = "2")
