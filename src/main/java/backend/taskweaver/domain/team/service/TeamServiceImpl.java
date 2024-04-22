@@ -107,12 +107,15 @@ public class TeamServiceImpl implements TeamService{
                     Team team = teamMember.getTeam();
                     String myRole = teamMember.getRole().toString();
 
-                    // 중복된 팀 멤버를 제거하고, 최대 3명의 유일한 멤버를 선택하되, 로그인한 유저는 제외
+                    // 중복된 팀 멤버를 제거하고, 최대 3명의 유일한 멤버를 선택하되, 로그인한 유저도 포함
                     List<TeamMember> distinctTeamMembers = removeDuplicates(team.getTeamMembers());
                     List<TeamMember> filteredMembers = distinctTeamMembers.stream()
                             .filter(member -> !member.getMember().getId().equals(userId)) // 로그인한 유저 제외
-                            .limit(3) // 최대 3명까지 선택
+                            .limit(3)
                             .collect(Collectors.toList());
+
+                    // 로그인한 유저 추가
+                    filteredMembers.add(0, teamMember); // 로그인한 유저를 리스트의 맨 앞에 추가
 
                     // 유일한 멤버 정보를 MemberInfo 객체로 매핑
                     List<TeamResponse.MemberInfo> members = filteredMembers.stream()
