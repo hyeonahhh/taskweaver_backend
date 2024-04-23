@@ -18,6 +18,7 @@ public class TeamConverter {
     public static Team toTeam(TeamRequest.teamCreateRequest request) {
         return Team.builder()
                 .name(request.getName())
+                .description(request.getDescription())
                 .inviteLink(generateInviteLink())
                 .build();
     }
@@ -26,6 +27,7 @@ public class TeamConverter {
         return new TeamResponse.teamCreateResult(
             team.getId(),
             team.getName(),
+            team.getDescription(),
             team.getInviteLink(),
             team.getTeamLeader(),
             team.getCreatedAt()
@@ -45,13 +47,17 @@ public class TeamConverter {
         return new TeamResponse.AllTeamInfo(
                 team.getId(),
                 team.getName(),
+                team.getDescription(),
+                team.getTeamLeader(),
+                team.getInviteLink(),
+                team.getCreatedAt(),
                 myRole,
                 totalMembers,
                 members
         );
     }
 
-    public static TeamResponse.findTeamResult toGetTeamResponse(Team team, List<TeamMember> teamMembers) {
+    public static TeamResponse.findTeamResult toGetTeamResponse(Team team, String myRole, List<TeamMember> teamMembers) {
         List<TeamResponse.TeamMemberInfo> memberInfos = teamMembers.stream()
                 .map(member -> new TeamResponse.TeamMemberInfo(
                         member.getMember().getId(),
@@ -67,9 +73,11 @@ public class TeamConverter {
         return new TeamResponse.findTeamResult(
                 team.getId(),
                 team.getName(),
+                team.getDescription(),
                 team.getTeamLeader(),
                 team.getInviteLink(),
                 team.getCreatedAt(),
+                myRole,
                 memberInfos,
                 memberCount // 멤버 수 추가
         );

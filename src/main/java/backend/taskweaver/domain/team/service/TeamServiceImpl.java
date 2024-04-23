@@ -38,6 +38,7 @@ public class TeamServiceImpl implements TeamService{
         // 팀 리더 정보를 설정하여 팀 객체 생성
         Team team =  Team.builder()
                 .name(request.getName())
+                .description(request.getDescription())
                 .inviteLink(generateInviteLink())
                 .teamLeader(user) // 팀 리더 설정
                 .build();
@@ -61,14 +62,27 @@ public class TeamServiceImpl implements TeamService{
         return TeamConverter.toCreateResponse(team);
     }
     // 해당 팀 조회
-    public TeamResponse.findTeamResult findTeam(Long id) {
+    public TeamResponse.findTeamResult findTeam(Long id, Long userId) {
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
         List<TeamMember> teamMembers = findAllDistinctTeamMembersWithTeam(id);
 
-        return TeamConverter.toGetTeamResponse(team, teamMembers);
+        // 로그인한 유저의 역할(role)을 조회
+        String myRole = ""; // 초기값 설정
+
+        // 로그인한 유저의 역할 조회 로직
+        Optional<TeamMember> userTeamMember = teamMembers.stream()
+                .filter(member -> member.getMember().getId().equals(userId))
+                .findFirst();
+
+        if (userTeamMember.isPresent()) {
+            myRole = userTeamMember.get().getRole().toString();
+        }
+
+        return TeamConverter.toGetTeamResponse(team, myRole, teamMembers);
     }
+
 
     public List<TeamMember> findAllDistinctTeamMembersWithTeam(Long teamId) {
         List<TeamMember> allTeamMembers = teamMemberRepository.findAllByTeamId(teamId);
@@ -93,12 +107,15 @@ public class TeamServiceImpl implements TeamService{
                     Team team = teamMember.getTeam();
                     String myRole = teamMember.getRole().toString();
 
-                    // 중복된 팀 멤버를 제거하고, 최대 3명의 유일한 멤버를 선택하되, 로그인한 유저는 제외
+                    // 중복된 팀 멤버를 제거하고, 최대 3명의 유일한 멤버를 선택하되, 로그인한 유저도 포함
                     List<TeamMember> distinctTeamMembers = removeDuplicates(team.getTeamMembers());
                     List<TeamMember> filteredMembers = distinctTeamMembers.stream()
                             .filter(member -> !member.getMember().getId().equals(userId)) // 로그인한 유저 제외
-                            .limit(3) // 최대 3명까지 선택
+                            .limit(3)
                             .collect(Collectors.toList());
+
+                    // 로그인한 유저 추가
+                    filteredMembers.add(0, teamMember); // 로그인한 유저를 리스트의 맨 앞에 추가
 
                     // 유일한 멤버 정보를 MemberInfo 객체로 매핑
                     List<TeamResponse.MemberInfo> members = filteredMembers.stream()

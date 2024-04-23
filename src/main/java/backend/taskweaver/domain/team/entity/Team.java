@@ -29,10 +29,8 @@ public class Team extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
-    /*
     @Column(nullable = false, length = 100)
     private String description;
-     */
 
     private String inviteLink;
 
