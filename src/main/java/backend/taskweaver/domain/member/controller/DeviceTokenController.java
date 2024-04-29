@@ -2,13 +2,9 @@ package backend.taskweaver.domain.member.controller;
 
 import backend.taskweaver.domain.member.dto.DeviceTokenRequest;
 import backend.taskweaver.domain.member.service.DeviceTokenService;
-import backend.taskweaver.domain.project.dto.ProjectRequest;
-import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
-import backend.taskweaver.global.firebase.Request;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
