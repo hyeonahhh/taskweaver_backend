@@ -1,6 +1,7 @@
 package backend.taskweaver.global.converter;
 
 import backend.taskweaver.domain.member.dto.*;
+import backend.taskweaver.domain.member.entity.DeviceToken;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.entity.enums.LoginType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ public class MemberConverter {
                 .imageUrl(signUpRequest.imageUrl())
                 .build();
     }
+
     public static SignUpResponse toSignUpResponse(Member member) {
         return new SignUpResponse(
                 member.getId(),
@@ -35,6 +37,7 @@ public class MemberConverter {
                 refreshToken
         );
     }
+
     public static MemberInfoResponse toMemberInfoResponse(Member member) {
         return new MemberInfoResponse(
                 member.getId(),
@@ -47,5 +50,12 @@ public class MemberConverter {
 
     public static CreateAccessTokenResponse toCreateAccessTokenResponse(String newAccessToken) {
         return new CreateAccessTokenResponse(newAccessToken);
+    }
+
+    public static DeviceToken toDeviceToken(DeviceTokenRequest request, Member member) {
+        return DeviceToken.builder()
+                .deviceToken(request.deviceToken())
+                .member(member)
+                .build();
     }
 }
