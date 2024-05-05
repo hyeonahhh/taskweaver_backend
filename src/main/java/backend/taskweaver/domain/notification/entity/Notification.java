@@ -32,7 +32,12 @@ public class Notification extends BaseEntity {
 
     private String sender;
 
+    private String content;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private NotificationType type;
+
+    @Column(name = "related_type_id")
+    private Long relatedTypeId; // 팀, 프로젝트, 태스크에 상관없이 저장
 }
