@@ -1,6 +1,8 @@
 package backend.taskweaver.domain.member.entity;
 
 import backend.taskweaver.domain.member.entity.enums.LoginType;
+import backend.taskweaver.domain.member.entity.enums.NotiRead;
+import backend.taskweaver.domain.notification.entity.enums.isRead;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -39,7 +41,13 @@ public class Member {
 
     private String imageUrl;
 
+    @Column(nullable = false, name="noti_read")
+    @Enumerated(EnumType.STRING)
+    private NotiRead notiRead;
+
     public void updatePassword(String password) {
         this.password = password;
     }
+
+
 }
