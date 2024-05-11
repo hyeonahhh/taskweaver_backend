@@ -56,4 +56,10 @@ public class SignService {
         redisService.setValues(request.email(), request.deviceToken());
         return MemberConverter.toSignInResponse(member, accessToken, refreshToken);
     }
+
+    public void logout(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+        redisService.deleteValues(member.getEmail());
+    }
 }
