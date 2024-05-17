@@ -1,69 +1,58 @@
 package backend.taskweaver.domain.project.service;
 
-import backend.taskweaver.domain.member.entity.DeviceToken;
 import backend.taskweaver.domain.member.entity.Member;
-import backend.taskweaver.domain.member.repository.DeviceTokenRepository;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.project.dto.*;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
-import backend.taskweaver.domain.project.entity.ProjectState;
-import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
-import backend.taskweaver.domain.project.repository.ProjectStateRepository;
 import backend.taskweaver.domain.team.entity.Team;
-import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.ProjectConverter;
+import backend.taskweaver.global.event.ProjectNotificationEvent;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
-import backend.taskweaver.global.firebase.FcmService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
-
     private final TeamRepository teamRepository;
-    private final TeamMemberRepository teamMemberRepository;
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
-    private final ProjectStateRepository projectStateRepository;
-    private final FcmService fcmService;
-    private final DeviceTokenRepository deviceTokenRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
-    public ProjectResponse createProject(ProjectRequest request, Long teamId) throws IOException {
+    public ProjectResponse createProject(ProjectRequest request, Long teamId) {
         // project state 저장
-        ProjectState state = ProjectConverter.toProjectState(ProjectStateName.BEFORE);
+        // ProjectState state = ProjectConverter.toProjectState(ProjectStateName.BEFORE);
 
         // project 저장
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
-        Project project = ProjectConverter.toProject(request, team, state);
+        Project project = ProjectConverter.toProject(request, team);
         projectRepository.save(project);
 
         // project member 저장
         List<Member> members = createProjectMember(project, request);
 
         // 푸시 알림 보내기
-        sendProjectNotification(members, project, request.managerId());
+        applicationEventPublisher.publishEvent(new ProjectNotificationEvent(project, members));
 
         return ProjectConverter.toProjectResponse(project, request.memberIdList());
     }
 
-    private List<Member> createProjectMember(Project project, ProjectRequest request) {
+    public List<Member> createProjectMember(Project project, ProjectRequest request) {
         // 담당자 id가 member id list에 있는지 확인
         if (!request.memberIdList().contains(request.managerId())) {
             throw new BusinessExceptionHandler(ErrorCode.MANAGER_ID_NOT_IN_MEMBER_ID_LIST);
@@ -71,16 +60,11 @@ public class ProjectServiceImpl implements ProjectService {
 
         List<ProjectMember> projectMembers = new ArrayList<>();
         List<Member> members = new ArrayList<>();
-
         request.memberIdList().forEach(memberId -> {
             // 해당 회원이 존재하는지 확인
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
             members.add(member);
-
-            // 해당 회원이 해당 팀에 존재하는지 확인
-            teamMemberRepository.findByTeamIdAndMemberId(project.getTeam().getId(), memberId)
-                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
 
             // 프로젝트 담당자면 담당자 설정
             if (memberId.equals(request.managerId())) {
@@ -96,19 +80,9 @@ public class ProjectServiceImpl implements ProjectService {
         return members;
     }
 
-    private void sendProjectNotification(List<Member> members, Project project, Long managerId) throws IOException {
-        String nickname = memberRepository.findById(managerId).get().getNickname();
-        ProjectNotificationMessage notificationMessage = new ProjectNotificationMessage(project.getTeam().getName(), project.getName(), nickname);
-
-        List<DeviceToken> deviceTokens = deviceTokenRepository.findAllByMemberIn(members);
-        for (DeviceToken deviceToken : deviceTokens) {
-            fcmService.sendMessageTo(deviceToken.getDeviceToken(), notificationMessage.getCreateMessage());
-        }
-    }
-
     @Override
     @Transactional
-    public void updateProject(Long projectId, ProjectRequest request, Long memberId) throws IOException {
+    public void updateProject(Long projectId, ProjectRequest request, Long memberId){
         // 프로젝트 존재하는지 확인
         Project project = validateProject(projectId);
 
@@ -150,45 +124,45 @@ public class ProjectServiceImpl implements ProjectService {
         return ProjectConverter.toProjectMemberResponse(projectMembers);
     }
 
-    @Override
-    @Transactional
-    public void delete(Long projectId, Long memberId) {
-        // 프로젝트 존재하는지 확인
-        Project project = validateProject(projectId);
-
-        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
-        checkIfIsManager(project.getManagerId(), memberId);
-
-        // project members 삭제
-        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
-        projectMembers.stream()
-                .map(ProjectMember::getId)
-                .forEach(projectMemberRepository::deleteById);
-
-        // project state 삭제
-        projectStateRepository.deleteById(project.getProjectState().getId());
-
-        // project 삭제
-        projectRepository.deleteById(projectId);
-    }
-
-    @Override
-    @Transactional
-    public void updateState(Long projectId, UpdateStateRequest request, Long memberId) {
-        // 프로젝트 존재하는지 확인
-        Project project = validateProject(projectId);
-
-        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
-        checkIfIsManager(project.getManagerId(), memberId);
-
-        ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
-                .filter(stateName -> stateName.toString().equals(request.projectState()))
-                .findFirst()
-                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_STATE_NOT_FOUND));
-
-        ProjectState projectState = project.getProjectState();
-        projectState.changeProjectState(foundState);
-    }
+//    @Override
+//    @Transactional
+//    public void delete(Long projectId, Long memberId) {
+//        // 프로젝트 존재하는지 확인
+//        Project project = validateProject(projectId);
+//
+//        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
+//        checkIfIsManager(project.getManagerId(), memberId);
+//
+//        // project members 삭제
+//        List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+//        projectMembers.stream()
+//                .map(ProjectMember::getId)
+//                .forEach(projectMemberRepository::deleteById);
+//
+//        // project state 삭제
+//        projectStateRepository.deleteById(project.getProjectState().getId());
+//
+//        // project 삭제
+//        projectRepository.deleteById(projectId);
+//    }
+//
+//    @Override
+//    @Transactional
+//    public void updateState(Long projectId, UpdateStateRequest request, Long memberId) {
+//        // 프로젝트 존재하는지 확인
+//        Project project = validateProject(projectId);
+//
+//        // 현재 로그인한 사람이 프로젝트 담당자인지 확인
+//        checkIfIsManager(project.getManagerId(), memberId);
+//
+//        ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
+//                .filter(stateName -> stateName.toString().equals(request.projectState()))
+//                .findFirst()
+//                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_STATE_NOT_FOUND));
+//
+//        ProjectState projectState = project.getProjectState();
+//        projectState.changeProjectState(foundState);
+//    }
 
     private void checkIfIsManager(Long projectManagerId, Long memberId) {
         if (!projectManagerId.equals(memberId)) {

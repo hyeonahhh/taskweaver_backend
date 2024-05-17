@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 
 public class ProjectConverter {
 
-    public static Project toProject(ProjectRequest request, Team team, ProjectState state) {
+    public static Project toProject(ProjectRequest request, Team team) {
         return Project.builder()
                 .name(request.name())
                 .description(request.description())
                 .team(team)
-                .projectState(state)
+                .projectState(ProjectStateName.BEFORE)
                 .build();
     }
 
@@ -37,7 +37,7 @@ public class ProjectConverter {
                 project.getDescription(),
                 project.getManagerId(),
                 memberIdList,
-                project.getProjectState().getStateName(),
+                project.getProjectStateName(),
                 project.getCreatedAt()
         );
     }
