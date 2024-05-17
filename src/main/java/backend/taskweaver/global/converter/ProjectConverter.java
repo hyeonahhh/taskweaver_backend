@@ -6,7 +6,6 @@ import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
-import backend.taskweaver.domain.project.entity.ProjectState;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.team.entity.Team;
 
@@ -15,18 +14,12 @@ import java.util.stream.Collectors;
 
 public class ProjectConverter {
 
-    public static Project toProject(ProjectRequest request, Team team, ProjectState state) {
+    public static Project toProject(ProjectRequest request, Team team) {
         return Project.builder()
                 .name(request.name())
                 .description(request.description())
                 .team(team)
-                .projectState(state)
-                .build();
-    }
-
-    public static ProjectState toProjectState(ProjectStateName projectState) {
-        return  ProjectState.builder()
-                .stateName(projectState)
+                .projectStateName(ProjectStateName.BEFORE)
                 .build();
     }
 
@@ -37,7 +30,7 @@ public class ProjectConverter {
                 project.getDescription(),
                 project.getManagerId(),
                 memberIdList,
-                project.getProjectState().getStateName(),
+                project.getProjectStateName(),
                 project.getCreatedAt()
         );
     }
