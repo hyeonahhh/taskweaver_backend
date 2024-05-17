@@ -72,10 +72,6 @@ public class ProjectServiceImpl implements ProjectService {
                     .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
             members.add(member);
 
-            // 해당 회원이 해당 팀에 존재하는지 확인
-            teamMemberRepository.findByTeamIdAndMemberId(project.getTeam().getId(), memberId)
-                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
-
             // 프로젝트 담당자면 담당자 설정
             if (memberId.equals(request.managerId())) {
                 project.setManager(memberId, member.getNickname());
