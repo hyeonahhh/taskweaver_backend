@@ -1,28 +1,33 @@
 package backend.taskweaver.global.firebase;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ExecutionException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class FcmService {
 
-    public void sendMessage(String targetToken, String body) throws ExecutionException, InterruptedException {
+    public void sendMessage(List<String> targetToken, String body) throws FirebaseMessagingException {
         Notification notification = Notification.builder()
                 .setTitle("TaskWeaver")
                 .setBody(body)
                 .build();
 
-        Message message = Message.builder().setToken(targetToken)
-                .setNotification(notification)
-                .build();
+        List<Message> messages = targetToken.stream()
+                .map(token -> Message.builder()
+                        .setToken(token)
+                        .setNotification(notification)
+                        .build())
+                .collect(Collectors.toList());
 
-        FirebaseMessaging.getInstance().sendAsync(message).get(); // 비동기로 보냄
+        FirebaseMessaging.getInstance().sendAll(messages);// 비동기로 보내는 걸로 바꾸기
     }
 
 //    private final ObjectMapper objectMapper;
