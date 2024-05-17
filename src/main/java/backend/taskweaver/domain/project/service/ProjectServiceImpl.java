@@ -78,7 +78,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // 프로젝트 담당자면 담당자 설정
             if (memberId.equals(request.managerId())) {
-                project.setManagerId(request.managerId());
+                project.setManager(memberId, member.getNickname());
             }
 
             // 프로젝트 멤버 저장

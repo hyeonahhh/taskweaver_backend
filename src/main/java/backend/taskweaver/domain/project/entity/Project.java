@@ -39,6 +39,9 @@ public class Project extends BaseEntity {
     @Column(name = "manager_id")
     private Long managerId;
 
+    @Column(name = "manager_name")
+    private String managerName;
+
     @Builder
     public Project(String name, String description, Team team, ProjectStateName projectStateName) {
         this.name = name;
@@ -47,9 +50,11 @@ public class Project extends BaseEntity {
         this.projectStateName = projectStateName;
     }
 
-    public void setManagerId(Long managerId) {
+    public void setManager(Long managerId, String managerName) {
         this.managerId = managerId;
+        this.managerName = managerName;
     }
+
     public void updateProject(ProjectRequest request) {
         this.description = request.description();
         this.name = request.name();
