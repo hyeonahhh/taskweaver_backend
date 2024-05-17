@@ -2,6 +2,7 @@ package backend.taskweaver.domain.project.entity;
 
 import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
+import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,28 +32,36 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "project_state_id")
-    private ProjectState projectState;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "project_state", nullable = false)
+    private ProjectStateName projectStateName;
 
     @Column(name = "manager_id")
     private Long managerId;
 
+    @Column(name = "manager_name")
+    private String managerName;
+
     @Builder
-    public Project(String name, String description, Team team, ProjectState projectState) {
+    public Project(String name, String description, Team team, ProjectStateName projectStateName) {
         this.name = name;
         this.description = description;
         this.team = team;
-        this.projectState = projectState;
+        this.projectStateName = projectStateName;
     }
 
-    public void setManagerId(Long managerId) {
+    public void setManager(Long managerId, String managerName) {
         this.managerId = managerId;
+        this.managerName = managerName;
     }
 
     public void updateProject(ProjectRequest request) {
         this.description = request.description();
         this.name = request.name();
         this.managerId = request.managerId();
+    }
+
+    public void updateProjectState(ProjectStateName projectStateName) {
+        this.projectStateName = projectStateName;
     }
 }

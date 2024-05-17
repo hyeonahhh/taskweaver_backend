@@ -24,7 +24,7 @@ public record ProjectResponse(
         List<Long> memberId,
 
         @Schema(description = "프로젝트 상태", example = "ON_PROGRESS")
-        ProjectStateName projectState,
+        ProjectStateName projectStateName,
 
         @Schema(description = "프로젝트 생성 날짜", example = "2024-04-04T11:04:54.1920")
         LocalDateTime createdAt

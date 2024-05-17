@@ -7,11 +7,9 @@ import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.project.dto.*;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectMember;
-import backend.taskweaver.domain.project.entity.ProjectState;
 import backend.taskweaver.domain.project.entity.enums.ProjectStateName;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
-import backend.taskweaver.domain.project.repository.ProjectStateRepository;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
@@ -38,20 +36,16 @@ public class ProjectServiceImpl implements ProjectService {
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
-    private final ProjectStateRepository projectStateRepository;
     private final FcmService fcmService;
     private final DeviceTokenRepository deviceTokenRepository;
 
     @Override
     @Transactional
     public ProjectResponse createProject(ProjectRequest request, Long teamId) throws IOException {
-        // project state 저장
-        ProjectState state = ProjectConverter.toProjectState(ProjectStateName.BEFORE);
-
         // project 저장
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
-        Project project = ProjectConverter.toProject(request, team, state);
+        Project project = ProjectConverter.toProject(request, team);
         projectRepository.save(project);
 
         // project member 저장
@@ -78,13 +72,9 @@ public class ProjectServiceImpl implements ProjectService {
                     .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
             members.add(member);
 
-            // 해당 회원이 해당 팀에 존재하는지 확인
-            teamMemberRepository.findByTeamIdAndMemberId(project.getTeam().getId(), memberId)
-                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_BELONG_TO_TEAM));
-
             // 프로젝트 담당자면 담당자 설정
             if (memberId.equals(request.managerId())) {
-                project.setManagerId(request.managerId());
+                project.setManager(memberId, member.getNickname());
             }
 
             // 프로젝트 멤버 저장
@@ -165,9 +155,6 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(ProjectMember::getId)
                 .forEach(projectMemberRepository::deleteById);
 
-        // project state 삭제
-        projectStateRepository.deleteById(project.getProjectState().getId());
-
         // project 삭제
         projectRepository.deleteById(projectId);
     }
@@ -186,8 +173,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .findFirst()
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_STATE_NOT_FOUND));
 
-        ProjectState projectState = project.getProjectState();
-        projectState.changeProjectState(foundState);
+        project.updateProjectState(foundState);
     }
 
     private void checkIfIsManager(Long projectManagerId, Long memberId) {
