@@ -32,31 +32,36 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-//    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-//    @JoinColumn(name = "project_state_id")
-//    private ProjectState projectState;
-
     @Enumerated(EnumType.STRING)
+    @Column(name = "project_state", nullable = false)
     private ProjectStateName projectStateName;
 
     @Column(name = "manager_id")
     private Long managerId;
 
+    @Column(name = "manager_name")
+    private String managerName;
+
     @Builder
-    public Project(String name, String description, Team team, ProjectStateName projectState) {
+    public Project(String name, String description, Team team, ProjectStateName projectStateName) {
         this.name = name;
         this.description = description;
         this.team = team;
-        this.projectStateName = projectState;
+        this.projectStateName = projectStateName;
     }
 
-    public void setManagerId(Long managerId) {
+    public void setManager(Long managerId, String managerName) {
         this.managerId = managerId;
+        this.managerName = managerName;
     }
 
     public void updateProject(ProjectRequest request) {
         this.description = request.description();
         this.name = request.name();
         this.managerId = request.managerId();
+    }
+
+    public void updateProjectState(ProjectStateName projectStateName) {
+        this.projectStateName = projectStateName;
     }
 }
