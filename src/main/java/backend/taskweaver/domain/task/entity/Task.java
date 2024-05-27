@@ -1,6 +1,7 @@
 package backend.taskweaver.domain.task.entity;
 
 import backend.taskweaver.domain.BaseEntity;
+import backend.taskweaver.domain.files.entity.Files;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.project.entity.ProjectState;
 import backend.taskweaver.domain.task.entity.enums.TaskStateName;
@@ -44,7 +45,7 @@ public class Task extends BaseEntity {
     private LocalDateTime deletedAt;
 
     @Column(name = "color")
-    private String color;
+    private Long emojiId;
 
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -63,6 +64,9 @@ public class Task extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "parentTask")
     private List<Task> children = new ArrayList<>();
+
+    @OneToMany(mappedBy = "task")
+    private List<Files> files = new ArrayList<>();
 
 
 }

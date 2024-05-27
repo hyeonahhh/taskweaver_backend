@@ -30,8 +30,8 @@ public class TaskRequest {
         @Schema(description = "태스크 참여자", example = "[1, 2, 3]")
         List<Long> members;
 
-        @Schema(description = "태스크 색깔", example = "#FFFFFF")
-        String color;
+        @Schema(description = "이모지 ID", example = "1")
+        Long emojiId;
 
         @Schema(description = "부모 태스크 ID", example = "1")
         Long parentTaskId;
@@ -58,8 +58,11 @@ public class TaskRequest {
         @Schema(description = "변경하고자 하는 태스크 참여자", example = "[1, 2, 3]")
         List<Long> members;
 
-        @Schema(description = "태스크 색깔", example = "#FFFFFF")
-        String color;
+        @Schema(description = "삭제하고자 하는 태스크", example = "[1, 2, 3]")
+        List<Long> deleteFiles;
+
+        @Schema(description = "변경하고자 하는 이모지", example = "1")
+        Long emojiId;
 
     }
 }
