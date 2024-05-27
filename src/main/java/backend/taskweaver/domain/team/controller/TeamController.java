@@ -45,10 +45,10 @@ public class TeamController {
 
     @Operation(summary = "팀 조회")
     @GetMapping("/team/{teamId}")
-    public ResponseEntity<ApiResponse> findTeam(@PathVariable(name = "teamId") Long teamId) {
+    public ResponseEntity<ApiResponse> findTeam(@PathVariable(name = "teamId") Long teamId, @AuthenticationPrincipal User user) {
 
         ApiResponse apiResponse = ApiResponse.builder()
-                .result(teamService.findTeam(teamId))
+                .result(teamService.findTeam(teamId,Long.parseLong(user.getUsername())))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
                 .build();
@@ -56,16 +56,16 @@ public class TeamController {
     }
 
     // 팀 멤버만 조회
-    @Operation(summary = "팀 조회")
-    @GetMapping("/team/{teamId}/member")
-    public ResponseEntity<ApiResponse> AllTeamMember(@PathVariable(name = "teamId") Long teamId) {
-        ApiResponse apiResponse = ApiResponse.builder()
-                .result(teamService.findTeam(teamId))
-                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
-                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
+//    @Operation(summary = "팀 조회")
+//    @GetMapping("/team/{teamId}/member")
+//    public ResponseEntity<ApiResponse> AllTeamMember(@PathVariable(name = "teamId") Long teamId, @AuthenticationPrincipal User user) {
+//        ApiResponse apiResponse = ApiResponse.builder()
+//                .result(teamService.findTeam(teamId))
+//                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+//                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+//                .build();
+//        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+//    }
 
     // 팀 전체 조회
     @Operation(summary =  "로그인한 유저의 팀 전체 조회")
@@ -91,6 +91,7 @@ public class TeamController {
     }
 
     // 팀장 권한 변경
+    /*
     @Operation(summary =  "팀장 권한 변경")
     @PutMapping("/team/{teamId}/changeLeader")
     public ResponseEntity<ApiResponse> changeTeamLeader(@PathVariable Long teamId, @RequestBody TeamLeaderRequest.ChangeLeaderRequest request, @AuthenticationPrincipal User user) {
@@ -102,6 +103,8 @@ public class TeamController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+    */
+
 
     @Operation(summary = "팀원 초대 - 이메일로 초대")
     @PostMapping("/team/invitation/email")
@@ -124,7 +127,4 @@ public class TeamController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
-
-
-
 }

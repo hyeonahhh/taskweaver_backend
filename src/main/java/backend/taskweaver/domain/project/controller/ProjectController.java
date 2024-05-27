@@ -1,9 +1,10 @@
 package backend.taskweaver.domain.project.controller;
 
+import backend.taskweaver.domain.project.dto.ProjectMemberResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
 import backend.taskweaver.domain.project.dto.UpdateStateRequest;
-import backend.taskweaver.domain.project.service.ProjectServiceImpl;
+import backend.taskweaver.domain.project.service.ProjectService;
 import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -25,14 +27,14 @@ import java.util.List;
 @Tag(name = "프로젝트 관련 api")
 public class ProjectController {
 
-    private final ProjectServiceImpl projectService;
+    private final ProjectService projectService;
 
     // todo: 응답부분 swagger 고치기
     
     @PostMapping("/team/{teamId}/project")
     @Operation(summary = "프로젝트 등록 메서드", description = "프로젝트 등록 api입니다.")
     public ResponseEntity<ApiResponse> addProject(@RequestBody @Valid ProjectRequest request,
-                                                  @PathVariable @Parameter(description = "팀 ID") Long teamId) {
+                                                  @PathVariable @Parameter(description = "팀 ID") Long teamId) throws IOException {
         ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
                 .result(projectService.createProject(request, teamId))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
@@ -66,6 +68,18 @@ public class ProjectController {
                 .body(apiResponse);
     }
 
+    @GetMapping("/project/{projectId}/members")
+    @Operation(summary = "프로젝트 멤버 전체 조회 메서드", description = "프로젝트 내의 모든 프로젝트원들을 조회하는 api입니다.")
+    public ResponseEntity<ApiResponse> getAllProjectMembers(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId) {
+        ApiResponse apiResponse = ApiResponse.<ProjectMemberResponse>builder()
+                .result(projectService.getAllProjectMembers(projectId))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
     @PatchMapping("/project/{projectId}/state")
     @Operation(summary = "프로젝트 상태 변경 메서드", description = "프로젝트의 상태를 변경하는 api입니다.")
     public ResponseEntity<ApiResponse> updateState(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
@@ -84,7 +98,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트 수정 메서드", description = "프로젝트의 이름, 내용, 담당자를 변경하는 api입니다.")
     public ResponseEntity<ApiResponse> updateProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
                                                    @RequestBody @Valid ProjectRequest request,
-                                                   @AuthenticationPrincipal User user) {
+                                                   @AuthenticationPrincipal User user) throws IOException {
         projectService.updateProject(projectId, request, Long.parseLong(user.getUsername()));
         ApiResponse apiResponse = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())

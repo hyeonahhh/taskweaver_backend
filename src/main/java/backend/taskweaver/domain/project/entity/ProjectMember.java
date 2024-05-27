@@ -2,11 +2,8 @@ package backend.taskweaver.domain.project.entity;
 
 import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.Member;
-import backend.taskweaver.domain.project.entity.enums.ProjectRole;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "project_member")
@@ -20,10 +17,6 @@ public class ProjectMember extends BaseEntity {
     @Column(name = "project_member_id")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "project_role", nullable = false)
-    private ProjectRole role;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
@@ -31,8 +24,4 @@ public class ProjectMember extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
-
-    public void changeRole(ProjectRole role) {
-        this.role = role;
-    }
 }
