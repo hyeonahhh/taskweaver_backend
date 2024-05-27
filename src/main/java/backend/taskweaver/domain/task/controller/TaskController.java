@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequestMapping("/v1")
 @Tag(name = "태스크 관련")
@@ -26,10 +29,12 @@ public class TaskController {
 
     @Operation(summary = "태스크 생성")
     @PostMapping("/projects/{projectId}/tasks")
-    public ResponseEntity<ApiResponse> createTask(@RequestBody TaskRequest.taskCreate request, @AuthenticationPrincipal User user, @PathVariable Long projectId) {
+    public ResponseEntity<ApiResponse> createTask(@RequestPart("request") TaskRequest.taskCreate request,
+                                                  @RequestPart("images") List<MultipartFile> multipartFiles,
+                                                  @AuthenticationPrincipal User user, @PathVariable Long projectId) {
         try {
             ApiResponse ar = ApiResponse.builder()
-                    .result(taskService.createTask(request, Long.parseLong(user.getUsername()), projectId))
+                    .result(taskService.createTask(request, multipartFiles, Long.parseLong(user.getUsername()), projectId))
                     .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                     .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                     .build();
@@ -37,6 +42,7 @@ public class TaskController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
 
     }
 
@@ -72,10 +78,13 @@ public class TaskController {
 
     @Operation(summary = "태스크 수정")
     @PatchMapping("/task/{taskId}")
-    public ResponseEntity<ApiResponse> changeTask(@RequestBody TaskRequest.taskChange request, @AuthenticationPrincipal User user, @PathVariable Long taskId) {
+    public ResponseEntity<ApiResponse> changeTask(@RequestPart("request") TaskRequest.taskChange request,
+                                                  @RequestPart("images") List<MultipartFile> multipartFiles,
+                                                  @AuthenticationPrincipal User user,
+                                                  @PathVariable Long taskId) {
         try {
             ApiResponse ar = ApiResponse.builder()
-                    .result(taskService.changeTask(request, Long.parseLong(user.getUsername()), taskId))
+                    .result(taskService.changeTask(request, multipartFiles, Long.parseLong(user.getUsername()), taskId))
                     .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                     .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                     .build();

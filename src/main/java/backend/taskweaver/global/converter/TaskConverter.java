@@ -1,5 +1,6 @@
 package backend.taskweaver.global.converter;
 
+import backend.taskweaver.domain.files.entity.Files;
 import backend.taskweaver.domain.project.entity.Project;
 import backend.taskweaver.domain.task.dto.TaskRequest;
 import backend.taskweaver.domain.task.dto.TaskResponse;
@@ -21,9 +22,9 @@ public class TaskConverter {
                 .content(request.getContent())
                 .startDate(formatter.parse(request.getStartDate()))
                 .endDate(formatter.parse(request.getEndDate()))
-                .color(request.getColor())
                 .project(project)
                 .taskState(taskStateName)
+                .emojiId(request.getEmojiId())
                 .build();
     }
 
@@ -35,19 +36,23 @@ public class TaskConverter {
                 .content(request.getContent())
                 .startDate(formatter.parse(request.getStartDate()))
                 .endDate(formatter.parse(request.getEndDate()))
-                .color(request.getColor())
                 .parentTask(parent)
                 .project(project)
                 .taskState(taskStateName)
+                .emojiId(request.getEmojiId())
                 .build();
     }
 
 
 
-    public static TaskResponse.taskCreateOrUpdateResult toCreateResponse(Task task, List<TaskMember> taskMembers) {
+    public static TaskResponse.taskCreateOrUpdateResult toCreateResponse(Task task, List<TaskMember> taskMembers, List<Files> files) {
         List<TaskResponse.taskMemberResult> taskMemberResults = new ArrayList<>();
+        List<TaskResponse.fileResult> fileResults = new ArrayList<>();
         for (TaskMember taskMember : taskMembers) {
             taskMemberResults.add(new TaskResponse.taskMemberResult(taskMember.getMember().getId(), taskMember.getMember().getImageUrl(), taskMember.getMember().getNickname()));
+        }
+        for (Files file : files) {
+            fileResults.add(new TaskResponse.fileResult(file.getId(), file.getOriginalName(), file.getImageUrl(), file.getTask().getId()));
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (task.getParentTask() == null) {
@@ -58,7 +63,9 @@ public class TaskConverter {
                     .startDate(formatter.format(task.getStartDate()))
                     .endDate(formatter.format(task.getStartDate()))
                     .taskMember(taskMemberResults)
+                    .files(fileResults)
                     .taskState(task.getTaskState().getValue())
+                    .emojiId(task.getEmojiId())
                     .build();
         } else {
             return TaskResponse.taskCreateOrUpdateResult.builder()
@@ -68,8 +75,10 @@ public class TaskConverter {
                     .startDate(formatter.format(task.getStartDate()))
                     .endDate(formatter.format(task.getStartDate()))
                     .taskMember(taskMemberResults)
+                    .files(fileResults)
                     .taskState(task.getTaskState().getValue())
                     .parentTaskId(task.getParentTask().getId())
+                    .emojiId(task.getEmojiId())
                     .build();
         }
 

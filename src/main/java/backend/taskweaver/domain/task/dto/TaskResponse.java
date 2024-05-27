@@ -20,8 +20,10 @@ public class TaskResponse {
         private String startDate;
         private String endDate;
         private List<taskMemberResult> taskMember;
+        private List<fileResult> files;
         private Integer taskState;
         private Long parentTaskId;
+        private Long emojiId;
     }
     @Builder
     @Getter
@@ -45,6 +47,17 @@ public class TaskResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class fileResult {
+        private Long id;
+        private String originalName;
+        private String imageUrl;
+        private Long taskId;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class taskChangeStateResult {
         private Long id;
         private Integer taskState;
@@ -59,6 +72,6 @@ public class TaskResponse {
         private String title;
         private String content;
         private String endDate;
-        private String color;
+        private Long emojiId;
     }
 }
