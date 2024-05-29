@@ -2,7 +2,6 @@ package backend.taskweaver.domain.notification.dto;
 
 import backend.taskweaver.domain.notification.entity.enums.NotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,5 +25,17 @@ public class NotificationResponse {
 
         @Schema(description = "알림 타입", example = "Team")
         NotificationType type;
+
+        @Schema(description = "관련된 팀, 프로젝트, 태스크 id", example = "1")
+        Long relatedTypeId;
+
+        @Schema(description = "조회 여부", example = "YES")
+        private String isRead; // is_read 필드 추가
+
+        // 추가된 필드들
+        @Schema(description = "로그인한 멤버 id", example = "1")
+        private Long memberId;
     }
+
+    
 }

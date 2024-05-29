@@ -41,9 +41,6 @@ public class Member {
 
     private String imageUrl;
 
-    @Column(nullable = false, name="noti_read")
-    @Enumerated(EnumType.STRING)
-    private NotiRead notiRead;
 
     public void updatePassword(String password) {
         this.password = password;

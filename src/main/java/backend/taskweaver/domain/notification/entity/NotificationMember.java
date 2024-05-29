@@ -33,6 +33,6 @@ public class NotificationMember extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "noti_id")
-    private Notification noti_id;
+    private Notification notification;
 }
 
