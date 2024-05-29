@@ -41,6 +41,10 @@ public class Member {
 
     private String imageUrl;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private isRead isRead;
+
 
     public void updatePassword(String password) {
         this.password = password;

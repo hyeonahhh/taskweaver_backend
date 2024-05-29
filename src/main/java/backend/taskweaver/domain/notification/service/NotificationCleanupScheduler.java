@@ -21,9 +21,9 @@ public class NotificationCleanupScheduler {
         this.notificationService = notificationService;
     }
 
-    @Scheduled(cron = "0 59 20 * * ?") // 매일 자정에 실행 (예시)
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행 (예시)
     public void scheduleOldNotificationCleanup() {
-        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(1);
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(14);
         notificationService.deleteOldNotifications(cutoffDate);
     }
 }
