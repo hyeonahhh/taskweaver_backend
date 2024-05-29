@@ -11,7 +11,9 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -40,4 +42,8 @@ public class Notification extends BaseEntity {
 
     @Column(name = "related_type_id")
     private Long relatedTypeId; // 팀, 프로젝트, 태스크에 상관없이 저장
+
+    @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationMember> notificationMembers = new ArrayList<>();
+
 }
