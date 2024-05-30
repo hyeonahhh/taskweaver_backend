@@ -14,8 +14,8 @@ public record SignInResponse(
         @Schema(description = "닉네임", example = "conan")
         String nickname,
 
-        @Schema(description = "알림 읽음 여부", example = "YES")
-        backend.taskweaver.domain.notification.entity.enums.isRead isRead,
+//        @Schema(description = "알림 읽음 여부", example = "YES")
+//        backend.taskweaver.domain.notification.entity.enums.isRead isRead,
 
         @Schema(description = "프로필 사진 url", example = "aaa.com")
         String imageUrl,

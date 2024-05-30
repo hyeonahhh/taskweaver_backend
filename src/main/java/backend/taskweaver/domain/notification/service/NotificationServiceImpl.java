@@ -30,10 +30,10 @@ public class NotificationServiceImpl implements NotificationService{
         List<NotificationMember> notificationMembers = notificationMemberRepository.findByMemberId(memberId);
 
         // Member의 isRead 값을 'YES'로 업데이트
-        memberRepository.findById(memberId).ifPresent(member -> {
-            member.setIsRead(isRead.YES); // setIsRead 메소드를 Member 엔티티에 추가해야 함
-            memberRepository.save(member);
-        });
+//        memberRepository.findById(memberId).ifPresent(member -> {
+//            member.setIsRead(isRead.YES); // setIsRead 메소드를 Member 엔티티에 추가해야 함
+//            memberRepository.save(member);
+//        });
 
         // 조회된 알림을 NotificationResponse.AllNotificationInfo 객체로 변환
         return notificationMembers.stream()

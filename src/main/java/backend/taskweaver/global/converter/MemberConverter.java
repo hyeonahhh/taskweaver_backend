@@ -16,7 +16,7 @@ public class MemberConverter {
                 .nickname(signUpRequest.nickname())
                 .loginType(LoginType.DEFAULT)
                 .imageUrl(signUpRequest.imageUrl())
-                .isRead(isRead.YES)
+//                .isRead(isRead.YES)
                 .build();
     }
 
@@ -34,7 +34,7 @@ public class MemberConverter {
                 member.getEmail(),
                 member.getLoginType(),
                 member.getNickname(),
-                member.getIsRead(),
+//                member.getIsRead(),
                 member.getImageUrl(),
                 accessToken,
                 refreshToken
