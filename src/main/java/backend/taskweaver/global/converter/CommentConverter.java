@@ -6,6 +6,8 @@ import backend.taskweaver.domain.task.dto.CommentResponse;
 import backend.taskweaver.domain.task.entity.Comment;
 import backend.taskweaver.domain.task.entity.Task;
 
+import java.util.ArrayList;
+
 public class CommentConverter {
 
     public static Comment toComment(CommentRequest request, Member member, Task task) {
@@ -27,20 +29,18 @@ public class CommentConverter {
                 .childBuild();
     }
 
-    public static CommentResponse toCommentResponse(Comment comment, Member member) {
-        CommentResponse.Member memberResponse = new CommentResponse.Member(
-                member.getId(),
-                member.getNickname(),
-                member.getImageUrl());
 
+    public static CommentResponse toCommentResponse(Comment comment) {
         Long parentCommentId = comment.getParentComment() != null ? comment.getParentComment().getId() : null;
-        CommentResponse.Comment commentResponse = new CommentResponse.Comment(
+        return new CommentResponse(
                 comment.getId(),
+                parentCommentId,
                 comment.getContent(),
                 comment.getCreatedAt().toString(),
-                comment.getDepth(),
-                parentCommentId);
-
-        return new CommentResponse(commentResponse, memberResponse);
+                comment.getMember().getId(),
+                comment.getMember().getNickname(),
+                comment.getMember().getImageUrl(),
+                new ArrayList<>()
+        );
     }
 }
