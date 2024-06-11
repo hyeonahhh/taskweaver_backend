@@ -15,6 +15,7 @@ public class CommentResponse {
     Long parentCommentId;
     String content;
     String createdAt;
+    String deletedAt;
     Long memberId;
     String nickname;
     String imageUrl;

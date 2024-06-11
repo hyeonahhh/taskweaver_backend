@@ -91,9 +91,26 @@ public class CommentServiceImpl implements CommentService {
             // 최상위 댓글이면
             } else {
                 commentResponseList.add(commentResponse);
-                List<Comment> childrenComment = comment.getChildrenComment();
             }
         });
         return commentResponseList;
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.COMMENT_NOT_FOUND));
+        int depth = comment.getDepth();
+        List<Comment> childrenComment = comment.getChildrenComment();
+
+        // 대댓글이거나, 최상위 댓글이면서 대댓글이 없을 때
+        if(depth == 1 || (depth == 0 && childrenComment.isEmpty())) {
+            commentRepository.delete(comment);
+
+        // 최상위 댓글이면서 대댓글이 있을 때
+        } else {
+            comment.deleteSoftly();
+        }
     }
 }

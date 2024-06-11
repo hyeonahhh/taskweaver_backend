@@ -29,14 +29,15 @@ public class CommentConverter {
                 .childBuild();
     }
 
-
     public static CommentResponse toCommentResponse(Comment comment) {
         Long parentCommentId = comment.getParentComment() != null ? comment.getParentComment().getId() : null;
+        String deletedAt = comment.getDeletedAt() != null ? comment.getDeletedAt().toString() : null;
         return new CommentResponse(
                 comment.getId(),
                 parentCommentId,
                 comment.getContent(),
                 comment.getCreatedAt().toString(),
+                deletedAt,
                 comment.getMember().getId(),
                 comment.getMember().getNickname(),
                 comment.getMember().getImageUrl(),
