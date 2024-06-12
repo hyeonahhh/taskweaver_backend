@@ -105,10 +105,10 @@ public class CommentServiceImpl implements CommentService {
         // 대댓글이거나, 최상위 댓글이면서 대댓글이 없을 때
         if(depth == 1 || (depth == 0 && childrenComment.isEmpty())) {
             commentRepository.delete(comment);
-
+        }
         // 최상위 댓글이면서 대댓글이 있을 때
-        } else {
-            comment.deleteSoftly();
+        if(depth == 0 && !childrenComment.isEmpty()) {
+                comment.deleteSoftly();
         }
     }
 }
