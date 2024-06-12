@@ -46,17 +46,15 @@ public class CommentServiceImpl implements CommentService {
         }
 
         // 대댓글일 때
-        else {
-            Comment parentComment = commentRepository.findById(request.getParentCommentId())
-                    .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.COMMENT_NOT_FOUND));
-            if (parentComment.getDepth() >= 1) {
-                throw new BusinessExceptionHandler(ErrorCode.COMMENT_DEPTH_EXCEED);
-            }
-            Comment comment = commentRepository.save(CommentConverter.toComment(request, member, task, parentComment));
-            parentComment.addChildrenComment(comment);
-            return CommentConverter.toCommentResponse(comment);
+        Comment parentComment = commentRepository.findById(request.getParentCommentId())
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.COMMENT_NOT_FOUND));
+        if (parentComment.getDepth() >= 1) {
+            throw new BusinessExceptionHandler(ErrorCode.COMMENT_DEPTH_EXCEED);
         }
-    }
+        Comment comment = commentRepository.save(CommentConverter.toComment(request, member, task, parentComment));
+        parentComment.addChildrenComment(comment);
+        return CommentConverter.toCommentResponse(comment);
+}
 
     @Transactional
     @Override
