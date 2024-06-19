@@ -55,6 +55,25 @@ public class TeamController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+
+    // 팀 수정
+    @Operation(summary = "팀 수정")
+    @PutMapping("/team/{teamId}")
+    public ResponseEntity<ApiResponse> updateTeam(@PathVariable(name = "teamId") Long teamId, @RequestBody TeamRequest.teamCreateRequest request, @AuthenticationPrincipal User user) {
+        try {
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .result(teamService.updateTeam(teamId, request))
+                    .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     // 팀 멤버만 조회
 //    @Operation(summary = "팀 조회")
 //    @GetMapping("/team/{teamId}/member")

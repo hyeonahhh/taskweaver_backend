@@ -20,4 +20,6 @@ public interface TeamService {
     public void deleteTeamMembers(Long teamId, List<Long> memberIds, Long user);
 
     public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user);
+
+    public TeamResponse.teamCreateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request);
 }

@@ -23,6 +23,13 @@ public class TeamConverter {
                 .build();
     }
 
+    public static Team updateTeam(TeamRequest.teamUpdateRequest request) {
+        return Team.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .build();
+    }
+
     public static TeamResponse.teamCreateResult toCreateResponse(Team team) {
         return new TeamResponse.teamCreateResult(
             team.getId(),
