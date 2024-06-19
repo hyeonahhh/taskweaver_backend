@@ -21,5 +21,5 @@ public interface TeamService {
 
     public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user);
 
-    public TeamResponse.teamCreateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request, Long userId);
+    public TeamResponse.teamUpdateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request, Long userId);
 }

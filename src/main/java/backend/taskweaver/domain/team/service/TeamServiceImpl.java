@@ -83,7 +83,7 @@ public class TeamServiceImpl implements TeamService{
 
     // 팀 수정
     @Transactional
-    public TeamResponse.teamCreateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request, Long userId) {
+    public TeamResponse.teamUpdateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request, Long userId) {
         // 팀 조회
         Team existingTeam = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
@@ -100,7 +100,7 @@ public class TeamServiceImpl implements TeamService{
 
         teamRepository.save(existingTeam);
 
-        return TeamConverter.toCreateResponse(existingTeam);
+        return TeamConverter.toUpdateResponse(existingTeam);
     }
 
     private String generateInviteLink() {

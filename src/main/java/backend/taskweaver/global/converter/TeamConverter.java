@@ -41,6 +41,17 @@ public class TeamConverter {
         );
     }
 
+    public static TeamResponse.teamUpdateResult toUpdateResponse(Team team) {
+        return new TeamResponse.teamUpdateResult(
+                team.getId(),
+                team.getName(),
+                team.getDescription(),
+                team.getInviteLink(),
+                team.getTeamLeader(),
+                team.getModifiedAt()
+        );
+    }
+
     public static TeamInviteResponse.InviteAnswerResult toInviteResponse(TeamMember teamMember) {
         return new TeamInviteResponse.InviteAnswerResult(
                 teamMember.getId(),
