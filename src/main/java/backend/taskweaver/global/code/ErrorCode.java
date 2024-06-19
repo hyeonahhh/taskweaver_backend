@@ -100,6 +100,7 @@ public enum ErrorCode {
     CANNOT_INVITE_TEAM_LEADER(404, "T007", "Team leaders are not eligible for invitations."),
     INVALID_INVITE_RESPONSE(404, "T008", "InviteState values must be 1 or 2."),
     DUPLICATE_TEAM_MEMBER(404, "T009", "This is a team member that already exists."),
+    TEAM_MEMBER_CANNOT_UPDATE(404, "T010", "Only the leader can edit team information."),
     //TASK
     TASK_NOT_FOUND(404, "TS001", "Task Not Found"),
     TASK_STATE_NOT_FOUND(404, "TS002", "Task State Not Found"),

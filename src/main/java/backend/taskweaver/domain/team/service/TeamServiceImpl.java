@@ -81,27 +81,29 @@ public class TeamServiceImpl implements TeamService{
         return TeamConverter.toGetTeamResponse(team, myRole, teamMembers);
     }
 
-
     // 팀 수정
     @Transactional
-    public TeamResponse.teamCreateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request) {
+    public TeamResponse.teamCreateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request, Long userId) {
         // 팀 조회
         Team existingTeam = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
-        // 팀 정보 수정
+        // 로그인한 유저가 팀의 소유자인지 확인
+        if (!existingTeam.getTeamLeader().equals(userId)) {
+            throw new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_CANNOT_UPDATE);
+        }
+
+
         existingTeam.setName(request.getName());
         existingTeam.setDescription(request.getDescription());
-        existingTeam.setInviteLink(generateInviteLink());  // 초대 링크 새로 생성
 
-        // 수정된 팀 저장
+
         teamRepository.save(existingTeam);
 
         return TeamConverter.toCreateResponse(existingTeam);
     }
 
     private String generateInviteLink() {
-        // 초대 링크 생성 로직 (예: UUID 사용)
         return "https://example.com/invite/" + UUID.randomUUID().toString();
     }
 

@@ -62,7 +62,7 @@ public class TeamController {
     public ResponseEntity<ApiResponse> updateTeam(@PathVariable(name = "teamId") Long teamId, @RequestBody TeamRequest.teamCreateRequest request, @AuthenticationPrincipal User user) {
         try {
             ApiResponse apiResponse = ApiResponse.builder()
-                    .result(teamService.updateTeam(teamId, request))
+                    .result(teamService.updateTeam(teamId, request, Long.parseLong(user.getUsername())))
                     .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                     .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                     .build();
