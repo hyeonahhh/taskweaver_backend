@@ -23,6 +23,13 @@ public class TeamConverter {
                 .build();
     }
 
+    public static Team updateTeam(TeamRequest.teamUpdateRequest request) {
+        return Team.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .build();
+    }
+
     public static TeamResponse.teamCreateResult toCreateResponse(Team team) {
         return new TeamResponse.teamCreateResult(
             team.getId(),
@@ -31,6 +38,17 @@ public class TeamConverter {
             team.getInviteLink(),
             team.getTeamLeader(),
             team.getCreatedAt()
+        );
+    }
+
+    public static TeamResponse.teamUpdateResult toUpdateResponse(Team team) {
+        return new TeamResponse.teamUpdateResult(
+                team.getId(),
+                team.getName(),
+                team.getDescription(),
+                team.getInviteLink(),
+                team.getTeamLeader(),
+                team.getModifiedAt()
         );
     }
 
