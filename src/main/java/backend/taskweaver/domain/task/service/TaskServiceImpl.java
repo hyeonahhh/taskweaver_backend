@@ -1,5 +1,8 @@
 package backend.taskweaver.domain.task.service;
 
+import backend.taskweaver.domain.files.entity.Files;
+import backend.taskweaver.domain.files.repository.FilesRepository;
+import backend.taskweaver.domain.files.service.S3Service;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
@@ -13,9 +16,13 @@ import backend.taskweaver.domain.task.repository.TaskRepository;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.TaskConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,13 +36,22 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
     private final TaskMemberRepository taskMemberRepository;
+    private final S3Service s3Service;
+    private final FilesRepository filesRepository;
+    private final EntityManager em;
 
-    public TaskResponse.taskCreateOrUpdateResult createTask(TaskRequest.taskCreate request, Long user, Long projectId) throws ParseException {
+    public TaskResponse.taskCreateOrUpdateResult createTask(TaskRequest.taskCreate request, List<MultipartFile> multipartFiles, Long user, Long projectId) throws ParseException, IOException {
         Task task;
+        List<Files> filesList = new ArrayList<>();
         if (request.getParentTaskId() == null) {
             task = taskRepository.save(TaskConverter.toTask(request, projectRepository.findById(projectId).get(), TaskStateName.BEFORE));
         } else {
             task = taskRepository.save(TaskConverter.toTask(request, projectRepository.findById(projectId).get(), taskRepository.findById(request.getParentTaskId()).get(), TaskStateName.BEFORE));
+        }
+        for (MultipartFile file : multipartFiles) {
+            Files newFile = s3Service.saveFile(file);
+            newFile.setTask(task);
+            filesList.add(filesRepository.save(newFile));
         }
 
         List<TaskMember> taskMembers = new ArrayList<>();
@@ -44,7 +60,7 @@ public class TaskServiceImpl implements TaskService {
             taskMembers.add(taskMemberRepository.save(new TaskMember(task, member)));
         }
 
-        return TaskConverter.toCreateResponse(task, taskMembers);
+        return TaskConverter.toCreateResponse(task, taskMembers, filesList);
     }
 
 
@@ -72,8 +88,10 @@ public class TaskServiceImpl implements TaskService {
         return new TaskResponse.taskChangeStateResult(task.getId(), task.getTaskState().getValue());
     }
 
-    public TaskResponse.taskCreateOrUpdateResult changeTask(TaskRequest.taskChange request, Long user, Long taskId) {
+    @Transactional
+    public TaskResponse.taskCreateOrUpdateResult changeTask(TaskRequest.taskChange request, List<MultipartFile> multipartFiles, Long user, Long taskId) throws IOException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        List<Files> filesList = new ArrayList<>();
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TASK_NOT_FOUND));
         Member member = memberRepository.findById(user)
@@ -88,19 +106,33 @@ public class TaskServiceImpl implements TaskService {
             task.setContent(request.getTaskContent());
         }
         if (request.getEndDate() != null && !request.getEndDate().equals("")) {
-            task.setTitle(request.getTaskTitle());
+            task.setTitle(request.getEndDate());
         }
-        if (request.getColor() != null && !request.getColor().equals("")) {
-            task.setColor(request.getColor());
+        if (request.getEmojiId() != null && !request.getEndDate().equals("")) {
+            task.setEmojiId(request.getEmojiId());
         }
         if (request.getMembers() != null && !request.getMembers().isEmpty()) {
             taskMemberRepository.deleteAllByTask(task);
-
             for (Long id : request.getMembers()) {
                 Member m = memberRepository.findById(id).get();
                 taskMembers.add(taskMemberRepository.save(new TaskMember(task, m)));
             }
         }
-        return TaskConverter.toCreateResponse(task, taskMembers);
+        if (request.getDeleteFiles() != null && !request.getDeleteFiles().isEmpty()) {
+            System.out.println(request.getDeleteFiles());
+            for (Long id : request.getDeleteFiles()) {
+                System.out.println(id + "삭제하고 싶은 파일 ID");
+                filesRepository.deleteFilesById(id);
+            }
+            em.flush();
+        }
+        for (MultipartFile file : multipartFiles) {
+            Files newFile = s3Service.saveFile(file);
+            newFile.setTask(task);
+            filesRepository.save(newFile);
+            //filesList.add(filesRepository.save(newFile));
+        }
+        filesList.addAll(filesRepository.findAllByTask(task));
+        return TaskConverter.toCreateResponse(task, taskMembers, filesList);
     }
 }

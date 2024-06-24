@@ -26,6 +26,19 @@ public class TeamResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class teamUpdateResult {
+        Long id;
+        String name;
+        String description;
+        String inviteLink;
+        Long teamLeader;
+        LocalDateTime updateAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class findTeamResult {
         @Schema(description = "팀 id", example = "1")
         Long id;

@@ -1,6 +1,8 @@
 package backend.taskweaver.domain.member.entity;
 
 import backend.taskweaver.domain.member.entity.enums.LoginType;
+import backend.taskweaver.domain.member.entity.enums.NotiRead;
+import backend.taskweaver.domain.notification.entity.enums.isRead;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
@@ -39,7 +42,14 @@ public class Member {
 
     private String imageUrl;
 
+//    @Column(nullable = false)
+//    @Enumerated(EnumType.STRING)
+//    private isRead isRead;
+
+
     public void updatePassword(String password) {
         this.password = password;
     }
+
+
 }

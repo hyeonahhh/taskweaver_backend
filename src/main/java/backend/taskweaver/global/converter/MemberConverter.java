@@ -3,6 +3,7 @@ package backend.taskweaver.global.converter;
 import backend.taskweaver.domain.member.dto.*;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.entity.enums.LoginType;
+import backend.taskweaver.domain.notification.entity.enums.isRead;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class MemberConverter {
@@ -14,6 +15,7 @@ public class MemberConverter {
                 .nickname(signUpRequest.nickname())
                 .loginType(LoginType.DEFAULT)
                 .imageUrl(signUpRequest.imageUrl())
+//                .isRead(isRead.YES)
                 .build();
     }
 
@@ -31,6 +33,7 @@ public class MemberConverter {
                 member.getEmail(),
                 member.getLoginType(),
                 member.getNickname(),
+//                member.getIsRead(),
                 member.getImageUrl(),
                 accessToken,
                 refreshToken
