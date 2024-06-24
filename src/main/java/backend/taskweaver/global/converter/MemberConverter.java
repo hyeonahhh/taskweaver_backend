@@ -1,7 +1,6 @@
 package backend.taskweaver.global.converter;
 
 import backend.taskweaver.domain.member.dto.*;
-import backend.taskweaver.domain.member.entity.DeviceToken;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.entity.enums.LoginType;
 import backend.taskweaver.domain.notification.entity.enums.isRead;
@@ -53,12 +52,5 @@ public class MemberConverter {
 
     public static CreateAccessTokenResponse toCreateAccessTokenResponse(String newAccessToken) {
         return new CreateAccessTokenResponse(newAccessToken);
-    }
-
-    public static DeviceToken toDeviceToken(DeviceTokenRequest request, Member member) {
-        return DeviceToken.builder()
-                .deviceToken(request.deviceToken())
-                .member(member)
-                .build();
     }
 }

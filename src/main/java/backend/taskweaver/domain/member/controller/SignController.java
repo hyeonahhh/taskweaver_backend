@@ -10,10 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "회원 가입 및 로그인")
 @RequiredArgsConstructor
@@ -40,6 +39,17 @@ public class SignController {
                 .result(signService.signIn(request))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
+
+    @Operation(summary = "로그아웃")
+    @DeleteMapping("/v1/auth/logout")
+    public ResponseEntity<ApiResponse> logout(@AuthenticationPrincipal User user) {
+        signService.logout(Long.parseLong(user.getUsername()));
+        ApiResponse ar = ApiResponse.builder()
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
