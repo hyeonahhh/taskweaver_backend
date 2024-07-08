@@ -59,7 +59,8 @@
 
 # 📄 API 명세서 
 
-	Swagger: http://ec2-3-34-95-39.ap-northeast-2.compute.amazonaws.com:8083/swagger-ui/index.html#/
+***Swagger*** :  http://ec2-3-34-95-39.ap-northeast-2.compute.amazonaws.com:8083/swagger-ui/index.html#/
+
 ![KakaoTalk_20240701_161946579](https://github.com/TaskWeaver/backend/assets/111855256/f4c8ccb2-9a56-4331-ac90-99fa96b06e01)
 
 <br>
