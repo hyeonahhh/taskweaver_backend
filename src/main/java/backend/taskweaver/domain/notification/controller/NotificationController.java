@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@EnableJpaAuditing
 public class NotificationController {
 
     private final NotificationService notificationService;

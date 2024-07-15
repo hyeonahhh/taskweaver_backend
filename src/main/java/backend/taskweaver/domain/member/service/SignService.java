@@ -11,7 +11,6 @@ import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.MemberConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
-import backend.taskweaver.global.redis.RedisService;
 import backend.taskweaver.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,7 +25,7 @@ public class SignService {
     private final MemberRefreshTokenRepository memberRefreshTokenRepository;
     private final PasswordEncoder encoder;
     private final TokenProvider tokenProvider;
-    private final RedisService redisService;
+//    private final RedisService redisService;
 
 
     @Transactional
@@ -53,13 +52,13 @@ public class SignService {
                         it -> it.updateRefreshToken(refreshToken),
                         () -> memberRefreshTokenRepository.save(new MemberRefreshToken(member, refreshToken))
                 );
-        redisService.setValues(request.email(), request.deviceToken());
+       // redisService.setValues(request.email(), request.deviceToken());
         return MemberConverter.toSignInResponse(member, accessToken, refreshToken);
     }
 
     public void logout(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
-        redisService.deleteValues(member.getEmail());
+       // redisService.deleteValues(member.getEmail());
     }
 }

@@ -46,7 +46,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<Member> members = createProjectMember(project, request);
 
         // 푸시 알림 보내기
-        applicationEventPublisher.publishEvent(new ProjectNotificationEvent(project, members));
+        // applicationEventPublisher.publishEvent(new ProjectNotificationEvent(project, members));
 
         return ProjectConverter.toProjectResponse(project, request.memberIdList());
     }

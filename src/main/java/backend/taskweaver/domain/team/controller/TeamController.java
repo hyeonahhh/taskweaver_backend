@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@EnableJpaAuditing
 public class TeamController {
 
     private final TeamService teamService;

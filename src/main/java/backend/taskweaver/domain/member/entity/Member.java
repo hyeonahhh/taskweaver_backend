@@ -34,8 +34,6 @@ public class Member {
     @Column(nullable = false, length = 20)
     private String nickname;
 
-    private LocalDateTime deleteAt;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
