@@ -19,7 +19,6 @@ public class TaskweaverApplication {
 		SpringApplication.run(TaskweaverApplication.class, args);
 	}
 
-	@GetMapping(value = "/")
 	public String helloWorld() {
 		return "CI/CD";
 	}
