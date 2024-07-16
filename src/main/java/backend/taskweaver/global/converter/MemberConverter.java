@@ -24,6 +24,7 @@ public class MemberConverter {
                 member.getId(),
                 member.getEmail(),
                 member.getNickname()
+                // 이미지 추가하기
         );
     }
 
