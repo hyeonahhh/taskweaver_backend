@@ -19,6 +19,14 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
+    public final backend.taskweaver.domain.QBaseEntity _super = new backend.taskweaver.domain.QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = _super.deletedAt;
+
     public final StringPath email = createString("email");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -27,9 +35,15 @@ public class QMember extends EntityPathBase<Member> {
 
     public final EnumPath<backend.taskweaver.domain.member.entity.enums.LoginType> loginType = createEnum("loginType", backend.taskweaver.domain.member.entity.enums.LoginType.class);
 
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
+
     public final StringPath nickname = createString("nickname");
 
     public final StringPath password = createString("password");
+
+    //inherited
+    public final BooleanPath softDeleted = _super.softDeleted;
 
     public QMember(String variable) {
         super(Member.class, forVariable(variable));

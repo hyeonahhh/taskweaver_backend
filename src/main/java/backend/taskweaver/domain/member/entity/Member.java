@@ -1,14 +1,11 @@
 package backend.taskweaver.domain.member.entity;
 
+import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.enums.LoginType;
-import backend.taskweaver.domain.member.entity.enums.NotiRead;
-import backend.taskweaver.domain.notification.entity.enums.isRead;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,7 +15,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -44,10 +41,7 @@ public class Member {
 //    @Enumerated(EnumType.STRING)
 //    private isRead isRead;
 
-
     public void updatePassword(String password) {
         this.password = password;
     }
-
-
 }
