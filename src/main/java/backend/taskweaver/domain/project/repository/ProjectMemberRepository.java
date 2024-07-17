@@ -12,4 +12,5 @@ import java.util.List;
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
     List<ProjectMember> findByProject(Project project);
     void deleteAllByProject(Project project);
+    void deleteByMemberId(Long memberId);
 }

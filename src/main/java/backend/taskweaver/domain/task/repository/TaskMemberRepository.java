@@ -19,4 +19,6 @@ public interface TaskMemberRepository extends JpaRepository<TaskMember, Long> {
     Optional<TaskMember> findByMemberAndTask(Member member, Task task);
 
     int deleteAllByTask(Task task);
+
+    void deleteByMemberId(Long memberId);
 }
