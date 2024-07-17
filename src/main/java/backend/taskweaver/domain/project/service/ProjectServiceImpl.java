@@ -48,25 +48,25 @@ public class ProjectServiceImpl implements ProjectService {
         // 푸시 알림 보내기
         // applicationEventPublisher.publishEvent(new ProjectNotificationEvent(project, members));
 
-        return ProjectConverter.toProjectResponse(project, request.memberIdList());
+        return ProjectConverter.toProjectResponse(project, request.getMemberIdList());
     }
 
     private List<Member> createProjectMember(Project project, ProjectRequest request) {
         // 담당자 id가 member id list에 있는지 확인
-        if (!request.memberIdList().contains(request.managerId())) {
+        if (!request.getMemberIdList().contains(request.getManagerId())) {
             throw new BusinessExceptionHandler(ErrorCode.MANAGER_ID_NOT_IN_MEMBER_ID_LIST);
         }
 
         List<ProjectMember> projectMembers = new ArrayList<>();
         List<Member> members = new ArrayList<>();
-        request.memberIdList().forEach(memberId -> {
+        request.getMemberIdList().forEach(memberId -> {
             // 해당 회원이 존재하는지 확인
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
             members.add(member);
 
             // 프로젝트 담당자면 담당자 설정
-            if (memberId.equals(request.managerId())) {
+            if (memberId.equals(request.getManagerId())) {
                 project.setManager(memberId, member.getNickname());
             }
 
@@ -152,7 +152,7 @@ public class ProjectServiceImpl implements ProjectService {
         checkIfIsManager(project.getManagerId(), memberId);
 
         ProjectStateName foundState = Arrays.stream(ProjectStateName.values())
-                .filter(stateName -> stateName.toString().equals(request.projectState()))
+                .filter(stateName -> stateName.toString().equals(request.getProjectState()))
                 .findFirst()
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.PROJECT_STATE_NOT_FOUND));
 

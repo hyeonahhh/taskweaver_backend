@@ -56,9 +56,9 @@ public class Project extends BaseEntity {
     }
 
     public void updateProject(ProjectRequest request) {
-        this.description = request.description();
-        this.name = request.name();
-        this.managerId = request.managerId();
+        this.description = request.getDescription();
+        this.name = request.getName();
+        this.managerId = request.getManagerId();
     }
 
     public void updateProjectState(ProjectStateName projectStateName) {
