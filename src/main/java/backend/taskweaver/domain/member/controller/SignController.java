@@ -8,6 +8,7 @@ import backend.taskweaver.global.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,14 +27,12 @@ public class SignController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/v1/auth/sign-up")
-    public ResponseEntity<ApiResponse> signUp(@RequestBody SignUpRequest request, HttpServletRequest httpServletRequest) {
-
+    public ResponseEntity<ApiResponse> signUp(@RequestBody @Valid SignUpRequest request) {
         ApiResponse ar = ApiResponse.builder()
                 .result(signService.registerMember(request))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
-        System.out.println(httpServletRequest.getMethod());
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
 
