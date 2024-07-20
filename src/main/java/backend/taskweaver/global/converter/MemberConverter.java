@@ -27,7 +27,8 @@ public class MemberConverter {
         return new SignUpResponse(
                 member.getId(),
                 member.getEmail(),
-                member.getNickname()
+                member.getNickname(),
+                member.getImageUrl()
         );
     }
 
