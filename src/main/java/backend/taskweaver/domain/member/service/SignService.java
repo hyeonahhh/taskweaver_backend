@@ -1,5 +1,6 @@
 package backend.taskweaver.domain.member.service;
 
+import backend.taskweaver.domain.files.service.S3Service;
 import backend.taskweaver.domain.member.dto.SignInRequest;
 import backend.taskweaver.domain.member.dto.SignInResponse;
 import backend.taskweaver.domain.member.dto.SignUpRequest;
@@ -12,11 +13,17 @@ import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.MemberConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import backend.taskweaver.global.security.TokenProvider;
+import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
+import okio.FileMetadata;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
+
 
 @RequiredArgsConstructor
 @Service
@@ -26,17 +33,31 @@ public class SignService {
     private final PasswordEncoder encoder;
     private final TokenProvider tokenProvider;
 //    private final RedisService redisService;
+        private final S3Service s3Service;
 
-
+    // 회원가입
     @Transactional
-    public SignUpResponse registerMember(SignUpRequest request) {
+    public SignUpResponse registerMember(SignUpRequest request, MultipartFile profileImage) {
         try {
-            Member member = memberRepository.saveAndFlush(MemberConverter.toMember(request, encoder));
+            // S3에 이미지 파일 업로드하고 URL을 직접 가져옴
+            String imageUrl = s3Service.saveProfileImage(profileImage); // S3에 저장하고 URL을 반환
+
+            // 회원 정보 저장
+            Member member = MemberConverter.toMember(request, encoder, imageUrl);
+            member = memberRepository.saveAndFlush(member);
+
             return MemberConverter.toSignUpResponse(member);
         } catch (DataIntegrityViolationException e) {
             throw new BusinessExceptionHandler(ErrorCode.DUPLICATED_EMAIL);
+        } catch (IOException e) {
+            throw new BusinessExceptionHandler(ErrorCode.FILE_UPLOAD_FAILED);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
         }
     }
+
+
+
 
     //@Transactional(readOnly = true)
     @Transactional

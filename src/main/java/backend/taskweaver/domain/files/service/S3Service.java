@@ -28,10 +28,28 @@ public class S3Service {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());
+        metadata.setContentDisposition("inline");
 
         amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
         return new Files(originalFilename, amazonS3.getUrl(bucket, originalFilename).toString());
     }
+
+    public String saveProfileImage(MultipartFile multipartFile) throws IOException {
+        String originalFilename = multipartFile.getOriginalFilename();
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+        metadata.setContentDisposition("inline");
+
+
+        amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
+
+        // URL 반환
+        return amazonS3.getUrl(bucket, originalFilename).toString();
+    }
+
+
 
     public ResponseEntity<UrlResource> downloadImage(String originalFilename) {
         UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, originalFilename));

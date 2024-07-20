@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Tag(name = "회원 가입 및 로그인")
 @RequiredArgsConstructor
@@ -23,9 +26,10 @@ public class SignController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/v1/auth/sign-up")
-    public ResponseEntity<ApiResponse> signUp(@RequestBody SignUpRequest request) {
+    public ResponseEntity<ApiResponse> signUp(@RequestPart("request") SignUpRequest reqeust,
+                                              @RequestPart("profileImage") MultipartFile profileImage) {
         ApiResponse ar = ApiResponse.builder()
-                .result(signService.registerMember(request))
+                .result(signService.registerMember(reqeust, profileImage))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
