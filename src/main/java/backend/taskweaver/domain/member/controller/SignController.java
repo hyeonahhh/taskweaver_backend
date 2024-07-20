@@ -38,7 +38,6 @@ public class SignController {
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
-        System.out.println(httpServletRequest.getMethod());
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
 
