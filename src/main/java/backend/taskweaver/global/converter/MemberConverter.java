@@ -29,6 +29,7 @@ public class MemberConverter {
                 member.getEmail(),
                 member.getNickname(),
                 member.getImageUrl()
+
         );
     }
 
