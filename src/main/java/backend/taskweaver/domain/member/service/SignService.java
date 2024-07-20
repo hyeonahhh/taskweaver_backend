@@ -42,9 +42,17 @@ public class SignService {
     // 회원가입
     @Transactional
     public SignUpResponse registerMember(SignUpRequest request, MultipartFile profileImage) {
+        String imageUrl;
+
         try {
-            // S3에 이미지 파일 업로드하고 URL을 직접 가져옴
-            String imageUrl = s3Service.saveProfileImage(profileImage); // S3에 저장하고 URL을 반환
+            // 이미지 파일이 비어 있는지 확인
+            if (profileImage == null || profileImage.isEmpty()) {
+                // 디폴트 이미지 URL을 가져오는 방법
+                imageUrl = s3Service.saveDefaultProfileImage(); // 디폴트 이미지를 저장하는 메소드 호출
+            } else {
+                // 업로드된 이미지 URL 가져오기
+                imageUrl = s3Service.saveProfileImage(profileImage);
+            }
 
             // 회원 정보 저장
             Member member = MemberConverter.toMember(request, encoder, imageUrl);
@@ -54,11 +62,12 @@ public class SignService {
         } catch (DataIntegrityViolationException e) {
             throw new BusinessExceptionHandler(ErrorCode.DUPLICATED_EMAIL);
         } catch (IOException e) {
-            throw new BusinessExceptionHandler(ErrorCode.FILE_UPLOAD_FAILED);
+            throw new BusinessExceptionHandler(ErrorCode.PROFILE_IMAGE_UPLOAD_FAILED);
         } catch (java.io.IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 
 
 

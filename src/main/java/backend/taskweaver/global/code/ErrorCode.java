@@ -111,7 +111,7 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(404, "M002", "Member Not Found"),
     PASSWORD_NOT_MATCH(403, "M003", "Password doesn't match"),
     SAME_PASSWORD(400, "M004", "New password cannot be the same as the current password"),
-    FILE_UPLOAD_FAILED(400, "M005", "File upload failed"),
+    PROFILE_IMAGE_UPLOAD_FAILED(400, "M005", "Profile Image upload failed"),
 
     // COMENT
     COMMENT_NOT_FOUND(404, "C001", "Comment Not Found"),
