@@ -7,28 +7,38 @@ import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Tag(name = "회원 가입 및 로그인")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping
+@Slf4j
 public class SignController {
     private final SignService signService;
 
     @Operation(summary = "회원 가입")
     @PostMapping("/v1/auth/sign-up")
-    public ResponseEntity<ApiResponse> signUp(@RequestBody SignUpRequest request) {
+
+    public ResponseEntity<ApiResponse> signUp(@RequestPart("request") SignUpRequest reqeust,
+                                              @RequestPart("profileImage") MultipartFile profileImage) {
+
         ApiResponse ar = ApiResponse.builder()
-                .result(signService.registerMember(request))
+                .result(signService.registerMember(reqeust, profileImage))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
+        System.out.println(httpServletRequest.getMethod());
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
 
