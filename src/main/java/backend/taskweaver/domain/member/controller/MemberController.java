@@ -19,6 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Tag(name = "회원 관련 컨트롤러")
 @RequiredArgsConstructor
@@ -40,8 +43,9 @@ public class MemberController {
 
     @Operation(summary = "개인정보 변경 api", description = "개인정보 수정 api 입니다.")
     @PatchMapping("")
-    public ResponseEntity<ApiResponse> updateMember(@AuthenticationPrincipal User user, @RequestBody UpdateMemberRequest request) {
-        memberService.updateMember(Long.parseLong(user.getUsername()), request);
+    public ResponseEntity<ApiResponse> updateMember(@AuthenticationPrincipal User user, @RequestPart("request") UpdateMemberRequest request,
+                                                    @RequestPart("profileImage") MultipartFile profileImage) throws IOException {
+        memberService.updateMember(Long.parseLong(user.getUsername()), request, profileImage);
         ApiResponse ar = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())

@@ -1,8 +1,8 @@
 package backend.taskweaver.domain.member.service;
 
+import backend.taskweaver.domain.files.service.S3Service;
 import backend.taskweaver.domain.member.dto.*;
 import backend.taskweaver.domain.member.entity.Member;
-import backend.taskweaver.domain.member.entity.MemberRefreshToken;
 import backend.taskweaver.domain.member.repository.MemberRefreshTokenRepository;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.global.code.ErrorCode;
@@ -10,11 +10,12 @@ import backend.taskweaver.global.converter.MemberConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import backend.taskweaver.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class MemberService {
     private final MemberRefreshTokenRepository memberRefreshTokenRepository;
     private final PasswordEncoder encoder;
     private final TokenProvider tokenProvider;
+    private final S3Service s3Service;
 
 
     @Transactional(readOnly = true)
@@ -36,11 +38,19 @@ public class MemberService {
 
     // 회원정보 수정
     @Transactional
-    public void updateMember(Long memberId, UpdateMemberRequest request) {
+    public void updateMember(Long memberId, UpdateMemberRequest request, MultipartFile profileImage) throws IOException {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
 
         member.setNickname(request.nickname());
+
+        // 프로필 이미지 수정
+        if (profileImage != null && !profileImage.isEmpty()) {
+            // S3에 새 프로필 이미지 업로드
+            String imageUrl = s3Service.saveProfileImage(profileImage);
+            member.setImageUrl(imageUrl); // 이미지 URL 업데이트
+        }
+
 
     }
 
