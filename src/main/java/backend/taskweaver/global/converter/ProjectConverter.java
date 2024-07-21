@@ -16,8 +16,8 @@ public class ProjectConverter {
 
     public static Project toProject(ProjectRequest request, Team team) {
         return Project.builder()
-                .name(request.name())
-                .description(request.description())
+                .name(request.getName())
+                .description(request.getDescription())
                 .team(team)
                 .projectStateName(ProjectStateName.BEFORE)
                 .build();
