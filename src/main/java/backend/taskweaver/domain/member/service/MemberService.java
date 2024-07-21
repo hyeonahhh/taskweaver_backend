@@ -44,15 +44,15 @@ public class MemberService {
 
         member.setNickname(request.nickname());
 
-        if (profileImage != null && !profileImage.isEmpty()) {
-            String imageUrl = s3Service.saveProfileImage(profileImage);
-            if (imageUrl != null) {
-                member.setImageUrl(imageUrl); // 이미지 URL 업데이트
-            } else {
-                throw new BusinessExceptionHandler(ErrorCode.PROFILE_IMAGE_UPLOAD_FAILED);
-            }
+        String imageUrl = (profileImage != null && !profileImage.isEmpty())
+                ? s3Service.saveProfileImage(profileImage)
+                : s3Service.saveDefaultProfileImage();
+
+        if (imageUrl == null) {
+            throw new BusinessExceptionHandler(ErrorCode.PROFILE_IMAGE_UPLOAD_FAILED);
         }
 
+        member.setImageUrl(imageUrl); // 이미지 URL 업데이트
         return MemberConverter.toSignUpResponse(member);
     }
 
