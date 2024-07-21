@@ -30,7 +30,6 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-@Slf4j
 public class SignService {
     private final MemberRepository memberRepository;
     private final MemberRefreshTokenRepository memberRefreshTokenRepository;

@@ -1,8 +1,8 @@
 package backend.taskweaver.domain.member.service;
 
+import backend.taskweaver.domain.files.service.S3Service;
 import backend.taskweaver.domain.member.dto.*;
 import backend.taskweaver.domain.member.entity.Member;
-import backend.taskweaver.domain.member.entity.MemberRefreshToken;
 import backend.taskweaver.domain.member.repository.MemberRefreshTokenRepository;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.global.code.ErrorCode;
@@ -10,11 +10,12 @@ import backend.taskweaver.global.converter.MemberConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import backend.taskweaver.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class MemberService {
     private final MemberRefreshTokenRepository memberRefreshTokenRepository;
     private final PasswordEncoder encoder;
     private final TokenProvider tokenProvider;
+    private final S3Service s3Service;
 
 
     @Transactional(readOnly = true)
@@ -32,6 +34,28 @@ public class MemberService {
                 .map(MemberConverter::toMemberInfoResponse)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
+
+
+    // 회원정보 수정
+    @Transactional
+    public SignUpResponse updateMember(Long memberId, UpdateMemberRequest request, MultipartFile profileImage) throws IOException {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.setNickname(request.nickname());
+
+        String imageUrl = (profileImage != null && !profileImage.isEmpty())
+                ? s3Service.saveProfileImage(profileImage)
+                : s3Service.saveDefaultProfileImage();
+
+        if (imageUrl == null) {
+            throw new BusinessExceptionHandler(ErrorCode.PROFILE_IMAGE_UPLOAD_FAILED);
+        }
+
+        member.setImageUrl(imageUrl); // 이미지 URL 업데이트
+        return MemberConverter.toSignUpResponse(member);
+    }
+
 
     @Transactional
     public void updatePassword(Long memberId, UpdatePasswordRequest request) {
