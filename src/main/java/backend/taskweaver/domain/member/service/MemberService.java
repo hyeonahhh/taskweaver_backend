@@ -33,6 +33,17 @@ public class MemberService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
 
+
+    // 회원정보 수정
+    @Transactional
+    public void updateMember(Long memberId, UpdateMemberRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.setNickname(request.nickname());
+
+    }
+
     @Transactional
     public void updatePassword(Long memberId, UpdatePasswordRequest request) {
         Member member = memberRepository.findById(memberId)
