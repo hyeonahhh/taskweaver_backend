@@ -38,21 +38,24 @@ public class MemberService {
 
     // 회원정보 수정
     @Transactional
-    public void updateMember(Long memberId, UpdateMemberRequest request, MultipartFile profileImage) throws IOException {
+    public SignUpResponse updateMember(Long memberId, UpdateMemberRequest request, MultipartFile profileImage) throws IOException {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
 
         member.setNickname(request.nickname());
 
-        // 프로필 이미지 수정
         if (profileImage != null && !profileImage.isEmpty()) {
-            // S3에 새 프로필 이미지 업로드
             String imageUrl = s3Service.saveProfileImage(profileImage);
-            member.setImageUrl(imageUrl); // 이미지 URL 업데이트
+            if (imageUrl != null) {
+                member.setImageUrl(imageUrl); // 이미지 URL 업데이트
+            } else {
+                throw new BusinessExceptionHandler(ErrorCode.PROFILE_IMAGE_UPLOAD_FAILED);
+            }
         }
 
-
+        return MemberConverter.toSignUpResponse(member);
     }
+
 
     @Transactional
     public void updatePassword(Long memberId, UpdatePasswordRequest request) {

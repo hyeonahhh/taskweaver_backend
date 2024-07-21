@@ -47,6 +47,7 @@ public class MemberController {
                                                     @RequestPart("profileImage") MultipartFile profileImage) throws IOException {
         memberService.updateMember(Long.parseLong(user.getUsername()), request, profileImage);
         ApiResponse ar = ApiResponse.builder()
+                .result(memberService.updateMember(Long.parseLong(user.getUsername()), request, profileImage))
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
