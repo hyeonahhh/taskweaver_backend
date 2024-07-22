@@ -71,6 +71,21 @@ public class TeamController {
         }
     }
 
+    // 팀 삭제
+    @Operation(summary = "팀 삭제")
+    @DeleteMapping("/team/{teamId}")
+    public ResponseEntity<ApiResponse> deleteTeam(@PathVariable(name = "teamId") Long teamId, @AuthenticationPrincipal User user) {
+        try {
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .result(teamService.deleteTeam(teamId, Long.parseLong(user.getUsername())))
+                    .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     // 팀 멤버만 조회
@@ -145,4 +160,6 @@ public class TeamController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+
 }

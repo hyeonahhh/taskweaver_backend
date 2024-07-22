@@ -145,4 +145,20 @@ public class TeamResponse {
         @Schema(description = "프로필 사진 url", example = "domain 주소")
         private String imageUrl;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TeamDeleteResult {
+        @Schema(description = "팀 id", example = "1")
+        Long id;
+
+        @Schema(description = "팀 이름", example = "팀 이름")
+        String name;
+
+        @Schema(description = "팀 리더 id", example = "1")
+        Long teamLeader;
+    }
+
 }
