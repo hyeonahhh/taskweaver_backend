@@ -117,11 +117,11 @@ public class TeamResponse {
         @Schema(description = "팀 소개", example = "팀 소개")
         String description;
 
-        @Schema(description = "팀 리더 id", example = "1")
-        Long teamLeader;
+//        @Schema(description = "팀 리더 id", example = "1")
+//        Long teamLeader;
 
-        @Schema(description = "초대 링크", example = "https://localhost:8081/invite/abea91ea-c861-40aa-b1fe-be2fe98ba4e2")
-        String inviteLink;
+//        @Schema(description = "초대 링크", example = "https://localhost:8081/invite/abea91ea-c861-40aa-b1fe-be2fe98ba4e2")
+//        String inviteLink;
 
         @Schema(description = "생성 날짜", example = "2024-02-08T22:58:10.061223")
         LocalDateTime createdAt;
