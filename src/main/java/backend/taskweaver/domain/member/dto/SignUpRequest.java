@@ -13,7 +13,7 @@ public record SignUpRequest(
 
         @Schema(description = "회원 비밀번호", example = "amy1234!")
         @NotNull
-        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = " 비밀번호는 영문, 숫자, 특수문자 중 3종류 이상 조합하여 최소 8자리 이상이어야 합니다.")
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = " 비밀번호는 영문, 숫자, 특수문자 중 3종류 이상 조합하여 최소 8자리 이상이어야 합니다.")
         String password,
 
         @Schema(description = "회원 닉네임", example = "코난")
