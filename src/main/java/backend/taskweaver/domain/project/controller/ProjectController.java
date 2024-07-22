@@ -3,6 +3,7 @@ package backend.taskweaver.domain.project.controller;
 import backend.taskweaver.domain.project.dto.ProjectMemberResponse;
 import backend.taskweaver.domain.project.dto.ProjectRequest;
 import backend.taskweaver.domain.project.dto.ProjectResponse;
+import backend.taskweaver.domain.project.dto.UpdateStateRequest;
 import backend.taskweaver.domain.project.service.ProjectService;
 import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
@@ -27,8 +28,6 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-
-    // todo: 응답부분 swagger 고치기
 
     @PostMapping("/team/{teamId}/project")
     @Operation(summary = "프로젝트 등록 메서드", description = "프로젝트 등록 api입니다.")
@@ -78,20 +77,20 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(apiResponse);
     }
-//
-//    @PatchMapping("/project/{projectId}/state")
-//    @Operation(summary = "프로젝트 상태 변경 메서드", description = "프로젝트의 상태를 변경하는 api입니다.")
-//    public ResponseEntity<ApiResponse> updateState(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
-//                                                   @RequestBody @Valid UpdateStateRequest request,
-//                                                   @AuthenticationPrincipal User user) {
-//        projectService.updateState(projectId, request, Long.parseLong(user.getUsername()));
-//        ApiResponse apiResponse = ApiResponse.builder()
-//                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
-//                .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
-//                .build();
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(apiResponse);
-//    }
+
+    @PatchMapping("/project/{projectId}/state")
+    @Operation(summary = "프로젝트 상태 변경 메서드", description = "프로젝트의 상태를 변경하는 api입니다.")
+    public ResponseEntity<ApiResponse> updateState(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
+                                                   @RequestBody @Valid UpdateStateRequest request,
+                                                   @AuthenticationPrincipal User user) {
+        projectService.updateState(projectId, request, Long.parseLong(user.getUsername()));
+        ApiResponse apiResponse = ApiResponse.builder()
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
 
     @PatchMapping("/project/{projectId}")
     @Operation(summary = "프로젝트 수정 메서드", description = "프로젝트의 이름, 내용, 담당자를 변경하는 api입니다.")
@@ -107,16 +106,16 @@ public class ProjectController {
                 .body(apiResponse);
     }
 
-//    @DeleteMapping("/project/{projectId}")
-//    @Operation(summary = "프로젝트 삭제 메서드", description = "프로젝트 담당자가 프로젝트를 삭제하는 api입니다.")
-//    public ResponseEntity<ApiResponse> deleteProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
-//                                                     @AuthenticationPrincipal User user) {
-//        projectService.delete(projectId, Long.parseLong(user.getUsername()));
-//        ApiResponse apiResponse = ApiResponse.builder()
-//                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
-//                .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
-//                .build();
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(apiResponse);
-//    }
+    @DeleteMapping("/project/{projectId}")
+    @Operation(summary = "프로젝트 삭제 메서드", description = "프로젝트 담당자가 프로젝트를 삭제하는 api입니다.")
+    public ResponseEntity<ApiResponse> deleteProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
+                                                     @AuthenticationPrincipal User user) {
+        projectService.delete(projectId, Long.parseLong(user.getUsername()));
+        ApiResponse apiResponse = ApiResponse.builder()
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
 }

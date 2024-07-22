@@ -8,7 +8,11 @@ public record SignUpResponse(
         @Schema(description = "회원 이메일", example = "xxx@naver.com")
         String email,
         @Schema(description = "회원 닉네임", example = "코난")
-        String nickname
+        String nickname,
+
+        @Schema(description = "회원 이미지 url", example = "https://taskweaver-bucket.s3.ap-northeast-2.amazonaws.com/pen.png")
+        String imageUrl
+
 ) {
 
 }
