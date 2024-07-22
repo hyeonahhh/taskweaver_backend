@@ -5,15 +5,13 @@ import backend.taskweaver.domain.member.dto.UpdatePasswordRequest;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.domain.project.entity.Project;
+import backend.taskweaver.domain.project.entity.ProjectMember;
 import backend.taskweaver.domain.project.repository.ProjectMemberRepository;
 import backend.taskweaver.domain.project.repository.ProjectRepository;
 import backend.taskweaver.domain.task.repository.TaskMemberRepository;
-import backend.taskweaver.domain.task.repository.TaskRepository;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
-import backend.taskweaver.domain.team.service.TeamService;
-import backend.taskweaver.domain.team.service.TeamServiceImpl;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.MemberConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
@@ -67,26 +65,35 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
 
-        // 팀 리더라면 탈퇴 불가
         List<Team> teams = teamRepository.findAllByTeamLeader(memberId);
-        if(!teams.isEmpty()) {
-            throw new BusinessExceptionHandler(ErrorCode.CANNOT_WITHDRAW_TEAM_LEADER);
+        for (Team team : teams) {
+            //  팀 리더고 팀 멤버가 2명 이상이면 탈퇴 불가 -> 리더 권한 변경 후 탈퇴 가능
+            if (team.getTeamMembers().size() >= 2) {
+                throw new BusinessExceptionHandler(ErrorCode.CANNOT_WITHDRAW_TEAM_LEADER);
+            }
+            // 팀 조회 때를 대비하여 팀의 teamLeader를 null로 변경
+            team.setTeamLeader(null);
         }
 
-        // 속한 팀에서 탈퇴하기
+        // 팀 멤버가 1명뿐이면 팀에서 바로 탈퇴 가능
         teamMemberRepository.deleteByMemberId(memberId);
 
-        // 프로젝트 리더라면 탈퇴 불가
         List<Project> projects = projectRepository.findAllByManagerId(memberId);
-        if(!projects.isEmpty()) {
-            throw new BusinessExceptionHandler(ErrorCode.CANNOT_WITHDRAW_PROJECT_LEADER);
+        for (Project project : projects) {
+            List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+            // 프로젝트 리더고 프로젝트 멤버가 2명 이상이면 탈퇴 불가 -> 리더 권한 변경 후 탈퇴 가능
+            if (projectMembers.size() >= 2) {
+                throw new BusinessExceptionHandler(ErrorCode.CANNOT_WITHDRAW_PROJECT_LEADER);
+            }
+            // 프로젝트 조회 때를 대비하여 프로젝트의 projectLeader를 null로 변경
+             project.setManager(null, null);
         }
 
-        // 속한 프로젝트에서 탈퇴하기
+        // 프로젝트 멤버가 1명뿐이면 프로젝트에서 바로 탈퇴 가능
         projectMemberRepository.deleteByMemberId(memberId);
 
         // 속한 태스크에서 탈퇴하기
-        taskMemberRepository.deleteByMemberId(memberId); // managerId 삭제하기
+        taskMemberRepository.deleteByMemberId(memberId);
 
         // 회원 탈퇴하기
         member.deleteSoftly();
