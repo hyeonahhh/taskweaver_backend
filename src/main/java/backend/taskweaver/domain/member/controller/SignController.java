@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -29,7 +30,7 @@ public class SignController {
     private final SignService signService;
 
     @Operation(summary = "회원 가입")
-    @PostMapping("/v1/auth/sign-up")
+    @PostMapping(value = "/v1/auth/sign-up", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 
     public ResponseEntity<ApiResponse> signUp(@RequestPart("request") @Valid SignUpRequest reqeust,
                                               @RequestPart("profileImage") MultipartFile profileImage) {
