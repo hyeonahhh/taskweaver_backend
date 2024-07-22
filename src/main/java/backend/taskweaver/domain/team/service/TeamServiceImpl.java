@@ -111,7 +111,7 @@ public class TeamServiceImpl implements TeamService{
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
         if (!existingTeam.getTeamLeader().equals(user)) {
-            throw new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND);
+            throw new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_CANNOT_DELETE);
         }
 
         teamRepository.delete(existingTeam);

@@ -101,6 +101,7 @@ public enum ErrorCode {
     INVALID_INVITE_RESPONSE(404, "T008", "InviteState values must be 1 or 2."),
     DUPLICATE_TEAM_MEMBER(404, "T009", "This is a team member that already exists."),
     TEAM_MEMBER_CANNOT_UPDATE(404, "T010", "Only the leader can edit team information."),
+    TEAM_MEMBER_CANNOT_DELETE(404, "T011", "Only the leader can delete team information."),
 
     //TASK
     TASK_NOT_FOUND(404, "TS001", "Task Not Found"),
