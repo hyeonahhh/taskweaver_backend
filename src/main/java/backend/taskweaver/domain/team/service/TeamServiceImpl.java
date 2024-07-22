@@ -250,6 +250,7 @@ public class TeamServiceImpl implements TeamService{
 
         // 새로운 팀장으로 변경
         team.setTeamLeader(newLeaderId);
+        teamRepository.save(team);
 
         return TeamConverter.toChangeLeaderResponse(team, newLeaderId);
     }
