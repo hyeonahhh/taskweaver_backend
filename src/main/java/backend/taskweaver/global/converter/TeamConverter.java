@@ -52,6 +52,13 @@ public class TeamConverter {
         );
     }
 
+    public static TeamResponse.TeamDeleteResult toDeleteResponse(Team team) {
+        return new TeamResponse.TeamDeleteResult(
+                team.getId(),
+                team.getName(),
+                team.getTeamLeader()
+        );
+    }
     public static TeamInviteResponse.InviteAnswerResult toInviteResponse(TeamMember teamMember) {
         return new TeamInviteResponse.InviteAnswerResult(
                 teamMember.getId(),
@@ -100,6 +107,7 @@ public class TeamConverter {
                 memberCount // 멤버 수 추가
         );
     }
+
 
     public static TeamLeaderResponse.ChangeLeaderResponse toChangeLeaderResponse(Team team, Long newLeaderId) {
         return TeamLeaderResponse.ChangeLeaderResponse.builder()

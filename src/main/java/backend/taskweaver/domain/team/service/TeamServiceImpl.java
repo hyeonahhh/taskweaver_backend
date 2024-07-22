@@ -103,6 +103,21 @@ public class TeamServiceImpl implements TeamService{
         return TeamConverter.toUpdateResponse(existingTeam);
     }
 
+    // 팀 삭제
+    @Transactional
+    public TeamResponse.TeamDeleteResult deleteTeam(Long teamId, Long user) {
+        // 팀 조회
+        Team existingTeam = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+
+        if (!existingTeam.getTeamLeader().equals(user)) {
+            throw new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND);
+        }
+
+        teamRepository.delete(existingTeam);
+
+        return TeamConverter.toDeleteResponse(existingTeam);
+    }
     private String generateInviteLink() {
         return "https://example.com/invite/" + UUID.randomUUID().toString();
     }
