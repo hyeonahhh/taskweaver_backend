@@ -2,6 +2,7 @@ package backend.taskweaver.domain.team.controller;
 
 import backend.taskweaver.domain.team.dto.TeamInviteRequest;
 import backend.taskweaver.domain.team.dto.TeamLeaderRequest;
+import backend.taskweaver.domain.team.dto.TeamLeaderResponse;
 import backend.taskweaver.domain.team.dto.TeamRequest;
 import backend.taskweaver.domain.team.service.TeamService;
 import backend.taskweaver.global.code.ApiResponse;
@@ -124,19 +125,24 @@ public class TeamController {
     }
 
     // 팀장 권한 변경
-    /*
-    @Operation(summary =  "팀장 권한 변경")
+
+    @Operation(summary = "팀장 권한 변경")
     @PutMapping("/team/{teamId}/changeLeader")
-    public ResponseEntity<ApiResponse> changeTeamLeader(@PathVariable Long teamId, @RequestBody TeamLeaderRequest.ChangeLeaderRequest request, @AuthenticationPrincipal User user) {
-        teamService.changeTeamLeader(teamId, request, Long.parseLong(user.getUsername())); // deleteTeamMembers 메서드 직접 호출
+    public ResponseEntity<ApiResponse> changeTeamLeader(@PathVariable Long teamId,
+                                                        @RequestBody TeamLeaderRequest.ChangeLeaderRequest request,
+                                                        @AuthenticationPrincipal User user) {
+        // 팀장 권한 변경 메소드 호출
+        TeamLeaderResponse.ChangeLeaderResponse changeLeaderResponse = teamService.changeTeamLeader(teamId, request, Long.parseLong(user.getUsername()));
+
+        // ApiResponse 생성
         ApiResponse apiResponse = ApiResponse.builder()
-                .result(teamService.changeTeamLeader(teamId, request, Long.parseLong(user.getUsername())))
+                .result(changeLeaderResponse)
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
+
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
-    */
 
 
     @Operation(summary = "팀원 초대 - 이메일로 초대")
