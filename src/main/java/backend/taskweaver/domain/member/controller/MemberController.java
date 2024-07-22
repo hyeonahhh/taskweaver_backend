@@ -28,6 +28,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/v1/user")
 public class MemberController {
+
     private final MemberService memberService;
 
     @Operation(summary = "마이페이지(회원 정보 조회)")
@@ -62,6 +63,17 @@ public class MemberController {
         ApiResponse ar = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
+
+    @Operation(summary = "회원 탈퇴 api", description = "회원 탈퇴 api 입니다.")
+    @DeleteMapping
+    public ResponseEntity<ApiResponse> deleteUser(@AuthenticationPrincipal User user) {
+        memberService.delete(Long.parseLong(user.getUsername()));
+        ApiResponse ar = ApiResponse.builder()
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }

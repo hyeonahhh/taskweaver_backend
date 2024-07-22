@@ -8,6 +8,7 @@ import backend.taskweaver.global.code.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public class SignController {
     @Operation(summary = "회원 가입")
     @PostMapping("/v1/auth/sign-up")
 
-    public ResponseEntity<ApiResponse> signUp(@RequestPart("request") SignUpRequest reqeust,
+    public ResponseEntity<ApiResponse> signUp(@RequestPart("request") @Valid SignUpRequest reqeust,
                                               @RequestPart("profileImage") MultipartFile profileImage) {
 
         ApiResponse ar = ApiResponse.builder()
