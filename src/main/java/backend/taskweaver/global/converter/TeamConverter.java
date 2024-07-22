@@ -65,8 +65,8 @@ public class TeamConverter {
         return new TeamResponse.AllTeamInfo(
                 team.getId(),
                 team.getName(),
-                team.getDescription(),
-                team.getTeamLeader(),
+//                team.getDescription(),
+//                team.getTeamLeader(),
                 team.getInviteLink(),
                 team.getCreatedAt(),
                 myRole,
