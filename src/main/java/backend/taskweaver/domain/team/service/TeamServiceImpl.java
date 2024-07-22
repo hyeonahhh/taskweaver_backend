@@ -216,18 +216,26 @@ public class TeamServiceImpl implements TeamService{
     }
 
     // 팀장 권한 변경
+    // 저장은 제대로 되는데 예외처리가 이상하게 터짐!
+    // team 엔티티의 team_leader 필드 안바뀜!!
     public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user) {
         // 요청으로부터 팀 ID와 새로운 팀장 ID를 가져옵니다.
         Long newLeaderId = request.getNewLeaderId();
 
-        // 로그인한 유저가 팀장인지 확인
-        Optional<Team> optionalTeam = teamRepository.findById(teamId);
-        Team team = optionalTeam.filter(t -> t.getTeamLeader().equals(user))
-                .orElseThrow(() -> {
-                    System.out.println("팀 리더 ID: " + optionalTeam.map(Team::getTeamLeader).orElse(null)); // 팀 리더 ID 출력
-                    System.out.println("로그인한 유저 ID: " + user); // 로그인한 유저 ID 출력
-                    return new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
-                });
+        // 팀을 찾고, 로그인한 유저가 팀장인지 확인
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
+
+        System.out.println("=============================");
+        System.out.println("팀 리더 ID1: " + team.getTeamLeader()); // 팀 리더 ID 출력
+        System.out.println("로그인한 유저 ID1: " + user); // 로그인한 유저 ID 출력
+
+        if (!team.getTeamLeader().equals(user)) {
+            System.out.println("팀 리더 ID2: " + team.getTeamLeader()); // 팀 리더 ID 출력
+            System.out.println("로그인한 유저 ID2: " + user); // 로그인한 유저 ID 출력
+            throw new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
+        }
+
         // 새로운 팀장 정보가 유효한지 확인
         Member newLeader = memberRepository.findById(newLeaderId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_MEMBER_NOT_FOUND));
@@ -247,7 +255,6 @@ public class TeamServiceImpl implements TeamService{
 
         // 새로운 팀장으로 변경
         team.setTeamLeader(newLeaderId);
-        teamRepository.save(team);
 
         return TeamConverter.toChangeLeaderResponse(team, newLeaderId);
     }
