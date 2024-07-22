@@ -226,13 +226,8 @@ public class TeamServiceImpl implements TeamService{
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.TEAM_NOT_FOUND));
 
-        System.out.println("=============================");
-        System.out.println("팀 리더 ID1: " + team.getTeamLeader()); // 팀 리더 ID 출력
-        System.out.println("로그인한 유저 ID1: " + user); // 로그인한 유저 ID 출력
 
         if (!team.getTeamLeader().equals(user)) {
-            System.out.println("팀 리더 ID2: " + team.getTeamLeader()); // 팀 리더 ID 출력
-            System.out.println("로그인한 유저 ID2: " + user); // 로그인한 유저 ID 출력
             throw new BusinessExceptionHandler(ErrorCode.NOT_TEAM_LEADER);
         }
 
