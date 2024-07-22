@@ -110,7 +110,10 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(409, "M001", "Email is duplicated"),
     MEMBER_NOT_FOUND(404, "M002", "Member Not Found"),
     PASSWORD_NOT_MATCH(403, "M003", "Password doesn't match"),
-    SAME_PASSWORD(400, "M004", "New password cannot be the same as the current password"),
+    SAME_PASSWORD(400, "M004", "New password cannot be the same as the current password."),
+    CANNOT_WITHDRAW_TEAM_LEADER(400, "M005", "You cannot withdraw because you are the team leader."),
+    CANNOT_WITHDRAW_PROJECT_LEADER(400, "M005", "You cannot withdraw because you are the project leader."),
+
 
     // COMENT
     COMMENT_NOT_FOUND(404, "C001", "Comment Not Found"),

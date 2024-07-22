@@ -12,6 +12,8 @@ import backend.taskweaver.domain.task.repository.TaskRepository;
 import backend.taskweaver.domain.team.entity.Team;
 import backend.taskweaver.domain.team.repository.TeamMemberRepository;
 import backend.taskweaver.domain.team.repository.TeamRepository;
+import backend.taskweaver.domain.team.service.TeamService;
+import backend.taskweaver.domain.team.service.TeamServiceImpl;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.MemberConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
@@ -34,7 +36,6 @@ public class MemberService {
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectRepository projectRepository;
     private final TaskMemberRepository taskMemberRepository;
-    private final TaskRepository taskRepository;
 
     @Transactional(readOnly = true)
     public MemberInfoResponse getMemberInfo(Long id) {
@@ -63,35 +64,31 @@ public class MemberService {
 
     @Transactional
     public void delete(Long memberId) {
-        // 팀 리더라면 팀 리더 필드를 null로 업데이트한다
-        List<Team> teams = teamRepository.findAllByTeamLeader(memberId);
-        for (Team team : teams) {
-            team.setTeamLeader(null);
-        }
-        // 속한 팀들에서 삭제하기
-        teamMemberRepository.deleteByMemberId(memberId);
-
-        // 팀장이 탈퇴히면 어떻게 되는지?
-
-
-        // 프로젝트 리더라면 프로젝트 리더 필드를 null로 업데이트한다.
-        List<Project> projects = projectRepository.findAllByManagerId(memberId);
-        for (Project project : projects) {
-            project.setManager(null, null);
-        }
-
-        // 프로젝트에서 회원 삭제하기
-        projectMemberRepository.deleteByMemberId(memberId);
-
-        // 프로젝트 팀장이 탈퇴하면 어떻게 되는지?
-
-
-        // 태스크에서 회원 삭제하기
-        taskMemberRepository.deleteByMemberId(memberId); // managerId 삭제하기
-
-        // 회원 삭제
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+
+        // 팀 리더라면 탈퇴 불가
+        List<Team> teams = teamRepository.findAllByTeamLeader(memberId);
+        if(!teams.isEmpty()) {
+            throw new BusinessExceptionHandler(ErrorCode.CANNOT_WITHDRAW_TEAM_LEADER);
+        }
+
+        // 속한 팀에서 탈퇴하기
+        teamMemberRepository.deleteByMemberId(memberId);
+
+        // 프로젝트 리더라면 탈퇴 불가
+        List<Project> projects = projectRepository.findAllByManagerId(memberId);
+        if(!projects.isEmpty()) {
+            throw new BusinessExceptionHandler(ErrorCode.CANNOT_WITHDRAW_PROJECT_LEADER);
+        }
+
+        // 속한 프로젝트에서 탈퇴하기
+        projectMemberRepository.deleteByMemberId(memberId);
+
+        // 속한 태스크에서 탈퇴하기
+        taskMemberRepository.deleteByMemberId(memberId); // managerId 삭제하기
+
+        // 회원 탈퇴하기
         member.deleteSoftly();
     }
 }
