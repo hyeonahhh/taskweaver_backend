@@ -2,16 +2,16 @@ package backend.taskweaver.domain.task.entity;
 
 import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.files.entity.Files;
+import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.project.entity.Project;
-import backend.taskweaver.domain.project.entity.ProjectState;
 import backend.taskweaver.domain.task.entity.enums.TaskStateName;
-import backend.taskweaver.domain.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "task")
@@ -31,18 +31,11 @@ public class Task extends BaseEntity {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "project_state_id")
-    private ProjectState projectState;
-
     @Column(name = "title")
     private String title;
 
     @Column(name = "content")
     private String content;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @Column(name = "color")
     private Long emojiId;
@@ -68,5 +61,12 @@ public class Task extends BaseEntity {
     @OneToMany(mappedBy = "task")
     private List<Files> files = new ArrayList<>();
 
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+    private List<TaskMember> taskMembers = new ArrayList<>();
+    public List<Member> getMembers() {
+        return taskMembers.stream()
+                .map(TaskMember::getMember)
+                .collect(Collectors.toList());
+    }
 
 }

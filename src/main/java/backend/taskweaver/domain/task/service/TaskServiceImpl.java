@@ -17,16 +17,20 @@ import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.TaskConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -41,6 +45,7 @@ public class TaskServiceImpl implements TaskService {
     private final EntityManager em;
 
     public TaskResponse.taskCreateOrUpdateResult createTask(TaskRequest.taskCreate request, List<MultipartFile> multipartFiles, Long user, Long projectId) throws ParseException, IOException {
+        //프로젝트 상태 확인
         Task task;
         List<Files> filesList = new ArrayList<>();
         if (request.getParentTaskId() == null) {
@@ -134,5 +139,41 @@ public class TaskServiceImpl implements TaskService {
         }
         filesList.addAll(filesRepository.findAllByTask(task));
         return TaskConverter.toCreateResponse(task, taskMembers, filesList);
+    }
+
+    public List<TaskResponse.taskInquiryResult> getTaskList(Long teamId, Long projectId) {
+        List<Task> tasks = taskRepository.findAllTasksByTeamAndProject(teamId, projectId);
+        return tasks.stream().map(TaskConverter::toTaskInquiryResult).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly=true)
+    public List<TaskResponse.todoInquiryResult> getTodoList(Long user, TaskRequest.todoList request) throws ParseException {
+        //
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date endDate = formatter.parse(request.getEndDate());
+        List<Task> tasks = taskRepository.findAllByEndDate(endDate);
+
+        Member member = memberRepository.findById(user)
+                .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
+        List<Task> userTasks = tasks.stream()
+                .filter(task -> task.getMembers().contains(member))
+                .collect(Collectors.toList());
+        Map<Long, Map<Long, List<Task>>> groupedTasks = userTasks.stream()
+                .collect(Collectors.groupingBy(
+                        task -> task.getProject().getTeam().getId(), // Team ID로 그룹화
+                        Collectors.groupingBy(task -> task.getProject().getId()) // Project ID로 그룹화
+                ));
+
+        List<TaskResponse.todoInquiryResult> results = new ArrayList<>();
+
+        for (Long teamId : groupedTasks.keySet()) {
+            for (Long projectId : groupedTasks.get(teamId).keySet()) {
+                List<Task> projectTasks = groupedTasks.get(teamId).get(projectId);
+                TaskResponse.todoInquiryResult result = TaskConverter.toTodoInquiryResult(projectTasks, endDate);
+                results.add(result);
+            }
+        }
+
+        return results;
     }
 }

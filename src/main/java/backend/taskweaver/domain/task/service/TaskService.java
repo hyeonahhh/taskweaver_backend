@@ -20,4 +20,8 @@ public interface TaskService {
     public TaskResponse.taskChangeStateResult changeTaskState(TaskRequest.taskStateChange request, Long user, Long taskId);
 
     public TaskResponse.taskCreateOrUpdateResult changeTask(TaskRequest.taskChange request, List<MultipartFile> multipartFiles, Long user, Long taskId) throws IOException;
+
+    public List<TaskResponse.taskInquiryResult> getTaskList(Long teamId, Long projectId);
+    
+    public List<TaskResponse.todoInquiryResult> getTodoList(Long user, TaskRequest.todoList request) throws ParseException;
 }

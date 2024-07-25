@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -74,4 +75,63 @@ public class TaskResponse {
         private String endDate;
         private Long emojiId;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class taskInquiryResult {
+        private Long id;
+        private String title;
+        private Long emojiId;
+        private String endDate;
+        private List<taskMemberResult> members;
+        private List<childTaskInquiryResult> children;
+        private taskStatusCountResult childTaskStatusCount;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class childTaskInquiryResult {
+        private Long id;
+        private String title;
+        private Long emojiId;
+        private String endDate;
+        private List<taskMemberResult> members;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class taskStatusCountResult {
+        private int before;
+        private int onProgress;
+        private int complete;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class todoInquiryResult {
+        private String endDate;
+        private Long teamId;
+        private String teamName;
+        private Long projectId;
+        private String projectName;
+        private List<todoTaskResult> tasks;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class todoTaskResult {
+        private Long taskId;
+        private String title;
+        private String content;
+    }
+
 }
