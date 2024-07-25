@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@EnableJpaAuditing
 public class TeamController {
 
     private final TeamService teamService;
@@ -54,6 +53,40 @@ public class TeamController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+
+    // 팀 수정
+    @Operation(summary = "팀 수정")
+    @PutMapping("/team/{teamId}")
+    public ResponseEntity<ApiResponse> updateTeam(@PathVariable(name = "teamId") Long teamId, @RequestBody TeamRequest.teamCreateRequest request, @AuthenticationPrincipal User user) {
+        try {
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .result(teamService.updateTeam(teamId, request, Long.parseLong(user.getUsername())))
+                    .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // 팀 삭제
+    @Operation(summary = "팀 삭제")
+    @DeleteMapping("/team/{teamId}")
+    public ResponseEntity<ApiResponse> deleteTeam(@PathVariable(name = "teamId") Long teamId, @AuthenticationPrincipal User user) {
+        try {
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .result(teamService.deleteTeam(teamId, Long.parseLong(user.getUsername())))
+                    .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     // 팀 멤버만 조회
 //    @Operation(summary = "팀 조회")
@@ -127,4 +160,6 @@ public class TeamController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
+
+
 }

@@ -100,6 +100,8 @@ public enum ErrorCode {
     CANNOT_INVITE_TEAM_LEADER(404, "T007", "Team leaders are not eligible for invitations."),
     INVALID_INVITE_RESPONSE(404, "T008", "InviteState values must be 1 or 2."),
     DUPLICATE_TEAM_MEMBER(404, "T009", "This is a team member that already exists."),
+    TEAM_MEMBER_CANNOT_UPDATE(404, "T010", "Only the leader can edit team information."),
+
     //TASK
     TASK_NOT_FOUND(404, "TS001", "Task Not Found"),
     TASK_STATE_NOT_FOUND(404, "TS002", "Task State Not Found"),
@@ -109,7 +111,10 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(409, "M001", "Email is duplicated"),
     MEMBER_NOT_FOUND(404, "M002", "Member Not Found"),
     PASSWORD_NOT_MATCH(403, "M003", "Password doesn't match"),
-    SAME_PASSWORD(400, "M004", "New password cannot be the same as the current password"),
+    SAME_PASSWORD(400, "M004", "New password cannot be the same as the current password."),
+    CANNOT_WITHDRAW_TEAM_LEADER(400, "M005", "You cannot withdraw because you are the team leader."),
+    CANNOT_WITHDRAW_PROJECT_LEADER(400, "M005", "You cannot withdraw because you are the project leader."),
+    PROFILE_IMAGE_UPLOAD_FAILED(400, "M005", "Profile Image upload failed"),
 
     // COMENT
     COMMENT_NOT_FOUND(404, "C001", "Comment Not Found"),

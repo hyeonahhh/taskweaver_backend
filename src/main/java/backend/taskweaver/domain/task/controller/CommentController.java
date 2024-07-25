@@ -52,4 +52,28 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(apiResponse);
     }
+
+    @GetMapping("/task/{taskId}/comment")
+    @Operation(summary = "댓글 조회 api", description = "댓글을 조회하는 api입니다.")
+    public ResponseEntity<ApiResponse> getComment(@PathVariable @Parameter(description = "태스크 ID") Long taskId) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .result(commentService.get(taskId))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
+    @DeleteMapping("/comment/{commentId}")
+    @Operation(summary = "댓글 삭제 api", description = "댓글을 삭제하는 api입니다.")
+    public ResponseEntity<ApiResponse> deleteComment(@PathVariable @Parameter(description = "댓글 ID") Long commentId) {
+        commentService.delete(commentId);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(apiResponse);
+    }
 }

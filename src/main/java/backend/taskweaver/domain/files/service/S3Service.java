@@ -28,10 +28,28 @@ public class S3Service {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());
+        metadata.setContentDisposition("inline");
 
         amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
         return new Files(originalFilename, amazonS3.getUrl(bucket, originalFilename).toString());
     }
+
+    public String saveProfileImage(MultipartFile multipartFile) throws IOException {
+        String originalFilename = multipartFile.getOriginalFilename();
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+        metadata.setContentDisposition("inline");
+
+
+        amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
+
+        // URL 반환
+        return amazonS3.getUrl(bucket, originalFilename).toString();
+    }
+
+
 
     public ResponseEntity<UrlResource> downloadImage(String originalFilename) {
         UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, originalFilename));
@@ -44,4 +62,11 @@ public class S3Service {
                 .body(urlResource);
 
     }
+
+    public String saveDefaultProfileImage() throws IOException {
+        String defaultImageUrl = "https://taskweaver-bucket.s3.ap-northeast-2.amazonaws.com/pen.png"; // 디폴트 이미지 URL
+        // URL 반환 (디폴트 이미지 URL을 직접 사용)
+        return defaultImageUrl;
+    }
+
 }

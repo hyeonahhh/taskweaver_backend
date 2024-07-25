@@ -18,6 +18,8 @@ public interface TeamService {
     public TeamInviteResponse.InviteAnswerResult answerInvite(TeamInviteRequest.InviteAnswerRequest request, Long user);
 
     public void deleteTeamMembers(Long teamId, List<Long> memberIds, Long user);
-
+    public TeamResponse.TeamDeleteResult deleteTeam(Long teamId, Long user);
     public TeamLeaderResponse.ChangeLeaderResponse changeTeamLeader(Long teamId, TeamLeaderRequest.ChangeLeaderRequest request, Long user);
+
+    public TeamResponse.teamUpdateResult updateTeam(Long teamId, TeamRequest.teamCreateRequest request, Long userId);
 }

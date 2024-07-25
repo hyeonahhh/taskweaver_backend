@@ -1,28 +1,35 @@
 package backend.taskweaver.global.converter;
 
 import backend.taskweaver.domain.member.dto.*;
-import backend.taskweaver.domain.member.entity.DeviceToken;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.entity.enums.LoginType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class MemberConverter {
 
-    public static Member toMember(SignUpRequest signUpRequest, PasswordEncoder encoder) {
+    public static Member toMember(SignUpRequest signUpRequest, PasswordEncoder encoder, String profileImage) {
+        String imageUrl = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            imageUrl = profileImage;
+        }
+
         return Member.builder()
                 .email(signUpRequest.email())
                 .password(encoder.encode(signUpRequest.password()))
                 .nickname(signUpRequest.nickname())
                 .loginType(LoginType.DEFAULT)
-                .imageUrl(signUpRequest.imageUrl())
+                .imageUrl(imageUrl)
                 .build();
     }
+
 
     public static SignUpResponse toSignUpResponse(Member member) {
         return new SignUpResponse(
                 member.getId(),
                 member.getEmail(),
-                member.getNickname()
+                member.getNickname(),
+                member.getImageUrl()
+
         );
     }
 
@@ -32,6 +39,7 @@ public class MemberConverter {
                 member.getEmail(),
                 member.getLoginType(),
                 member.getNickname(),
+//                member.getIsRead(),
                 member.getImageUrl(),
                 accessToken,
                 refreshToken
@@ -50,12 +58,5 @@ public class MemberConverter {
 
     public static CreateAccessTokenResponse toCreateAccessTokenResponse(String newAccessToken) {
         return new CreateAccessTokenResponse(newAccessToken);
-    }
-
-    public static DeviceToken toDeviceToken(DeviceTokenRequest request, Member member) {
-        return DeviceToken.builder()
-                .deviceToken(request.deviceToken())
-                .member(member)
-                .build();
     }
 }

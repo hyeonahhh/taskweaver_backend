@@ -29,12 +29,10 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    // todo: 응답부분 swagger 고치기
-    
     @PostMapping("/team/{teamId}/project")
     @Operation(summary = "프로젝트 등록 메서드", description = "프로젝트 등록 api입니다.")
     public ResponseEntity<ApiResponse> addProject(@RequestBody @Valid ProjectRequest request,
-                                                  @PathVariable @Parameter(description = "팀 ID") Long teamId) throws IOException {
+                                                  @PathVariable @Parameter(description = "팀 ID") Long teamId) {
         ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
                 .result(projectService.createProject(request, teamId))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
@@ -58,7 +56,7 @@ public class ProjectController {
 
     @GetMapping("/project/{projectId}")
     @Operation(summary = "프로젝트 상세 조회 메서드", description = "한 프로젝트에 대해 상세 조회하는 api입니다.")
-    public ResponseEntity<ApiResponse> getOneProject(@PathVariable @Parameter(description = "프로젝트 ID")Long projectId) {
+    public ResponseEntity<ApiResponse> getOneProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId) {
         ApiResponse apiResponse = ApiResponse.<ProjectResponse>builder()
                 .result(projectService.getOne(projectId))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
@@ -97,8 +95,8 @@ public class ProjectController {
     @PatchMapping("/project/{projectId}")
     @Operation(summary = "프로젝트 수정 메서드", description = "프로젝트의 이름, 내용, 담당자를 변경하는 api입니다.")
     public ResponseEntity<ApiResponse> updateProject(@PathVariable @Parameter(description = "프로젝트 ID") Long projectId,
-                                                   @RequestBody @Valid ProjectRequest request,
-                                                   @AuthenticationPrincipal User user) throws IOException {
+                                                     @RequestBody @Valid ProjectRequest request,
+                                                     @AuthenticationPrincipal User user) throws IOException {
         projectService.updateProject(projectId, request, Long.parseLong(user.getUsername()));
         ApiResponse apiResponse = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())

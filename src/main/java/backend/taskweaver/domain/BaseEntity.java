@@ -23,8 +23,8 @@ public class BaseEntity {
     private LocalDateTime deletedAt;
 
     // 삭제
-    public void deleteSoftly(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
+    public void deleteSoftly() {
+        this.deletedAt = LocalDateTime.now();
     }
 
     // 확인

@@ -5,30 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Schema(description = "댓글 등록 응답 DTO")
 @Getter
 @AllArgsConstructor
 public class CommentResponse {
-    private CommentResponse.Comment comment;
-    private CommentResponse.Member member;
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Getter
-    public static class Comment {
-        Long commentId;
-        String content;
-        String createdAt;
-        int depth;
-        Long parentCommentId;
-    }
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Getter
-    public static class Member {
-        Long memberId;
-        String nickname;
-        String imageUrl;
-    }
+    Long commentId;
+    Long parentCommentId;
+    String content;
+    String createdAt;
+    String deletedAt;
+    Long memberId;
+    String nickname;
+    String imageUrl;
+    List<CommentResponse> childrens;
 }
 

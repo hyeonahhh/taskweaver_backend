@@ -1,21 +1,21 @@
 package backend.taskweaver.domain.member.entity;
 
+import backend.taskweaver.domain.BaseEntity;
 import backend.taskweaver.domain.member.entity.enums.LoginType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
+@Setter
 @Builder
 @DynamicUpdate
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -31,13 +31,15 @@ public class Member {
     @Column(nullable = false, length = 20)
     private String nickname;
 
-    private LocalDateTime deleteAt;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
     private String imageUrl;
+
+//    @Column(nullable = false)
+//    @Enumerated(EnumType.STRING)
+//    private isRead isRead;
 
     public void updatePassword(String password) {
         this.password = password;

@@ -23,6 +23,13 @@ public class TeamConverter {
                 .build();
     }
 
+    public static Team updateTeam(TeamRequest.teamUpdateRequest request) {
+        return Team.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .build();
+    }
+
     public static TeamResponse.teamCreateResult toCreateResponse(Team team) {
         return new TeamResponse.teamCreateResult(
             team.getId(),
@@ -34,6 +41,24 @@ public class TeamConverter {
         );
     }
 
+    public static TeamResponse.teamUpdateResult toUpdateResponse(Team team) {
+        return new TeamResponse.teamUpdateResult(
+                team.getId(),
+                team.getName(),
+                team.getDescription(),
+                team.getInviteLink(),
+                team.getTeamLeader(),
+                team.getModifiedAt()
+        );
+    }
+
+    public static TeamResponse.TeamDeleteResult toDeleteResponse(Team team) {
+        return new TeamResponse.TeamDeleteResult(
+                team.getId(),
+                team.getName(),
+                team.getTeamLeader()
+        );
+    }
     public static TeamInviteResponse.InviteAnswerResult toInviteResponse(TeamMember teamMember) {
         return new TeamInviteResponse.InviteAnswerResult(
                 teamMember.getId(),
@@ -47,8 +72,8 @@ public class TeamConverter {
         return new TeamResponse.AllTeamInfo(
                 team.getId(),
                 team.getName(),
-                team.getDescription(),
-                team.getTeamLeader(),
+//                team.getDescription(),
+//                team.getTeamLeader(),
                 team.getInviteLink(),
                 team.getCreatedAt(),
                 myRole,
@@ -82,6 +107,7 @@ public class TeamConverter {
                 memberCount // 멤버 수 추가
         );
     }
+
 
     public static TeamLeaderResponse.ChangeLeaderResponse toChangeLeaderResponse(Team team, Long newLeaderId) {
         return TeamLeaderResponse.ChangeLeaderResponse.builder()
