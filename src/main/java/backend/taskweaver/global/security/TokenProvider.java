@@ -62,7 +62,6 @@ public class TokenProvider {
     public String recreateAccessToken(String oldAccessToken) throws JsonProcessingException {
         String subject = decodeJwtPayloadSubject(oldAccessToken);
         long reissueLimit = jwtProperties.getReissueLimit();
-        //long reissueLimit = jwtProperties.getRefreshExpirationDays()* 60 / jwtProperties.getExpirationMinutes();
         memberRefreshTokenRepository.findByMemberIdAndReissueCountLessThan(Long.valueOf(subject.split(":")[0]), reissueLimit)
                 .ifPresentOrElse(
                         MemberRefreshToken::increaseReissueCount,
@@ -76,7 +75,6 @@ public class TokenProvider {
         validateAndParseToken(refreshToken);
         String memberId = decodeJwtPayloadSubject(oldAccessToken).split(":")[0];
         long reissueLimit = jwtProperties.getReissueLimit();
-//        reissueLimit = jwtProperties.getRefreshExpirationDays()* 60 / jwtProperties.getExpirationMinutes();
         memberRefreshTokenRepository.findByMemberIdAndReissueCountLessThan(Long.valueOf(memberId), reissueLimit)
                 .filter(memberRefreshToken -> memberRefreshToken.validateRefreshToken(refreshToken))
                 .orElseThrow(() -> new ExpiredJwtException(null, null, "Refresh token expired."));
