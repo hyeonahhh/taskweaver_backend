@@ -65,4 +65,12 @@ public class TaskRequest {
         Long emojiId;
 
     }
+
+    @Getter
+    public static class todoList {
+
+        @Schema(description = "마감 날짜", example = "2024-12-31")
+        String endDate;
+
+    }
 }

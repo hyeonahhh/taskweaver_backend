@@ -32,12 +32,24 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+<<<<<<< HEAD
+	//runtimeOnly 'mysql:mysql-connector-java'
+=======
 //	runtimeOnly 'mysql:mysql-connector-java'
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+<<<<<<< HEAD
+	//Mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//thymeleaf(for email service)
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+=======
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
@@ -52,6 +64,7 @@ clean {
 
 tasks.withType(JavaCompile) {
 	options.generatedSourceOutputDirectory = file(querydslSrcDir)
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
 }
 
 tasks.named('bootBuildImage') {

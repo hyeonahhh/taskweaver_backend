@@ -1,5 +1,12 @@
 package backend.taskweaver.domain.member.service;
 
+<<<<<<< HEAD
+import backend.taskweaver.domain.member.dto.*;
+import backend.taskweaver.domain.member.entity.Member;
+import backend.taskweaver.domain.member.entity.MemberRefreshToken;
+import backend.taskweaver.domain.member.entity.oauth.KakaoProfile;
+import backend.taskweaver.domain.member.entity.oauth.OauthToken;
+=======
 import backend.taskweaver.domain.files.service.S3Service;
 import backend.taskweaver.domain.member.dto.SignInRequest;
 import backend.taskweaver.domain.member.dto.SignInResponse;
@@ -7,26 +14,44 @@ import backend.taskweaver.domain.member.dto.SignUpRequest;
 import backend.taskweaver.domain.member.dto.SignUpResponse;
 import backend.taskweaver.domain.member.entity.Member;
 import backend.taskweaver.domain.member.entity.MemberRefreshToken;
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
 import backend.taskweaver.domain.member.repository.MemberRefreshTokenRepository;
 import backend.taskweaver.domain.member.repository.MemberRepository;
 import backend.taskweaver.global.code.ErrorCode;
 import backend.taskweaver.global.converter.MemberConverter;
 import backend.taskweaver.global.exception.handler.BusinessExceptionHandler;
 import backend.taskweaver.global.security.TokenProvider;
+<<<<<<< HEAD
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+=======
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 
 import okio.FileMetadata;
 
 
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+<<<<<<< HEAD
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+=======
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
 
 @RequiredArgsConstructor
 @Service
@@ -38,7 +63,35 @@ public class SignService {
 //    private final RedisService redisService;
         private final S3Service s3Service;
 
+<<<<<<< HEAD
+    @Value("${KakaoAuthUrl}")
+    private String KakaoAuthUrl;
+
+    @Value("${KakaoApiKey}")
+    private String KakaoApiKey;
+
+    @Value("${RedirectURI}")
+    private String RedirectURI;
+
+    @Value("${KakaoApiUrl}")
+    private String KakaoApiUrl;
+
+    @Value("${NaverAuthUrl}")
+    private String NaverAuthUrl;
+
+    @Value("${NaverClientId}")
+    private String NaverClientId;
+
+    @Value("${NaverClientSecret}")
+    private String NaverClientSecret;
+
+    @Value("${NaverRedirectURI}")
+    private String NaverRedirectURI;
+
+
+=======
     // 회원가입
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
     @Transactional
     public SignUpResponse registerMember(SignUpRequest request, MultipartFile profileImage) {
         String imageUrl;
@@ -89,9 +142,76 @@ public class SignService {
         return MemberConverter.toSignInResponse(member, accessToken, refreshToken);
     }
 
+<<<<<<< HEAD
+    public OauthSignUpResponse getKakaoAccessToken(String code) {
+
+        RestTemplate rt = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", KakaoApiKey);
+        params.add("redirect_uri", RedirectURI);
+        params.add("code", code);
+
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
+                new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> accessTokenResponse = rt.exchange(
+                "https://kauth.kakao.com/oauth/token",
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String.class
+        );
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        OauthToken oauthToken = null;
+        try {
+            oauthToken = objectMapper.readValue(accessTokenResponse.getBody(), OauthToken.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return new OauthSignUpResponse(findKakaoProfile(oauthToken.getAccess_token()).getKakao_account().getEmail());
+    }
+
+
+    public KakaoProfile findKakaoProfile(String token) {
+        RestTemplate rt = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + token);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest =
+                new HttpEntity<>(headers);
+
+        ResponseEntity<String> kakaoProfileResponse = rt.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.GET,
+                kakaoProfileRequest,
+                String.class
+        );
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        KakaoProfile kakaoProfile = null;
+        try {
+            kakaoProfile = objectMapper.readValue(kakaoProfileResponse.getBody(), KakaoProfile.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return kakaoProfile;
+    }
+
+}
+=======
     public void logout(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessExceptionHandler(ErrorCode.MEMBER_NOT_FOUND));
        // redisService.deleteValues(member.getEmail());
     }
 }
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c

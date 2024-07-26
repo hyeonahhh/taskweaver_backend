@@ -119,7 +119,11 @@ public enum ErrorCode {
     // COMENT
     COMMENT_NOT_FOUND(404, "C001", "Comment Not Found"),
     COMMENT_DEPTH_EXCEED(404, "C002", "Comment Depth is Exceeded."),
-    NOT_COMMENT_WRITER(403, "C003", "Only comment writer can edit this comment.");
+    NOT_COMMENT_WRITER(403, "C003", "Only comment writer can edit this comment."),
+
+    EMAIL_ERROR(404, "E001", "An error occurred while sending the email."),
+
+    ;
 
     /**
      * ******************************* Error Code Constructor ***************************************

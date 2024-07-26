@@ -1,10 +1,12 @@
 package backend.taskweaver.domain.member.controller;
 
+import backend.taskweaver.domain.member.dto.EmailRequest;
 import backend.taskweaver.domain.member.dto.SignInRequest;
 import backend.taskweaver.domain.member.dto.SignUpRequest;
 import backend.taskweaver.domain.member.dto.UpdateMemberRequest;
 import backend.taskweaver.domain.member.dto.UpdatePasswordRequest;
 import backend.taskweaver.domain.member.entity.Member;
+import backend.taskweaver.domain.member.service.EmailService;
 import backend.taskweaver.domain.member.service.MemberService;
 import backend.taskweaver.domain.member.service.SignService;
 import backend.taskweaver.domain.team.dto.TeamRequest;
@@ -30,6 +32,7 @@ import java.io.IOException;
 public class MemberController {
 
     private final MemberService memberService;
+    private final EmailService emailService;
 
     @Operation(summary = "마이페이지(회원 정보 조회)")
     @GetMapping
@@ -63,6 +66,19 @@ public class MemberController {
         ApiResponse ar = ApiResponse.builder()
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMsg(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "인증번호 발송 api", description = "인증번호 이메일 발송 api 입니다.")
+    @PostMapping("/email")
+    public ResponseEntity<ApiResponse> sendEmail(@RequestBody @Valid EmailRequest request) {
+        //TODO 이메일 중복 여부 처리!
+        ApiResponse ar = ApiResponse.builder()
+                .result(emailService.sendMail(request))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }

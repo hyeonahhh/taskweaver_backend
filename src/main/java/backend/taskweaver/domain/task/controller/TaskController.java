@@ -94,4 +94,39 @@ public class TaskController {
         }
 
     }
+
+    @Operation(summary = "태스크 목록 조회")
+    @GetMapping("/team/{teamId}/project/{projectId}")
+    public ResponseEntity<ApiResponse> getTaskList(@AuthenticationPrincipal User user,
+                                                   @PathVariable Long teamId,
+                                                   @PathVariable Long projectId) {
+        try {
+            ApiResponse ar = ApiResponse.builder()
+                    .result(taskService.getTaskList(teamId, projectId))
+                    .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                    .build();
+            return new ResponseEntity<>(ar, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Operation(summary = "오늘 마감인 태스크 목록 조회 (투두리스트)")
+    @GetMapping("/todolist")
+    public ResponseEntity<ApiResponse> getTaskList(@AuthenticationPrincipal User user,
+                                                   @RequestBody TaskRequest.todoList request) {
+        try {
+            ApiResponse ar = ApiResponse.builder()
+                    .result(taskService.getTodoList(Long.parseLong(user.getUsername()), request))
+                    .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                    .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                    .build();
+            return new ResponseEntity<>(ar, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

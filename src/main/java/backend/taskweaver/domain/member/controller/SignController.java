@@ -2,6 +2,8 @@ package backend.taskweaver.domain.member.controller;
 
 import backend.taskweaver.domain.member.dto.SignInRequest;
 import backend.taskweaver.domain.member.dto.SignUpRequest;
+import backend.taskweaver.domain.member.entity.oauth.KakaoProfile;
+import backend.taskweaver.domain.member.entity.oauth.OauthToken;
 import backend.taskweaver.domain.member.service.SignService;
 import backend.taskweaver.global.code.ApiResponse;
 import backend.taskweaver.global.code.SuccessCode;
@@ -10,16 +12,24 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
+import org.springframework.http.HttpHeaders;
+=======
 import lombok.extern.slf4j.Slf4j;
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+<<<<<<< HEAD
+import org.springframework.web.bind.annotation.*;
+=======
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
 
 @Tag(name = "회원 가입 및 로그인")
 @RequiredArgsConstructor
@@ -54,6 +64,17 @@ public class SignController {
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
 
+<<<<<<< HEAD
+    @GetMapping("/v1/auth/kakao")
+    public ResponseEntity<ApiResponse> getLogin(@RequestParam("code") String code) {
+        ApiResponse ar = ApiResponse.builder()
+                .result(signService.getKakaoAccessToken(code))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMsg(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+
+=======
     @Operation(summary = "로그아웃")
     @DeleteMapping("/v1/auth/logout")
     public ResponseEntity<ApiResponse> logout(@AuthenticationPrincipal User user) {
@@ -63,5 +84,6 @@ public class SignController {
                 .resultMsg(SuccessCode.DELETE_SUCCESS.getMessage())
                 .build();
         return new ResponseEntity<>(ar, HttpStatus.OK);
+>>>>>>> c7c5efffba81a683618511ee9bc0280f4793e88c
     }
 }
