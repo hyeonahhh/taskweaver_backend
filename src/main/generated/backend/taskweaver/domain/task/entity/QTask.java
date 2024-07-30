@@ -31,7 +31,8 @@ public class QTask extends EntityPathBase<Task> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = _super.deletedAt;
 
     public final NumberPath<Long> emojiId = createNumber("emojiId", Long.class);
 
@@ -48,12 +49,12 @@ public class QTask extends EntityPathBase<Task> {
 
     public final backend.taskweaver.domain.project.entity.QProject project;
 
-    public final backend.taskweaver.domain.project.entity.QProjectState projectState;
-
     //inherited
     public final BooleanPath softDeleted = _super.softDeleted;
 
     public final DatePath<java.util.Date> startDate = createDate("startDate", java.util.Date.class);
+
+    public final ListPath<TaskMember, QTaskMember> taskMembers = this.<TaskMember, QTaskMember>createList("taskMembers", TaskMember.class, QTaskMember.class, PathInits.DIRECT2);
 
     public final EnumPath<backend.taskweaver.domain.task.entity.enums.TaskStateName> taskState = createEnum("taskState", backend.taskweaver.domain.task.entity.enums.TaskStateName.class);
 
@@ -79,7 +80,6 @@ public class QTask extends EntityPathBase<Task> {
         super(type, metadata, inits);
         this.parentTask = inits.isInitialized("parentTask") ? new QTask(forProperty("parentTask"), inits.get("parentTask")) : null;
         this.project = inits.isInitialized("project") ? new backend.taskweaver.domain.project.entity.QProject(forProperty("project"), inits.get("project")) : null;
-        this.projectState = inits.isInitialized("projectState") ? new backend.taskweaver.domain.project.entity.QProjectState(forProperty("projectState")) : null;
     }
 
 }
