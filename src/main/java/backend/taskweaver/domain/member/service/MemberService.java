@@ -125,4 +125,12 @@ public class MemberService {
         // 회원 탈퇴하기
         member.deleteSoftly();
     }
+
+    public boolean checkDuplication(String email) {
+        if (memberRepository.findByEmail(email).isPresent()) {
+            throw new BusinessExceptionHandler(ErrorCode.DUPLICATED_EMAIL);
+        }
+        return true;
+    }
+
 }
