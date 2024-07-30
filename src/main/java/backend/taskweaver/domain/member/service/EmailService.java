@@ -28,33 +28,39 @@ import java.util.Random;
 public class EmailService {
     private final JavaMailSender emailSender;
     private final SpringTemplateEngine templateEngine;
+    private final MemberService memberService;
 
     public EmailResponse sendMail(EmailRequest emailRequest) {
         try {
-            MimeMessage mimeMessage = emailSender.createMimeMessage();
-            String certificationNum = generateCertificationNum();
-            Context context = new Context();
-            context.setVariable("certificationNum", certificationNum);
-            //TODO: 여기 템플릿 채우기
-            String message = templateEngine.process("sendEmail", context);
+            if (memberService.checkDuplication(emailRequest.email())) {
+                MimeMessage mimeMessage = emailSender.createMimeMessage();
+                String certificationNum = generateCertificationNum();
+                Context context = new Context();
+                context.setVariable("certificationNum", certificationNum);
+                String message = templateEngine.process("sendEmail", context);
 
-            EmailMessage emailMessage = EmailMessage.builder()
-                    .to(emailRequest.email())//보내줘야할 사람
-                    //TODO: 여기 제목 채우기
-                    .subject("[Task Weaver] 본인인증을 위한 인증번호 발송")
-                    .message(message)
-                    .build();
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
-            mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
-            mimeMessageHelper.setText(emailMessage.getMessage(), true); // 메일 본문 내용, HTML 여부
-            emailSender.send(mimeMessage);
-            return new EmailResponse(emailRequest.email(), certificationNum);
+                EmailMessage emailMessage = EmailMessage.builder()
+                        .to(emailRequest.email())//보내줘야할 사람
+                        //TODO: 여기 제목 채우기
+                        .subject("[Task Weaver] 본인인증을 위한 인증번호 발송")
+                        .message(message)
+                        .build();
+                MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+                mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
+                mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
+                mimeMessageHelper.setText(emailMessage.getMessage(), true); // 메일 본문 내용, HTML 여부
+                emailSender.send(mimeMessage);
+                return new EmailResponse(emailRequest.email(), certificationNum);
+            }
+            else {
+                throw new BusinessExceptionHandler(ErrorCode.EMAIL_ERROR);
+            }
 
         } catch (MessagingException e) {
             throw new BusinessExceptionHandler(ErrorCode.EMAIL_ERROR);
         }
     }
+
     public String generateCertificationNum() {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
